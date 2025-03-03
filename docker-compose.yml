@@ -1,0 +1,17 @@
+services:
+  web:
+    build: .
+    ports:
+      - "51235:80" # Map host port 3000 to container port 80
+    container_name: the-wheel
+    #volumes: # Optional: Mount a volume for development to reflect code changes immediately
+    #  - ./src:/app/src
+    #  - ./public:/app/public
+    #depends_on: # Optional: If you have a backend, you can specify dependencies here
+      # - backend
+    #networks:
+    #  - app-network
+
+# Optional: Define a network if you have multiple services
+#networks:
+#  app-network:

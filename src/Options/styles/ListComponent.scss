@@ -1,0 +1,8 @@
+.c-list {
+    padding-left: 8px;
+
+    &__item {
+        list-style: none;
+        text-transform: capitalize;
+    }
+}

@@ -1,0 +1,15 @@
+.c-option {
+    display: flex;
+    flex-direction: row;
+    padding: 8px;
+
+    &__label {
+        flex-grow: 1;
+        text-align: left;
+        align-self: center;
+    }
+
+    &__controls {
+        text-align: right;
+    }
+}
