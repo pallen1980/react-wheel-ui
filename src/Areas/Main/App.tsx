@@ -6,9 +6,9 @@ import Options from "./Options/App";
 import Spinner from "./Spinner/app";
 
 import { Option } from "./Options/models";
+import { generateGuid } from "./Options/helpers";
 
 import './App.scss'
-import { generateGuid } from "./Options/helpers";
 
 function App() {
     const [ options, setOptions ] = useState<Option[]>([{ key: generateGuid(), value: "hello"}, { key: generateGuid(), value: "goodbye"}]);
