@@ -1,4 +1,4 @@
-import OptionComponent from "./Option";
+import OptionComponent from "./ListItem";
 import { Option } from "../models";
 
 import "../styles/ListComponent.scss";
