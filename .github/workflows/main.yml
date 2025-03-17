@@ -24,6 +24,11 @@ jobs:
         with:
           node-version: '18' # Or your desired Node.js version
 
+      - name: Remove node_modules and package-lock.json
+        run: |
+          rm -rf node_modules
+          rm package-lock.json
+          
       - name: Install dependencies
         run: npm install
 
