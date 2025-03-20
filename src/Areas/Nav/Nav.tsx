@@ -1,8 +1,9 @@
 import { NavLink } from "react-router";
+import Auth, { AuthType } from "../../Auth/Firebase/Auth";
 
 import "./nav.scss";
 
-export default () => {
+const Nav = () => {
     return (
         <>
             <NavLink className="nav-item logo" to="/" end>
@@ -16,8 +17,10 @@ export default () => {
             </div>
 
             <NavLink className="nav-item profile" to="/Profile" end>
-                Profile
+                <Auth type={AuthType.Popup} />
             </NavLink>
         </>
     )
 }
+
+export default Nav;
