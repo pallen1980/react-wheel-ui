@@ -5,6 +5,7 @@ import GoogleAuthByRedirect, { GoogleAuthByRedirectCallback } from './OAuth/Goog
 
 import SignOut from './SignOut';
 import { Identity } from '../Models';
+import { useAuth } from '../AuthProvider';
 
 export enum AuthType {
     Popup = 0,
@@ -18,6 +19,7 @@ interface AuthProps {
 const Auth = (props: AuthProps) => {
     const [user, setUser] = useState<Identity | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const { onLogin, onLogout } = useAuth();
     
     const handleSigningIn = () => {
         setIsLoading(true);
@@ -26,6 +28,7 @@ const Auth = (props: AuthProps) => {
     const handleSuccessfulSignIn = (user?: Identity, token?: string | undefined) => {
         if (user) {
             setUser(user);
+            onLogin();   
             setIsLoading(false);
         }
     }
@@ -40,8 +43,10 @@ const Auth = (props: AuthProps) => {
     }
 
     const handleSuccessfulSignOut = () => {
-        setIsLoading(false);
+        onLogout();
         setUser(null);
+
+        setIsLoading(false);
     }
 
     const handleSignOutError = (error: Error) => {
