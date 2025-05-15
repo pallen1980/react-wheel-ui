@@ -47,6 +47,7 @@ const Auth = (props: AuthProps) => {
         setUser(null);
 
         setIsLoading(false);
+        setUser(null);
     }
 
     const handleSignOutError = (error: Error) => {
