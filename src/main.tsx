@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router";
 
 import AuthProvider from "./Auth/AuthProvider.tsx";
+import ProtectedRoute from "./Auth/ProtectedRoute.tsx";
 
 import Header from "./Areas/Header/Header.tsx";
 import Nav from "./Areas/Nav/Nav.tsx";
@@ -26,7 +27,11 @@ createRoot(document.getElementById("app")!).render(
           <Routes>
             <Route index element={<Home />} />
             <Route path="Spinner" element={<App />}></Route>
-            <Route path="Profile" element={<Profile />}></Route>
+            <Route path="Profile" element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>}
+            ></Route>
           </Routes>
         </main>
         <footer>Footer</footer>
