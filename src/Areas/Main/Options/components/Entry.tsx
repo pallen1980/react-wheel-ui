@@ -33,7 +33,8 @@ export default (props: EntryProps) => {
     const handleSubmit = () => {
         props.onSubmit({
             key: props.initialOption ? props.initialOption.key : "",
-            value: entry
+            value: entry,
+            sequence: props.initialOption ? props.initialOption.sequence : 0 // Will be overridden by parent
         });
         setEntry("");
     }

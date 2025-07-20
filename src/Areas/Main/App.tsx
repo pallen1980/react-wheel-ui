@@ -11,7 +11,10 @@ import { generateGuid } from "./Options/helpers";
 import './App.scss'
 
 function App() {
-    const [ options, setOptions ] = useState<Option[]>([{ key: generateGuid(), value: "hello"}, { key: generateGuid(), value: "goodbye"}]);
+    const [ options, setOptions ] = useState<Option[]>([
+        { key: generateGuid(), value: "hello", sequence: 1}, 
+        { key: generateGuid(), value: "goodbye", sequence: 2}
+    ]);
     const [ isSpinning, setIsSpinning ] = useState<boolean>(false);
 
     const displayOptions = options.map(p => p.value);

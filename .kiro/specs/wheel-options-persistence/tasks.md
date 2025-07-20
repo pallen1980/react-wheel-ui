@@ -6,13 +6,18 @@
   - Set up Redux provider in main application entry point
   - _Requirements: 1.1, 2.1_
 
-- [ ] 2. Update Option model to include sequence property
+- [x] 2. Update Option model to include sequence property
   - Modify the Option interface to include sequence number
   - Update existing option creation logic to assign sequence values
   - Create helper functions for sequence management (reorder, insert, etc.)
   - _Requirements: 1.1, 1.3_
 
-- [ ] 3. Create Redux options slice with state management
+- [x] 3. Create Redux options slice with state management
+
+
+
+
+
   - Implement options slice with initial state structure
   - Create synchronous actions for CRUD operations (add, update, delete, reorder)
   - Add loading, saving, and error state management actions
