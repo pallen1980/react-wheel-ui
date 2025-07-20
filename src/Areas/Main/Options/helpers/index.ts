@@ -2,12 +2,15 @@
 import { Option } from '../models';
 
 const generateGuid = () => {
-    if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
-        return crypto.randomUUID();
-        //console.log(guid);
-    } else {
-        //console.log("crypto.randomUUID is not supported in this environment");
-        //fallback to another method.
+    try {
+        if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+            return crypto.randomUUID();
+        } else {
+            // Fallback to another method when crypto.randomUUID is not available
+            return "";
+        }
+    } catch (error) {
+        // Handle any errors that might occur when calling crypto.randomUUID
         return "";
     }
 }
@@ -19,7 +22,7 @@ const getNextSequence = (options: Option[]): number => {
 };
 
 const reorderOptions = (options: Option[]): Option[] => {
-    return options
+    return [...options]
         .sort((a, b) => a.sequence - b.sequence)
         .map((option, index) => ({
             ...option,
