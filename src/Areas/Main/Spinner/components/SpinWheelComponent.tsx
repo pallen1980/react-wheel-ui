@@ -14,8 +14,8 @@ export default forwardRef((props: SpinnerProps, ref: Ref<DelegateFunc>) => {
   const [rotation, setRotation] = useState(0);
   const [isSpinning, setSpinning] = useState(false);
 
-  const optionCount = !!props.options ? props.options.length : 0;
-  const currentDirection: Direction = !!props.direction ? props.direction : Direction.Clockwise;
+  const optionCount = props.options?.length ?? 0;
+  const currentDirection: Direction = props.direction ?? Direction.Clockwise;
 
   const onStartSpin = () => {
     if (isSpinning)

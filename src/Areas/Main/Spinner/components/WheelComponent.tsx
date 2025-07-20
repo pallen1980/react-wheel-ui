@@ -11,7 +11,7 @@ export default (props: WheelProps) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
     const numSectors: number = props.options && props.options.length || 0;
-    const currentRotation: number = !!props.rotate ? props.rotate : 0;
+    const currentRotation: number = props.rotate ?? 0;
 
     useEffect(() => {
         if (canvasRef.current) {

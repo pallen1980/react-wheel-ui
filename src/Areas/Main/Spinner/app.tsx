@@ -36,7 +36,7 @@ export default (props: AppProps) => {
     const handleWin = (winningIndex: number) => {
         setIsSpinning(false);
 
-        if (!!props.onWin) {
+        if (props.onWin) {
             props.onWin(winningIndex);
         }
     }
