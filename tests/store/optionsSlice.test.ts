@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import optionsReducer, {
   setOptions,
   addOption,
@@ -12,8 +12,8 @@ import optionsReducer, {
   setError,
   setLastSaved,
   clearError,
-} from './optionsSlice';
-import { Option } from '../Areas/Main/Options/models';
+} from '../../src/store/optionsSlice';
+import { Option } from '../../src/Areas/Main/Options/models';
 
 describe('optionsSlice', () => {
   const initialState = {

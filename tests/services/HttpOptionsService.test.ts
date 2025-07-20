@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { HttpOptionsService } from './HttpOptionsService';
-import { OptionsServiceError, OptionsErrorType } from './OptionsService';
-import { Option } from '../Areas/Main/Options/models';
+import { HttpOptionsService } from '../../src/services/HttpOptionsService';
+import { OptionsServiceError, OptionsErrorType } from '../../src/services/OptionsService';
+import { Option } from '../../src/Areas/Main/Options/models';
 
 // Mock fetch globally
 const mockFetch = vi.fn();
