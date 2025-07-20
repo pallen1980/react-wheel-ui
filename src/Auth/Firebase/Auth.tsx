@@ -1,4 +1,4 @@
-import  { useState, useEffect } from 'react';
+import  { useState } from 'react';
 
 import GoogleAuthByPopup, { GoogleAuthByPopupCallback } from './OAuth/GoogleAuthByPopup';
 import GoogleAuthByRedirect, { GoogleAuthByRedirectCallback } from './OAuth/GoogleAuthByRedirect';

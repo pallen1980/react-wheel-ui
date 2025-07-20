@@ -1,7 +1,9 @@
-export default () => {
+ const header = () => {
     return (
         <>
             Header
         </>
     )
-} 
+}
+
+export default header;

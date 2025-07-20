@@ -1,4 +1,4 @@
-import { useState, useImperativeHandle, forwardRef, Ref, useMemo } from "react";
+import { useState, useImperativeHandle, forwardRef, Ref } from "react";
 
 import Wheel from "./WheelComponent";
 import { Direction } from "../enums";

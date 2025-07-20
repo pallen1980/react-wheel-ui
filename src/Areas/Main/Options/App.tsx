@@ -38,7 +38,7 @@ export default (props: AppProps) => {
     }
 
     const handleNewOrChangedOption = (option: Option) => {
-        if (!!option.key) {
+        if (option.key) {
             props.onChange(
                 props.options.map(p => {
                     return p.key === option.key ? 

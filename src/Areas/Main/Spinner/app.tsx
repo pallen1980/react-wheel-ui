@@ -24,15 +24,21 @@ export default (props: AppProps) => {
 
     const handleStartSpin = () => {
         setIsSpinning(true);
-        delegateRef.current && delegateRef.current.startSpin();
+        if (delegateRef.current) { 
+            delegateRef.current.startSpin();
+        }
 
-        props.onSpinStarted && props.onSpinStarted();
+        if (props.onSpinStarted) {
+            props.onSpinStarted();
+        }
     }
 
     const handleWin = (winningIndex: number) => {
         setIsSpinning(false);
 
-        !!props.onWin && props.onWin(winningIndex);
+        if (!!props.onWin) {
+            props.onWin(winningIndex);
+        }
     }
 
     return (

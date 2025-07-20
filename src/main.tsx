@@ -1,7 +1,9 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { BrowserRouter, Routes, Route } from "react-router";
+import { Provider } from "react-redux";
 
+import { store } from "./store/index.ts";
 import AuthProvider from "./Auth/AuthProvider.tsx";
 import ProtectedRoute from "./Auth/ProtectedRoute.tsx";
 
@@ -15,27 +17,29 @@ import "./main.scss";
 
 createRoot(document.getElementById("app")!).render(
   <StrictMode>
-    <AuthProvider>
-      <BrowserRouter>
-        <header>
-          <Header></Header>
-        </header>
-        <nav>
-          <Nav></Nav>
-        </nav>
-        <main>
-          <Routes>
-            <Route index element={<Home />} />
-            <Route path="Spinner" element={<App />}></Route>
-            <Route path="Profile" element={
-              <ProtectedRoute>
-                <Profile />
-              </ProtectedRoute>}
-            ></Route>
-          </Routes>
-        </main>
-        <footer>Footer</footer>
-      </BrowserRouter>
-    </AuthProvider>
+    <Provider store={store}>
+      <AuthProvider>
+        <BrowserRouter>
+          <header>
+            <Header></Header>
+          </header>
+          <nav>
+            <Nav></Nav>
+          </nav>
+          <main>
+            <Routes>
+              <Route index element={<Home />} />
+              <Route path="Spinner" element={<App />}></Route>
+              <Route path="Profile" element={
+                <ProtectedRoute>
+                  <Profile />
+                </ProtectedRoute>}
+              ></Route>
+            </Routes>
+          </main>
+          <footer>Footer</footer>
+        </BrowserRouter>
+      </AuthProvider>
+    </Provider>
   </StrictMode>
 )
