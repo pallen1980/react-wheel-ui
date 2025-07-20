@@ -1,14 +1,10 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useCallback } from "react";
 
 const AuthContext = createContext<{
     isAuthenticated: boolean;
-    onLogin: () => void;
+    onLogin: () => Promise<void>;
     onLogout: () => void;
-}>({
-    isAuthenticated: false,
-    onLogin: () => {},
-    onLogout: () => {},
-});
+} | null>(null);
 
 type AuthProviderProps = {
     children: React.ReactNode;
@@ -17,13 +13,13 @@ type AuthProviderProps = {
 export default ({ children }: AuthProviderProps) => {
     const [isAuthenticated, setAuthenticated] = useState(false);
 
-    const handleLogin = async () => {
+    const handleLogin = useCallback(async () => {
         setAuthenticated(true);
-    };
+    }, []);
 
-    const handleLogout = () => {
+    const handleLogout = useCallback(() => {
         setAuthenticated(false);
-    };
+    }, []);
 
     const value = {
         isAuthenticated,
@@ -35,7 +31,11 @@ export default ({ children }: AuthProviderProps) => {
 };
 
 const useAuth = () => {
-    return useContext(AuthContext);
+    const context = useContext(AuthContext);
+    if (!context) {
+        throw new Error('useAuth must be used within an AuthProvider');
+    }
+    return context;
 };
 
 export { useAuth };
