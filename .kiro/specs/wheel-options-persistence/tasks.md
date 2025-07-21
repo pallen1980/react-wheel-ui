@@ -56,61 +56,61 @@
   - Test Options/App.tsx for add/edit/delete/shuffle/duplicate functionality
   - _Requirements: Core user experience and functionality reliability_
 
-- [ ] 9. Create Redux async thunks for API operations
+- [ ] 9. Improve test coverage and optimize coverage configuration
+  - Add tests for remaining core components (Spinner, Options components, Title, Nav)
+  - Exclude non-testable files from coverage (models, enums, simple exports)
+  - Update coverage thresholds to realistic levels for different file types
+  - Ensure all business logic components meet coverage requirements
+  - _Requirements: Code quality and maintainability_
+
+- [ ] 10. Create Redux async thunks for API operations
   - Implement loadOptionsThunk for fetching user options on app start
   - Implement saveOptionsThunk for persisting options to backend
   - Add proper error handling and loading state management
   - Write unit tests for thunk behavior with various scenarios
   - _Requirements: 1.1, 1.2, 3.1, 3.3_
 
-- [ ] 10. Implement auto-save Redux middleware
+- [ ] 11. Implement auto-save Redux middleware
   - Create middleware to detect option changes and trigger debounced saves
   - Implement debouncing logic to prevent excessive API calls
   - Add authentication checks before attempting saves
   - Write unit tests for middleware behavior and debouncing
   - _Requirements: 1.3, 2.2, 3.4_
 
-- [ ] 11. Update Main/App.tsx to use Redux state management
+- [ ] 12. Update Main/App.tsx to use Redux state management
   - Replace local useState with Redux useSelector and useDispatch
   - Dispatch loadOptions thunk on component mount when user is authenticated
   - Update all option modification handlers to dispatch Redux actions
   - Add loading and error state handling from Redux store
   - _Requirements: 1.1, 1.2, 2.1, 2.2_
 
-- [ ] 12. Refactor Options components to work with sequence property
+- [ ] 13. Refactor Options components to work with sequence property
   - Update Options/App.tsx to handle sequence-based ordering
   - Modify shuffle functionality to update sequence values properly
   - Update duplicate functionality to assign proper sequence values
   - Ensure all CRUD operations maintain proper sequence ordering
   - _Requirements: 1.3_
 
-- [ ] 13. Add visual feedback components for save states
+- [ ] 14. Add visual feedback components for save states
   - Create SaveIndicator component to show saving status
   - Integrate loading spinner for initial options load
   - Add error notifications using react-toastify for failed operations
   - Update UI to show appropriate feedback during all async operations
   - _Requirements: 4.1, 4.2, 4.3, 4.4_
 
-- [ ] 14. Integrate authentication context with options persistence
+- [ ] 15. Integrate authentication context with options persistence
   - Connect Redux thunks with authentication state
   - Clear options from Redux store when user logs out
   - Automatically load options when user logs in
   - Prevent API calls when user is not authenticated
   - _Requirements: 2.1, 2.2, 2.3, 2.4_
 
-- [ ] 15. Add comprehensive error handling and fallback behavior
+- [ ] 16. Add comprehensive error handling and fallback behavior
   - Implement graceful degradation when backend is unavailable
   - Add retry logic for failed save operations (user-initiated)
   - Ensure application continues to function with local state only
   - Add proper error logging and user-friendly error messages
   - _Requirements: 3.1, 3.2, 3.3, 4.3_
-
-- [ ] 16. Improve test coverage and optimize coverage configuration
-  - Add tests for remaining core components (Spinner, Options components, Title, Nav)
-  - Exclude non-testable files from coverage (models, enums, simple exports)
-  - Update coverage thresholds to realistic levels for different file types
-  - Ensure all business logic components meet coverage requirements
-  - _Requirements: Code quality and maintainability_
 
 - [ ] 17. Write integration tests for complete option sync flow
   - Test end-to-end option loading and saving with mocked API
