@@ -105,7 +105,14 @@
   - Add proper error logging and user-friendly error messages
   - _Requirements: 3.1, 3.2, 3.3, 4.3_
 
-- [ ] 16. Write integration tests for complete option sync flow
+- [ ] 16. Improve test coverage and optimize coverage configuration
+  - Add tests for remaining core components (Spinner, Options components, Title, Nav)
+  - Exclude non-testable files from coverage (models, enums, simple exports)
+  - Update coverage thresholds to realistic levels for different file types
+  - Ensure all business logic components meet coverage requirements
+  - _Requirements: Code quality and maintainability_
+
+- [ ] 17. Write integration tests for complete option sync flow
   - Test end-to-end option loading and saving with mocked API
   - Test authentication integration scenarios
   - Test error recovery and fallback behavior
