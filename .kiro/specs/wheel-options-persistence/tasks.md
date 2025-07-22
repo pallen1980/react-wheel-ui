@@ -57,15 +57,13 @@
   - _Requirements: Core user experience and functionality reliability_
 
 - [x] 9. Improve test coverage and optimize coverage configuration
-
-
   - Add tests for remaining core components (Spinner, Options components, Title, Nav)
   - Exclude non-testable files from coverage (models, enums, simple exports)
   - Update coverage thresholds to realistic levels for different file types
   - Ensure all business logic components meet coverage requirements
   - _Requirements: Code quality and maintainability_
 
-- [ ] 10. Create Redux async thunks for API operations
+- [x] 10. Create Redux async thunks for API operations
   - Implement loadOptionsThunk for fetching user options on app start
   - Implement saveOptionsThunk for persisting options to backend
   - Add proper error handling and loading state management

@@ -1,12 +1,14 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { Option } from '../Areas/Main/Options/models';
+import { OptionsService, OptionsServiceError } from '../services/OptionsService';
+import { auth } from '../Auth/Firebase/Config/Firebase';
 
 export interface OptionsState {
   options: Option[];
   isLoading: boolean;
   isSaving: boolean;
   error: string | null;
-  lastSaved: Date | null;
+  lastSaved: string | null;
 }
 
 export interface ReorderPayload {
@@ -21,6 +23,105 @@ const initialState: OptionsState = {
   error: null,
   lastSaved: null,
 };
+
+// Helper function to get current user ID
+const getCurrentUserId = (): string | null => {
+  return auth.currentUser?.uid || null;
+};
+
+// Helper function to get auth token
+const getAuthToken = async (): Promise<string | null> => {
+  const user = auth.currentUser;
+  if (!user) return null;
+  
+  try {
+    return await user.getIdToken();
+  } catch (error) {
+    console.error('Failed to get auth token:', error);
+    throw new OptionsServiceError(
+      'auth' as any,
+      'Failed to get authentication token',
+      false
+    );
+  }
+};
+
+// Async thunk for loading user options
+export const loadOptionsThunk = createAsyncThunk(
+  'options/loadOptions',
+  async (optionsService: OptionsService, { rejectWithValue }) => {
+    try {
+      const userId = getCurrentUserId();
+      if (!userId) {
+        throw new OptionsServiceError(
+          'auth' as any,
+          'User not authenticated',
+          false
+        );
+      }
+
+      // Verify we can get auth token before proceeding
+      await getAuthToken();
+
+      const options = await optionsService.loadUserOptions(userId);
+      return options;
+    } catch (error) {
+      if (error instanceof OptionsServiceError) {
+        return rejectWithValue({
+          type: error.type,
+          message: error.message,
+          retryable: error.retryable
+        });
+      }
+      
+      return rejectWithValue({
+        type: 'network',
+        message: error instanceof Error ? error.message : 'Unknown error occurred',
+        retryable: false
+      });
+    }
+  }
+);
+
+// Async thunk for saving user options
+export const saveOptionsThunk = createAsyncThunk(
+  'options/saveOptions',
+  async (
+    { optionsService, options }: { optionsService: OptionsService; options: Option[] },
+    { rejectWithValue }
+  ) => {
+    try {
+      const userId = getCurrentUserId();
+      if (!userId) {
+        throw new OptionsServiceError(
+          'auth' as any,
+          'User not authenticated',
+          false
+        );
+      }
+
+      // Verify we can get auth token before proceeding
+      await getAuthToken();
+
+      await optionsService.saveUserOptions(userId, options);
+      return { savedAt: new Date().toISOString() };
+    } catch (error) {
+      if (error instanceof OptionsServiceError) {
+        return rejectWithValue({
+          type: error.type,
+          message: error.message,
+          retryable: error.retryable
+        });
+      }
+      
+      return rejectWithValue({
+        type: 'network',
+        message: error instanceof Error ? error.message : 'Unknown error occurred',
+        retryable: false
+      });
+    }
+  }
+);
 
 const optionsSlice = createSlice({
   name: 'options',
@@ -111,12 +212,47 @@ const optionsSlice = createSlice({
         state.isSaving = false;
       }
     },
-    setLastSaved: (state, action: PayloadAction<Date | null>) => {
+    setLastSaved: (state, action: PayloadAction<string | null>) => {
       state.lastSaved = action.payload;
     },
     clearError: (state) => {
       state.error = null;
     },
+  },
+  extraReducers: (builder) => {
+    // Load options thunk
+    builder
+      .addCase(loadOptionsThunk.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(loadOptionsThunk.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.options = [...action.payload].sort((a, b) => a.sequence - b.sequence);
+        state.error = null;
+      })
+      .addCase(loadOptionsThunk.rejected, (state, action) => {
+        state.isLoading = false;
+        const errorPayload = action.payload as { type: string; message: string; retryable: boolean };
+        state.error = errorPayload?.message || 'Failed to load options';
+      });
+
+    // Save options thunk
+    builder
+      .addCase(saveOptionsThunk.pending, (state) => {
+        state.isSaving = true;
+        state.error = null;
+      })
+      .addCase(saveOptionsThunk.fulfilled, (state, action) => {
+        state.isSaving = false;
+        state.lastSaved = action.payload.savedAt;
+        state.error = null;
+      })
+      .addCase(saveOptionsThunk.rejected, (state, action) => {
+        state.isSaving = false;
+        const errorPayload = action.payload as { type: string; message: string; retryable: boolean };
+        state.error = errorPayload?.message || 'Failed to save options';
+      });
   },
 });
 

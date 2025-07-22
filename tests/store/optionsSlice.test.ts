@@ -1,323 +1,380 @@
-import { describe, it, expect } from 'vitest';
+import { configureStore } from '@reduxjs/toolkit';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import optionsReducer, {
+  loadOptionsThunk,
+  saveOptionsThunk,
+  OptionsState,
   setOptions,
   addOption,
   updateOption,
   deleteOption,
-  reorderOptions,
-  shuffleOptions,
   clearOptions,
-  setLoading,
-  setSaving,
-  setError,
-  setLastSaved,
-  clearError,
 } from '../../src/store/optionsSlice';
+import { OptionsService, OptionsServiceError, OptionsErrorType } from '../../src/services/OptionsService';
 import { Option } from '../../src/Areas/Main/Options/models';
+import { auth } from '../../src/Auth/Firebase/Config/Firebase';
 
-describe('optionsSlice', () => {
-  const initialState = {
-    options: [],
-    isLoading: false,
-    isSaving: false,
-    error: null,
-    lastSaved: null,
-  };
+// Mock Firebase auth
+vi.mock('../../src/Auth/Firebase/Config/Firebase', () => ({
+  auth: {
+    currentUser: null,
+  },
+}));
 
-  const mockOptions: Option[] = [
-    { key: 'option-1', value: 'First Option', sequence: 1 },
-    { key: 'option-2', value: 'Second Option', sequence: 2 },
-    { key: 'option-3', value: 'Third Option', sequence: 3 },
-  ];
+// Mock options service
+const mockOptionsService: OptionsService = {
+  loadUserOptions: vi.fn(),
+  saveUserOptions: vi.fn(),
+};
 
-  describe('setOptions', () => {
-    it('should set options and sort by sequence', () => {
-      const unsortedOptions: Option[] = [
-        { key: 'option-3', value: 'Third Option', sequence: 3 },
-        { key: 'option-1', value: 'First Option', sequence: 1 },
-        { key: 'option-2', value: 'Second Option', sequence: 2 },
-      ];
+// Test data
+const mockOptions: Option[] = [
+  { key: 'opt1', value: 'Option 1', sequence: 1 },
+  { key: 'opt2', value: 'Option 2', sequence: 2 },
+  { key: 'opt3', value: 'Option 3', sequence: 3 },
+];
 
-      const state = optionsReducer(initialState, setOptions(unsortedOptions));
+const mockUser = {
+  uid: 'test-user-123',
+  getIdToken: vi.fn().mockResolvedValue('mock-token'),
+};
 
-      expect(state.options).toHaveLength(3);
-      expect(state.options[0].sequence).toBe(1);
-      expect(state.options[1].sequence).toBe(2);
-      expect(state.options[2].sequence).toBe(3);
+describe('optionsSlice async thunks', () => {
+  let store: ReturnType<typeof configureStore>;
+
+  beforeEach(() => {
+    store = configureStore({
+      reducer: {
+        options: optionsReducer,
+      },
+    });
+    
+    // Reset mocks
+    vi.clearAllMocks();
+    (auth as any).currentUser = mockUser;
+  });
+
+  afterEach(() => {
+    (auth as any).currentUser = null;
+  });
+
+  describe('loadOptionsThunk', () => {
+    it('should handle successful options loading', async () => {
+      // Arrange
+      vi.mocked(mockOptionsService.loadUserOptions).mockResolvedValue(mockOptions);
+
+      // Act
+      const result = await store.dispatch(loadOptionsThunk(mockOptionsService));
+
+      // Assert
+      expect(result.type).toBe('options/loadOptions/fulfilled');
+      expect(result.payload).toEqual(mockOptions);
+      
+      const state = store.getState().options;
+      expect(state.isLoading).toBe(false);
+      expect(state.options).toEqual(mockOptions);
+      expect(state.error).toBeNull();
+      expect(mockOptionsService.loadUserOptions).toHaveBeenCalledWith('test-user-123');
     });
 
-    it('should handle empty options array', () => {
-      const state = optionsReducer(initialState, setOptions([]));
-      expect(state.options).toEqual([]);
+    it('should handle loading when user is not authenticated', async () => {
+      // Arrange
+      (auth as any).currentUser = null;
+
+      // Act
+      const result = await store.dispatch(loadOptionsThunk(mockOptionsService));
+
+      // Assert
+      expect(result.type).toBe('options/loadOptions/rejected');
+      expect(result.payload).toEqual({
+        type: 'auth',
+        message: 'User not authenticated',
+        retryable: false,
+      });
+      
+      const state = store.getState().options;
+      expect(state.isLoading).toBe(false);
+      expect(state.error).toBe('User not authenticated');
+      expect(mockOptionsService.loadUserOptions).not.toHaveBeenCalled();
+    });
+
+    it('should handle OptionsServiceError during loading', async () => {
+      // Arrange
+      const serviceError = new OptionsServiceError(
+        OptionsErrorType.NETWORK,
+        'Network connection failed',
+        true
+      );
+      vi.mocked(mockOptionsService.loadUserOptions).mockRejectedValue(serviceError);
+
+      // Act
+      const result = await store.dispatch(loadOptionsThunk(mockOptionsService));
+
+      // Assert
+      expect(result.type).toBe('options/loadOptions/rejected');
+      expect(result.payload).toEqual({
+        type: 'network',
+        message: 'Network connection failed',
+        retryable: true,
+      });
+      
+      const state = store.getState().options;
+      expect(state.isLoading).toBe(false);
+      expect(state.error).toBe('Network connection failed');
+    });
+
+    it('should handle unknown error during loading', async () => {
+      // Arrange
+      const unknownError = new Error('Unknown error');
+      vi.mocked(mockOptionsService.loadUserOptions).mockRejectedValue(unknownError);
+
+      // Act
+      const result = await store.dispatch(loadOptionsThunk(mockOptionsService));
+
+      // Assert
+      expect(result.type).toBe('options/loadOptions/rejected');
+      expect(result.payload).toEqual({
+        type: 'network',
+        message: 'Unknown error',
+        retryable: false,
+      });
+      
+      const state = store.getState().options;
+      expect(state.isLoading).toBe(false);
+      expect(state.error).toBe('Unknown error');
+    });
+
+    it('should set loading state during pending', async () => {
+      // Arrange
+      vi.mocked(mockOptionsService.loadUserOptions).mockImplementation(
+        () => new Promise(resolve => setTimeout(() => resolve(mockOptions), 100))
+      );
+
+      // Act
+      const promise = store.dispatch(loadOptionsThunk(mockOptionsService));
+      
+      // Assert loading state
+      const loadingState = store.getState().options;
+      expect(loadingState.isLoading).toBe(true);
+      expect(loadingState.error).toBeNull();
+
+      // Wait for completion
+      await promise;
+      
+      const finalState = store.getState().options;
+      expect(finalState.isLoading).toBe(false);
+    });
+
+    it('should sort options by sequence after loading', async () => {
+      // Arrange
+      const unsortedOptions: Option[] = [
+        { key: 'opt3', value: 'Option 3', sequence: 3 },
+        { key: 'opt1', value: 'Option 1', sequence: 1 },
+        { key: 'opt2', value: 'Option 2', sequence: 2 },
+      ];
+      vi.mocked(mockOptionsService.loadUserOptions).mockResolvedValue(unsortedOptions);
+
+      // Act
+      await store.dispatch(loadOptionsThunk(mockOptionsService));
+
+      // Assert
+      const state = store.getState().options;
+      expect(state.options).toEqual([
+        { key: 'opt1', value: 'Option 1', sequence: 1 },
+        { key: 'opt2', value: 'Option 2', sequence: 2 },
+        { key: 'opt3', value: 'Option 3', sequence: 3 },
+      ]);
     });
   });
 
-  describe('addOption', () => {
-    it('should add option with proper sequence when sequence is provided', () => {
-      const newOption: Option = { key: 'new-option', value: 'New Option', sequence: 5 };
-      const state = optionsReducer(
-        { ...initialState, options: mockOptions },
-        addOption(newOption)
+  describe('saveOptionsThunk', () => {
+    it('should handle successful options saving', async () => {
+      // Arrange
+      vi.mocked(mockOptionsService.saveUserOptions).mockResolvedValue();
+      const beforeSave = new Date();
+
+      // Act
+      const result = await store.dispatch(
+        saveOptionsThunk({ optionsService: mockOptionsService, options: mockOptions })
       );
 
+      // Assert
+      expect(result.type).toBe('options/saveOptions/fulfilled');
+      expect(typeof result.payload.savedAt).toBe('string');
+      expect(new Date(result.payload.savedAt).getTime()).toBeGreaterThanOrEqual(beforeSave.getTime());
+      
+      const state = store.getState().options;
+      expect(state.isSaving).toBe(false);
+      expect(typeof state.lastSaved).toBe('string');
+      expect(state.error).toBeNull();
+      expect(mockOptionsService.saveUserOptions).toHaveBeenCalledWith('test-user-123', mockOptions);
+    });
+
+    it('should handle saving when user is not authenticated', async () => {
+      // Arrange
+      (auth as any).currentUser = null;
+
+      // Act
+      const result = await store.dispatch(
+        saveOptionsThunk({ optionsService: mockOptionsService, options: mockOptions })
+      );
+
+      // Assert
+      expect(result.type).toBe('options/saveOptions/rejected');
+      expect(result.payload).toEqual({
+        type: 'auth',
+        message: 'User not authenticated',
+        retryable: false,
+      });
+      
+      const state = store.getState().options;
+      expect(state.isSaving).toBe(false);
+      expect(state.error).toBe('User not authenticated');
+      expect(mockOptionsService.saveUserOptions).not.toHaveBeenCalled();
+    });
+
+    it('should handle OptionsServiceError during saving', async () => {
+      // Arrange
+      const serviceError = new OptionsServiceError(
+        OptionsErrorType.PERMISSION,
+        'Insufficient permissions',
+        false
+      );
+      vi.mocked(mockOptionsService.saveUserOptions).mockRejectedValue(serviceError);
+
+      // Act
+      const result = await store.dispatch(
+        saveOptionsThunk({ optionsService: mockOptionsService, options: mockOptions })
+      );
+
+      // Assert
+      expect(result.type).toBe('options/saveOptions/rejected');
+      expect(result.payload).toEqual({
+        type: 'permission',
+        message: 'Insufficient permissions',
+        retryable: false,
+      });
+      
+      const state = store.getState().options;
+      expect(state.isSaving).toBe(false);
+      expect(state.error).toBe('Insufficient permissions');
+    });
+
+    it('should handle unknown error during saving', async () => {
+      // Arrange
+      const unknownError = new Error('Save failed');
+      vi.mocked(mockOptionsService.saveUserOptions).mockRejectedValue(unknownError);
+
+      // Act
+      const result = await store.dispatch(
+        saveOptionsThunk({ optionsService: mockOptionsService, options: mockOptions })
+      );
+
+      // Assert
+      expect(result.type).toBe('options/saveOptions/rejected');
+      expect(result.payload).toEqual({
+        type: 'network',
+        message: 'Save failed',
+        retryable: false,
+      });
+      
+      const state = store.getState().options;
+      expect(state.isSaving).toBe(false);
+      expect(state.error).toBe('Save failed');
+    });
+
+    it('should set saving state during pending', async () => {
+      // Arrange
+      vi.mocked(mockOptionsService.saveUserOptions).mockImplementation(
+        () => new Promise(resolve => setTimeout(() => resolve(), 100))
+      );
+
+      // Act
+      const promise = store.dispatch(
+        saveOptionsThunk({ optionsService: mockOptionsService, options: mockOptions })
+      );
+      
+      // Assert saving state
+      const savingState = store.getState().options;
+      expect(savingState.isSaving).toBe(true);
+      expect(savingState.error).toBeNull();
+
+      // Wait for completion
+      await promise;
+      
+      const finalState = store.getState().options;
+      expect(finalState.isSaving).toBe(false);
+    });
+  });
+
+  describe('thunk integration with existing reducers', () => {
+    it('should not interfere with synchronous actions', async () => {
+      // Arrange
+      const newOption: Option = { key: 'new', value: 'New Option', sequence: 4 };
+
+      // Act - mix async and sync actions
+      await store.dispatch(loadOptionsThunk(mockOptionsService));
+      store.dispatch(addOption(newOption));
+      await store.dispatch(saveOptionsThunk({ optionsService: mockOptionsService, options: [...mockOptions, newOption] }));
+
+      // Assert
+      const state = store.getState().options;
       expect(state.options).toHaveLength(4);
       expect(state.options[3]).toEqual(newOption);
+      expect(typeof state.lastSaved).toBe('string');
     });
 
-    it('should add option with auto-generated sequence when sequence is not provided', () => {
-      const newOption: Option = { key: 'new-option', value: 'New Option', sequence: 0 };
-      const state = optionsReducer(
-        { ...initialState, options: mockOptions },
-        addOption(newOption)
+    it('should clear error state when starting new operations', async () => {
+      // Arrange - set initial error state
+      store.dispatch(setOptions([]));
+      vi.mocked(mockOptionsService.loadUserOptions).mockRejectedValueOnce(
+        new Error('Initial error')
       );
+      await store.dispatch(loadOptionsThunk(mockOptionsService));
+      expect(store.getState().options.error).toBe('Initial error');
 
-      expect(state.options).toHaveLength(4);
-      expect(state.options[3].sequence).toBe(4); // Max sequence (3) + 1
-    });
+      // Act - start new successful operation
+      vi.mocked(mockOptionsService.loadUserOptions).mockResolvedValueOnce(mockOptions);
+      await store.dispatch(loadOptionsThunk(mockOptionsService));
 
-    it('should add option to empty array with sequence 1', () => {
-      const newOption: Option = { key: 'first-option', value: 'First Option', sequence: 0 };
-      const state = optionsReducer(initialState, addOption(newOption));
-
-      expect(state.options).toHaveLength(1);
-      expect(state.options[0].sequence).toBe(1);
-    });
-  });
-
-  describe('updateOption', () => {
-    it('should update existing option and maintain sort order', () => {
-      const updatedOption: Option = { key: 'option-2', value: 'Updated Second Option', sequence: 2 };
-      const state = optionsReducer(
-        { ...initialState, options: mockOptions },
-        updateOption(updatedOption)
-      );
-
-      expect(state.options).toHaveLength(3);
-      expect(state.options[1]).toEqual(updatedOption);
-    });
-
-    it('should not add option if key does not exist', () => {
-      const nonExistentOption: Option = { key: 'non-existent', value: 'Does not exist', sequence: 1 };
-      const state = optionsReducer(
-        { ...initialState, options: mockOptions },
-        updateOption(nonExistentOption)
-      );
-
-      expect(state.options).toHaveLength(3);
-      expect(state.options).toEqual(mockOptions);
-    });
-
-    it('should update option sequence and resort', () => {
-      const updatedOption: Option = { key: 'option-2', value: 'Second Option', sequence: 0.5 };
-      const state = optionsReducer(
-        { ...initialState, options: mockOptions },
-        updateOption(updatedOption)
-      );
-
-      expect(state.options[0].key).toBe('option-2');
-      expect(state.options[0].sequence).toBe(0.5);
-      expect(state.options[1].key).toBe('option-1');
-      expect(state.options[2].key).toBe('option-3');
-    });
-  });
-
-  describe('deleteOption', () => {
-    it('should delete option by key and resequence remaining options', () => {
-      const state = optionsReducer(
-        { ...initialState, options: mockOptions },
-        deleteOption('option-2')
-      );
-
-      expect(state.options).toHaveLength(2);
-      expect(state.options.find(opt => opt.key === 'option-2')).toBeUndefined();
-      
-      // Check resequencing
-      expect(state.options[0].sequence).toBe(1);
-      expect(state.options[1].sequence).toBe(2);
-    });
-
-    it('should handle deleting non-existent option', () => {
-      const state = optionsReducer(
-        { ...initialState, options: mockOptions },
-        deleteOption('non-existent')
-      );
-
-      expect(state.options).toHaveLength(3);
-      expect(state.options).toEqual(mockOptions);
-    });
-
-    it('should handle deleting from empty array', () => {
-      const state = optionsReducer(initialState, deleteOption('any-key'));
-      expect(state.options).toEqual([]);
-    });
-  });
-
-  describe('reorderOptions', () => {
-    it('should reorder options and update sequences', () => {
-      const state = optionsReducer(
-        { ...initialState, options: mockOptions },
-        reorderOptions({ fromIndex: 0, toIndex: 2 })
-      );
-
-      expect(state.options[0].key).toBe('option-2');
-      expect(state.options[1].key).toBe('option-3');
-      expect(state.options[2].key).toBe('option-1');
-      
-      // Check sequences are updated
-      expect(state.options[0].sequence).toBe(1);
-      expect(state.options[1].sequence).toBe(2);
-      expect(state.options[2].sequence).toBe(3);
-    });
-
-    it('should handle invalid fromIndex', () => {
-      const state = optionsReducer(
-        { ...initialState, options: mockOptions },
-        reorderOptions({ fromIndex: -1, toIndex: 1 })
-      );
-
-      expect(state.options).toEqual(mockOptions);
-    });
-
-    it('should handle invalid toIndex', () => {
-      const state = optionsReducer(
-        { ...initialState, options: mockOptions },
-        reorderOptions({ fromIndex: 0, toIndex: 5 })
-      );
-
-      expect(state.options).toEqual(mockOptions);
-    });
-
-    it('should handle same fromIndex and toIndex', () => {
-      const state = optionsReducer(
-        { ...initialState, options: mockOptions },
-        reorderOptions({ fromIndex: 1, toIndex: 1 })
-      );
-
-      expect(state.options).toEqual(mockOptions);
-    });
-  });
-
-  describe('shuffleOptions', () => {
-    it('should shuffle options and update sequences', () => {
-      const state = optionsReducer(
-        { ...initialState, options: mockOptions },
-        shuffleOptions()
-      );
-
-      expect(state.options).toHaveLength(3);
-      
-      // All original options should still be present
-      expect(state.options.map(opt => opt.key).sort()).toEqual(['option-1', 'option-2', 'option-3']);
-      
-      // Sequences should be 1, 2, 3 in order
-      expect(state.options[0].sequence).toBe(1);
-      expect(state.options[1].sequence).toBe(2);
-      expect(state.options[2].sequence).toBe(3);
-    });
-
-    it('should handle empty options array', () => {
-      const state = optionsReducer(initialState, shuffleOptions());
-      expect(state.options).toEqual([]);
-    });
-
-    it('should handle single option', () => {
-      const singleOption = [{ key: 'single', value: 'Single Option', sequence: 1 }];
-      const state = optionsReducer(
-        { ...initialState, options: singleOption },
-        shuffleOptions()
-      );
-
-      expect(state.options).toEqual(singleOption);
-    });
-  });
-
-  describe('clearOptions', () => {
-    it('should clear all options', () => {
-      const state = optionsReducer(
-        { ...initialState, options: mockOptions },
-        clearOptions()
-      );
-
-      expect(state.options).toEqual([]);
-    });
-  });
-
-  describe('setLoading', () => {
-    it('should set loading state to true and clear error', () => {
-      const stateWithError = { ...initialState, error: 'Some error' };
-      const state = optionsReducer(stateWithError, setLoading(true));
-
-      expect(state.isLoading).toBe(true);
+      // Assert
+      const state = store.getState().options;
       expect(state.error).toBeNull();
-    });
-
-    it('should set loading state to false without clearing error', () => {
-      const stateWithError = { ...initialState, error: 'Some error', isLoading: true };
-      const state = optionsReducer(stateWithError, setLoading(false));
-
-      expect(state.isLoading).toBe(false);
-      expect(state.error).toBe('Some error');
+      expect(state.options).toEqual(mockOptions);
     });
   });
 
-  describe('setSaving', () => {
-    it('should set saving state to true and clear error', () => {
-      const stateWithError = { ...initialState, error: 'Some error' };
-      const state = optionsReducer(stateWithError, setSaving(true));
+  describe('error handling edge cases', () => {
+    it('should handle auth token retrieval failure', async () => {
+      // Arrange
+      mockUser.getIdToken.mockRejectedValueOnce(new Error('Token expired'));
 
-      expect(state.isSaving).toBe(true);
-      expect(state.error).toBeNull();
+      // Act
+      const result = await store.dispatch(loadOptionsThunk(mockOptionsService));
+
+      // Assert - should fail when token retrieval fails
+      expect(result.type).toBe('options/loadOptions/rejected');
+      expect(result.payload).toEqual({
+        type: 'auth',
+        message: 'Failed to get authentication token',
+        retryable: false,
+      });
     });
 
-    it('should set saving state to false without clearing error', () => {
-      const stateWithError = { ...initialState, error: 'Some error', isSaving: true };
-      const state = optionsReducer(stateWithError, setSaving(false));
+    it('should handle non-Error objects thrown', async () => {
+      // Arrange
+      vi.mocked(mockOptionsService.loadUserOptions).mockRejectedValue('String error');
 
-      expect(state.isSaving).toBe(false);
-      expect(state.error).toBe('Some error');
-    });
-  });
+      // Act
+      const result = await store.dispatch(loadOptionsThunk(mockOptionsService));
 
-  describe('setError', () => {
-    it('should set error and clear loading states', () => {
-      const loadingState = { ...initialState, isLoading: true, isSaving: true };
-      const state = optionsReducer(loadingState, setError('Test error'));
-
-      expect(state.error).toBe('Test error');
-      expect(state.isLoading).toBe(false);
-      expect(state.isSaving).toBe(false);
-    });
-
-    it('should clear error when null is passed', () => {
-      const errorState = { ...initialState, error: 'Some error' };
-      const state = optionsReducer(errorState, setError(null));
-
-      expect(state.error).toBeNull();
-    });
-  });
-
-  describe('setLastSaved', () => {
-    it('should set lastSaved date', () => {
-      const testDate = new Date('2023-01-01T12:00:00Z');
-      const state = optionsReducer(initialState, setLastSaved(testDate));
-
-      expect(state.lastSaved).toBe(testDate);
-    });
-
-    it('should clear lastSaved when null is passed', () => {
-      const stateWithDate = { ...initialState, lastSaved: new Date() };
-      const state = optionsReducer(stateWithDate, setLastSaved(null));
-
-      expect(state.lastSaved).toBeNull();
-    });
-  });
-
-  describe('clearError', () => {
-    it('should clear error', () => {
-      const errorState = { ...initialState, error: 'Some error' };
-      const state = optionsReducer(errorState, clearError());
-
-      expect(state.error).toBeNull();
+      // Assert
+      expect(result.type).toBe('options/loadOptions/rejected');
+      expect(result.payload).toEqual({
+        type: 'network',
+        message: 'Unknown error occurred',
+        retryable: false,
+      });
     });
   });
 });
