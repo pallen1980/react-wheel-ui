@@ -49,7 +49,8 @@ const getAuthToken = async (): Promise<string | null> => {
 // Async thunk for loading user options
 export const loadOptionsThunk = createAsyncThunk(
   'options/loadOptions',
-  async (optionsService: OptionsService, { rejectWithValue }) => {
+  async (_, { rejectWithValue, extra }) => {
+    const { optionsService } = extra as { optionsService: OptionsService };
     try {
       const userId = getCurrentUserId();
       if (!userId) {
@@ -87,9 +88,10 @@ export const loadOptionsThunk = createAsyncThunk(
 export const saveOptionsThunk = createAsyncThunk(
   'options/saveOptions',
   async (
-    { optionsService, options }: { optionsService: OptionsService; options: Option[] },
-    { rejectWithValue }
+    { options }: { options: Option[] },
+    { rejectWithValue, extra }
   ) => {
+    const { optionsService } = extra as { optionsService: OptionsService };
     try {
       const userId = getCurrentUserId();
       if (!userId) {
