@@ -1,5 +1,4 @@
-import { Middleware, MiddlewareAPI, Dispatch, AnyAction } from '@reduxjs/toolkit';
-import { RootState } from '../index';
+import { Middleware, MiddlewareAPI, Dispatch, UnknownAction } from '@reduxjs/toolkit';
 import { 
   addOption, 
   updateOption, 
@@ -84,7 +83,7 @@ const isUserAuthenticated = (): boolean => {
 /**
  * Check if the action should trigger an auto-save
  */
-const shouldTriggerAutoSave = (action: AnyAction): boolean => {
+const shouldTriggerAutoSave = (action: UnknownAction): boolean => {
   // Don't trigger auto-save for load operations
   if (loadOptionsThunk.fulfilled.match(action)) {
     return false;
@@ -106,14 +105,14 @@ const shouldTriggerAutoSave = (action: AnyAction): boolean => {
 export const createAutoSaveMiddleware = (config: AutoSaveConfig): Middleware => {
   const saveManager = new DebouncedSaveManager(config.debounceMs);
 
-  return (store: MiddlewareAPI<Dispatch<AnyAction>, RootState>) => 
-    (next: Dispatch<AnyAction>) => 
-    (action: AnyAction) => {
+  return (store) => 
+    (next) => 
+    (action) => {
       // Process the action first
       const result = next(action);
 
       // Check if this action should trigger auto-save
-      if (shouldTriggerAutoSave(action)) {
+      if (shouldTriggerAutoSave(action as UnknownAction)) {
         // Check authentication before attempting save
         if (!isUserAuthenticated()) {
           console.debug('Auto-save skipped: User not authenticated');
@@ -122,7 +121,7 @@ export const createAutoSaveMiddleware = (config: AutoSaveConfig): Middleware => 
 
         // Get current state after action has been processed
         const state = store.getState();
-        const { options, isSaving } = state.options;
+        const { isSaving } = state.options;
 
         // Skip if already saving to prevent concurrent saves
         if (isSaving) {
@@ -143,14 +142,15 @@ export const createAutoSaveMiddleware = (config: AutoSaveConfig): Middleware => 
           const currentOptions = currentState.options.options;
 
           // Dispatch save thunk
-          store.dispatch(saveOptionsThunk({
+          (store.dispatch as any)(saveOptionsThunk({
             options: currentOptions
           }));
         });
       }
 
       // Cancel pending saves when user logs out or options are cleared
-      if (action.type === 'auth/logout' || action.type === 'options/clearOptions') {
+      const actionWithType = action as { type: string };
+      if (actionWithType.type === 'auth/logout' || actionWithType.type === 'options/clearOptions') {
         saveManager.cancelSave();
       }
 

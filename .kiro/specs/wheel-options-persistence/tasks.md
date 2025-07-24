@@ -77,7 +77,7 @@
   - Write unit tests for middleware behavior and debouncing
   - _Requirements: 1.3, 2.2, 3.4_
 
-- [ ] 12. Update Main/App.tsx to use Redux state management
+- [x] 12. Update Main/App.tsx to use Redux state management
   - Replace local useState with Redux useSelector and useDispatch
   - Dispatch loadOptions thunk on component mount when user is authenticated
   - Update all option modification handlers to dispatch Redux actions

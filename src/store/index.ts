@@ -6,9 +6,7 @@ import { createOptionsService } from '../services';
 // Create options service instance
 const optionsService = createOptionsService();
 
-// Create auto-save middleware
-const autoSaveMiddleware = createDefaultAutoSaveMiddleware(optionsService);
-
+// Create store
 export const store = configureStore({
   reducer: {
     options: optionsReducer,
@@ -18,7 +16,7 @@ export const store = configureStore({
       thunk: {
         extraArgument: { optionsService },
       },
-    }).concat(autoSaveMiddleware),
+    }).concat(createDefaultAutoSaveMiddleware(optionsService)),
 });
 
 export type RootState = ReturnType<typeof store.getState>;
