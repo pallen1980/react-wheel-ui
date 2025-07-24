@@ -236,7 +236,7 @@ const optionsSlice = createSlice({
       .addCase(loadOptionsThunk.rejected, (state, action) => {
         state.isLoading = false;
         const errorPayload = action.payload as { type: string; message: string; retryable: boolean };
-        state.error = errorPayload?.message || 'Failed to load options';
+        state.error = errorPayload?.message || 'Unable to load your saved options';
       });
 
     // Save options thunk
@@ -253,7 +253,7 @@ const optionsSlice = createSlice({
       .addCase(saveOptionsThunk.rejected, (state, action) => {
         state.isSaving = false;
         const errorPayload = action.payload as { type: string; message: string; retryable: boolean };
-        state.error = errorPayload?.message || 'Failed to save options';
+        state.error = errorPayload?.message || 'Unable to save your changes';
       });
   },
 });

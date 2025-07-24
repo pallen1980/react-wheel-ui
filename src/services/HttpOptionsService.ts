@@ -39,7 +39,7 @@ export class HttpOptionsService implements OptionsService {
       if (!authToken) {
         throw new OptionsServiceError(
           OptionsErrorType.AUTH,
-          'No authentication token available',
+          'Please sign in to access your saved options',
           false
         );
       }
@@ -55,7 +55,7 @@ export class HttpOptionsService implements OptionsService {
       if (response.status === 401) {
         throw new OptionsServiceError(
           OptionsErrorType.AUTH,
-          'Authentication failed',
+          'Your session has expired. Please sign in again',
           false
         );
       }
@@ -63,7 +63,7 @@ export class HttpOptionsService implements OptionsService {
       if (response.status === 403) {
         throw new OptionsServiceError(
           OptionsErrorType.PERMISSION,
-          'Insufficient permissions to access options',
+          'You don\'t have permission to access these options',
           false
         );
       }
@@ -76,7 +76,7 @@ export class HttpOptionsService implements OptionsService {
       if (!response.ok) {
         throw new OptionsServiceError(
           OptionsErrorType.NETWORK,
-          `HTTP ${response.status}: ${response.statusText}`,
+          response.status >= 500 ? 'Our servers are having issues. Please try again in a moment' : 'Unable to load your options right now',
           response.status >= 500 // Server errors are retryable
         );
       }
@@ -87,7 +87,7 @@ export class HttpOptionsService implements OptionsService {
       if (!Array.isArray(data.options)) {
         throw new OptionsServiceError(
           OptionsErrorType.DATA,
-          'Invalid response format: options must be an array',
+          'The server sent invalid data. Please try again',
           false
         );
       }
@@ -97,7 +97,7 @@ export class HttpOptionsService implements OptionsService {
         if (!option.key || !option.value || typeof option.sequence !== 'number') {
           throw new OptionsServiceError(
             OptionsErrorType.DATA,
-            'Invalid option format: missing required properties',
+            'Some of your saved options have invalid data',
             false
           );
         }
@@ -114,7 +114,7 @@ export class HttpOptionsService implements OptionsService {
       if (error instanceof TypeError && error.message.includes('fetch')) {
         throw new OptionsServiceError(
           OptionsErrorType.NETWORK,
-          'Network error: Unable to connect to server',
+          'Unable to connect to our servers. Please check your internet connection',
           true,
           error as Error
         );
@@ -123,7 +123,7 @@ export class HttpOptionsService implements OptionsService {
       if (error instanceof Error && error.name === 'AbortError') {
         throw new OptionsServiceError(
           OptionsErrorType.NETWORK,
-          'Request timeout',
+          'The request took too long. Please try again',
           true,
           error
         );
@@ -132,7 +132,7 @@ export class HttpOptionsService implements OptionsService {
       // Unknown error
       throw new OptionsServiceError(
         OptionsErrorType.NETWORK,
-        `Unexpected error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        'Something went wrong while loading your options',
         false,
         error instanceof Error ? error : undefined
       );
@@ -150,7 +150,7 @@ export class HttpOptionsService implements OptionsService {
       if (!authToken) {
         throw new OptionsServiceError(
           OptionsErrorType.AUTH,
-          'No authentication token available',
+          'Please sign in to save your options',
           false
         );
       }
@@ -160,7 +160,7 @@ export class HttpOptionsService implements OptionsService {
         if (!option.key || !option.value || typeof option.sequence !== 'number') {
           throw new OptionsServiceError(
             OptionsErrorType.DATA,
-            'Invalid option format: missing required properties',
+            'Some of your options have invalid data and cannot be saved',
             false
           );
         }
@@ -180,7 +180,7 @@ export class HttpOptionsService implements OptionsService {
       if (response.status === 401) {
         throw new OptionsServiceError(
           OptionsErrorType.AUTH,
-          'Authentication failed',
+          'Your session has expired. Please sign in again',
           false
         );
       }
@@ -188,7 +188,7 @@ export class HttpOptionsService implements OptionsService {
       if (response.status === 403) {
         throw new OptionsServiceError(
           OptionsErrorType.PERMISSION,
-          'Insufficient permissions to save options',
+          'You don\'t have permission to save these options',
           false
         );
       }
@@ -196,7 +196,7 @@ export class HttpOptionsService implements OptionsService {
       if (!response.ok) {
         throw new OptionsServiceError(
           OptionsErrorType.NETWORK,
-          `HTTP ${response.status}: ${response.statusText}`,
+          response.status >= 500 ? 'Our servers are having issues. Your changes are saved locally' : 'Unable to save your options right now',
           response.status >= 500 // Server errors are retryable
         );
       }
@@ -210,7 +210,7 @@ export class HttpOptionsService implements OptionsService {
       if (error instanceof TypeError && error.message.includes('fetch')) {
         throw new OptionsServiceError(
           OptionsErrorType.NETWORK,
-          'Network error: Unable to connect to server',
+          'Unable to connect to our servers. Your changes are saved locally',
           true,
           error as Error
         );
@@ -219,7 +219,7 @@ export class HttpOptionsService implements OptionsService {
       if (error instanceof Error && error.name === 'AbortError') {
         throw new OptionsServiceError(
           OptionsErrorType.NETWORK,
-          'Request timeout',
+          'The save request took too long. Your changes are saved locally',
           true,
           error
         );
@@ -228,7 +228,7 @@ export class HttpOptionsService implements OptionsService {
       // Unknown error
       throw new OptionsServiceError(
         OptionsErrorType.NETWORK,
-        `Unexpected error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        'Something went wrong while saving. Your changes are saved locally',
         false,
         error instanceof Error ? error : undefined
       );
