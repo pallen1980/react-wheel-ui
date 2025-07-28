@@ -1,11 +1,11 @@
-import { 
-  OptionsService, 
-  OptionsServiceError, 
-  OptionsErrorType, 
-  LoadOptionsResponse, 
+import {
+  OptionsService,
+  OptionsServiceError,
+  OptionsErrorType,
+  LoadOptionsResponse,
   SaveOptionsRequest,
   API_CONFIG,
-  API_ENDPOINTS 
+  API_ENDPOINTS
 } from './OptionsService';
 import { Option } from '../Areas/Main/Options/models';
 
@@ -82,7 +82,7 @@ export class HttpOptionsService implements OptionsService {
       }
 
       const data: LoadOptionsResponse = await response.json();
-      
+
       // Validate response data
       if (!Array.isArray(data.options)) {
         throw new OptionsServiceError(
@@ -239,7 +239,7 @@ export class HttpOptionsService implements OptionsService {
    * Fetch with timeout support
    */
   private async fetchWithTimeout(
-    url: string, 
+    url: string,
     options: RequestInit
   ): Promise<Response> {
     const controller = new AbortController();

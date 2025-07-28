@@ -3,12 +3,23 @@
 # Stage 1: Build the React app
 FROM node:23-alpine AS build
 
+# Install build dependencies for native modules
+RUN apk add --no-cache python3 make g++ libc6-compat
+
 WORKDIR /app
 
+# Copy package files
 COPY package*.json ./
-RUN npm install
 
+# Install dependencies with workaround for rollup Alpine issue
+RUN rm -rf node_modules package-lock.json && \
+    npm install && \
+    npm rebuild
+
+# Copy source code
 COPY . .
+
+# Build the application
 RUN npm run build
 
 # Stage 2: Serve the app with Nginx
@@ -23,6 +34,7 @@ ARG FIREBASE_STORAGE_BUCKET
 ARG FIREBASE_MESSAGING_SENDER_ID
 ARG FIREBASE_APP_ID
 ARG FIREBASE_MEASUREMENT_ID
+ARG VITE_API_BASE_URL
 
 # Set environment variables within the build context using the build arguments
 ENV FIREBASE_API_KEY=$FIREBASE_API_KEY
@@ -33,6 +45,7 @@ ENV FIREBASE_STORAGE_BUCKET=$FIREBASE_STORAGE_BUCKET
 ENV FIREBASE_MESSAGING_SENDER_ID=$FIREBASE_MESSAGING_SENDER_ID
 ENV FIREBASE_APP_ID=$FIREBASE_APP_ID
 ENV FIREBASE_MEASUREMENT_ID=$FIREBASE_MEASUREMENT_ID
+ENV VITE_API_BASE_URL=$VITE_API_BASE_URL
 
 COPY --from=build /app/dist /usr/share/nginx/html
 
