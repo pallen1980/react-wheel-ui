@@ -99,14 +99,14 @@ function Test-RequiredEnvVars {
         exit 1
     }
     
-    Write-Host "All required environment variables are present" -ForegroundColor Green
+    Write-Host "✓ All required environment variables are present" -ForegroundColor Green
 }
 
 # Function to display configuration summary
 function Show-ConfigSummary {
     param([hashtable]$EnvVars)
     
-    Write-Host "\n=== Configuration Summary ===" -ForegroundColor Cyan
+    Write-Host "`n=== Configuration Summary ===" -ForegroundColor Cyan
     Write-Host "Firebase Project ID: $($EnvVars['VITE_FIREBASE_PROJECT_ID'])" -ForegroundColor White
     Write-Host "Firebase Auth Domain: $($EnvVars['VITE_FIREBASE_AUTH_DOMAIN'])" -ForegroundColor White
     
@@ -122,7 +122,7 @@ function Show-ConfigSummary {
 
 # Main execution
 try {
-    Write-Host "Starting The Wheel Application with Docker Compose" -ForegroundColor Magenta
+    Write-Host "🎡 Starting The Wheel Application with Docker Compose" -ForegroundColor Magenta
     Write-Host "======================================================" -ForegroundColor Magenta
     
     # Check if Docker is running
@@ -150,7 +150,7 @@ try {
     
     # Clean up if requested
     if ($Clean) {
-        Write-Host "Cleaning up existing containers and volumes..." -ForegroundColor Yellow
+        Write-Host "🧹 Cleaning up existing containers and volumes..." -ForegroundColor Yellow
         docker-compose down --volumes --remove-orphans
         docker system prune -f
     }
@@ -160,14 +160,14 @@ try {
     
     if ($Detached) {
         $composeArgs += "--detach"
-        Write-Host "Starting containers in detached mode..." -ForegroundColor Green
+        Write-Host "🚀 Starting containers in detached mode..." -ForegroundColor Green
     } else {
-        Write-Host "Starting containers in foreground mode (Ctrl+C to stop)..." -ForegroundColor Green
+        Write-Host "🚀 Starting containers in foreground mode (Ctrl+C to stop)..." -ForegroundColor Green
     }
     
     if ($Build) {
         $composeArgs += "--build"
-        Write-Host "Force rebuilding images..." -ForegroundColor Yellow
+        Write-Host "🔨 Force rebuilding images..." -ForegroundColor Yellow
     }
     
     # Run docker-compose
@@ -175,11 +175,11 @@ try {
     & docker-compose @composeArgs
     
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "Application started successfully!" -ForegroundColor Green
-        Write-Host "Access the application at: http://localhost:51235" -ForegroundColor Cyan
+        Write-Host "`n✅ Application started successfully!" -ForegroundColor Green
+        Write-Host "🌐 Access the application at: http://localhost:51235" -ForegroundColor Cyan
         
         if ($Detached) {
-            Write-Host "\nUseful commands:" -ForegroundColor Yellow
+            Write-Host "`nUseful commands:" -ForegroundColor Yellow
             Write-Host "  View logs: docker-compose logs -f" -ForegroundColor Gray
             Write-Host "  Stop app:  docker-compose down" -ForegroundColor Gray
             Write-Host "  Restart:   docker-compose restart" -ForegroundColor Gray
