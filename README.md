@@ -17,7 +17,7 @@ For environment configuration and Docker deployment, see **[Setup Guide](./setup
 
 Comprehensive documentation is available in the [docs](./docs/) folder:
 
-- **[Getting Started](./docs/README.md)** - Setup, configuration, and overview
+- **[Getting Started](./docs/setup.md)** - Setup, configuration, and overview
 - **[Authentication](./docs/Auth/)** - Firebase auth integration and usage
 - **[Services](./docs/services/)** - API services and data layer
 - **[State Management](./docs/store/)** - Redux store and async thunks

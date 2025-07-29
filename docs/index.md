@@ -5,9 +5,9 @@ Welcome to The Wheel application documentation. This documentation is organized 
 ## Quick Navigation
 
 ### 🚀 Getting Started
-- [**Main README**](./README.md) - Project overview, setup, and quick start
-- [Environment Setup](./README.md#environment-variables) - Firebase configuration
-- [Development Commands](./README.md#development-commands) - Build, test, and run commands
+- [Main Setup](./setup.md) - Project overview, setup, and quick start
+- [Environment Setup](./setup.md#environment-variables) - Firebase configuration
+- [Development Commands](./setup.md#development-commands) - Build, test, and run commands
 
 ### 🏗️ Architecture
 - [**Areas**](./Areas/) - Feature-based component architecture

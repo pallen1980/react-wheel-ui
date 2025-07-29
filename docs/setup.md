@@ -1,8 +1,10 @@
-# Setup Guide
+# The Wheel - React Application
 
-This guide covers environment configuration and deployment options for The Wheel application.
+A React-based web application featuring a spinner/wheel component with Firebase authentication integration.
 
-## Environment Setup
+## Quick Start
+
+### Environment Setup
 
 Create a `.env` file in your project root directory with the following variables:
 
@@ -21,7 +23,7 @@ VITE_FIREBASE_MEASUREMENT_ID=[YOUR-FIREBASE-MEASUREMENT-ID] # Optional
 VITE_API_BASE_URL=[BASE-URL-TO-THE-API] # e.g. http://mycustomapi:512345
 ```
 
-### Environment Variables Explained
+#### Environment Variables Explained
 
 | Variable | Required | Description |
 |----------|----------|-------------|
@@ -34,6 +36,17 @@ VITE_API_BASE_URL=[BASE-URL-TO-THE-API] # e.g. http://mycustomapi:512345
 | `VITE_FIREBASE_APP_ID` | ✅ | Firebase application ID |
 | `VITE_FIREBASE_MEASUREMENT_ID` | ❌ | Google Analytics measurement ID |
 | `VITE_API_BASE_URL` | ❌ | Custom API endpoint (defaults to `/api`) |
+
+### Development Commands
+
+```bash
+npm install          # Install dependencies
+npm run dev          # Start development server
+npm run build        # Build for production
+npm run test         # Run tests
+npm run lint         # Run ESLint
+npm run preview      # Preview production build
+```
 
 ## Docker Deployment
 
@@ -168,4 +181,40 @@ docker-compose up --build
 - **Production**: Use Docker deployment for optimized builds and consistent environments
 - **Testing**: Docker setup mirrors production environment for accurate testing
 
-The Docker configuration is optimized for production deployment while maintaining ease of use for development and testing scenarios.
+## Architecture Overview
+
+The application follows an **Areas-based architecture** where each major feature/page has its own folder:
+
+- **Areas/**: Feature-based components (Header, Home, Main, Nav, Profile)
+- **Auth/**: Authentication logic with Firebase integration
+- **services/**: API services and business logic
+- **store/**: Redux state management
+
+## Key Features
+
+- Interactive spinner/wheel functionality
+- User authentication via Firebase
+- Protected routes for authenticated users
+- Responsive design with dark/light theme support
+- Options persistence with backend API
+- Dockerized deployment ready
+
+## Documentation Structure
+
+This documentation is organized to mirror the source code structure:
+
+- [Authentication](./Auth/) - Firebase auth setup and usage
+- [Services](./services/) - API services and data layer
+- [Store](./store/) - Redux state management
+- [Areas](./Areas/) - Component documentation by feature
+
+## Technology Stack
+
+- **Frontend**: React 18.3.1 with TypeScript
+- **Routing**: React Router 7.3.0
+- **Build Tool**: Vite 6.1.1
+- **State Management**: Redux Toolkit with async thunks
+- **Authentication**: Firebase 11.4.0
+- **Styling**: SCSS/Sass 1.83.4
+- **Testing**: Vitest with React Testing Library
+- **Deployment**: Docker with Nginx
