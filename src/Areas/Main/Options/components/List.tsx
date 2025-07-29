@@ -10,11 +10,13 @@ interface ListProps {
 }
 
 export default (props: ListProps) => {
+    // Sort options by sequence to ensure proper display order
+    const sortedOptions = [...props.options].sort((a, b) => a.sequence - b.sequence);
 
     return (
         <>
             <ul className="c-list">
-                {props.options.map(option => {
+                {sortedOptions.map(option => {
                     return (
                         <li
                             className="c-list__item" 

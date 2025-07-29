@@ -3,7 +3,7 @@ import ListComponent from "./components/List";
 import EntryComponent from "./components/Entry";
 
 import { Option } from "./models";
-import { generateGuid, getNextSequence, shuffleWithSequence, duplicateOptionsWithSequence } from "./helpers";
+import { generateGuid, getNextSequence, shuffleWithSequence, duplicateOptionsWithSequence, reorderOptions } from "./helpers";
 
 interface AppProps {
     options: Option[],
@@ -24,9 +24,9 @@ export default (props: AppProps) => {
     }
 
     const handleDelete = (deletedKey: string) => {
-        props.onChange(
-            props.options.filter(p => p.key !== deletedKey)
-        );
+        const filteredOptions = props.options.filter(p => p.key !== deletedKey);
+        // Reorder sequences after deletion to maintain proper ordering
+        props.onChange(reorderOptions(filteredOptions));
     }
 
     const handleNewOrChangedOption = (option: Option) => {

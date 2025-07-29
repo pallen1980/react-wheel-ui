@@ -80,7 +80,8 @@ vi.mock('../../../../src/Areas/Main/Options/helpers', () => ({
   shuffleWithSequence: vi.fn(),
   duplicateOptionsWithSequence: vi.fn(),
   getNextSequence: vi.fn(),
-  generateGuid: vi.fn()
+  generateGuid: vi.fn(),
+  reorderOptions: vi.fn()
 }));
 
 describe('Options App Component', () => {
@@ -100,6 +101,8 @@ describe('Options App Component', () => {
     vi.clearAllMocks();
     vi.mocked(helpers.generateGuid).mockReturnValue('new-guid-123');
     vi.mocked(helpers.getNextSequence).mockReturnValue(4);
+    // Mock reorderOptions to return the input as-is for most tests
+    vi.mocked(helpers.reorderOptions).mockImplementation((options) => options);
   });
 
   describe('Initial Render', () => {
@@ -200,45 +203,51 @@ describe('Options App Component', () => {
 
   describe('Delete Functionality', () => {
     it('should remove option when delete is clicked', () => {
+      const filteredOptions = [
+        { key: 'option-1', value: 'First Option', sequence: 1 },
+        { key: 'option-3', value: 'Third Option', sequence: 3 }
+      ];
+      vi.mocked(helpers.reorderOptions).mockReturnValue(filteredOptions);
+
       render(<OptionsApp {...defaultProps} />);
       
       const deleteButton = screen.getByTestId('delete-option-2');
       fireEvent.click(deleteButton);
       
-      const expectedOptions = [
-        { key: 'option-1', value: 'First Option', sequence: 1 },
-        { key: 'option-3', value: 'Third Option', sequence: 3 }
-      ];
-      
-      expect(mockOnChange).toHaveBeenCalledWith(expectedOptions);
+      expect(helpers.reorderOptions).toHaveBeenCalledWith(filteredOptions);
+      expect(mockOnChange).toHaveBeenCalledWith(filteredOptions);
     });
 
     it('should handle deleting first option', () => {
+      const filteredOptions = [
+        { key: 'option-2', value: 'Second Option', sequence: 2 },
+        { key: 'option-3', value: 'Third Option', sequence: 3 }
+      ];
+      vi.mocked(helpers.reorderOptions).mockReturnValue(filteredOptions);
+
       render(<OptionsApp {...defaultProps} />);
       
       const deleteButton = screen.getByTestId('delete-option-1');
       fireEvent.click(deleteButton);
       
-      const expectedOptions = [
-        { key: 'option-2', value: 'Second Option', sequence: 2 },
-        { key: 'option-3', value: 'Third Option', sequence: 3 }
-      ];
-      
-      expect(mockOnChange).toHaveBeenCalledWith(expectedOptions);
+      expect(helpers.reorderOptions).toHaveBeenCalledWith(filteredOptions);
+      expect(mockOnChange).toHaveBeenCalledWith(filteredOptions);
     });
 
     it('should handle deleting last option', () => {
+      const filteredOptions = [
+        { key: 'option-1', value: 'First Option', sequence: 1 },
+        { key: 'option-2', value: 'Second Option', sequence: 2 }
+      ];
+      vi.mocked(helpers.reorderOptions).mockReturnValue(filteredOptions);
+
       render(<OptionsApp {...defaultProps} />);
       
       const deleteButton = screen.getByTestId('delete-option-3');
       fireEvent.click(deleteButton);
       
-      const expectedOptions = [
-        { key: 'option-1', value: 'First Option', sequence: 1 },
-        { key: 'option-2', value: 'Second Option', sequence: 2 }
-      ];
-      
-      expect(mockOnChange).toHaveBeenCalledWith(expectedOptions);
+      expect(helpers.reorderOptions).toHaveBeenCalledWith(filteredOptions);
+      expect(mockOnChange).toHaveBeenCalledWith(filteredOptions);
     });
 
     it('should not allow delete when disabled', () => {

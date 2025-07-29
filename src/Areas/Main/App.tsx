@@ -90,7 +90,9 @@ function App() {
         }
     }, [error]);
 
-    const displayOptions = options.map((p: Option) => p.value);
+    // Sort options by sequence before displaying in spinner
+    const sortedOptions = [...options].sort((a, b) => a.sequence - b.sequence);
+    const displayOptions = sortedOptions.map((p: Option) => p.value);
 
     const capitalize = (str: string) => str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
 
@@ -103,8 +105,8 @@ function App() {
     }
 
     const handleWin = (index: number) => {
-        if (index > -1 && options.length > index) {
-            toast(`Winner! ${capitalize(options[index].value)}`);
+        if (index > -1 && sortedOptions.length > index) {
+            toast(`Winner! ${capitalize(sortedOptions[index].value)}`);
         }
         setIsSpinning(false);
     }
