@@ -4,6 +4,9 @@ import { ToastContainer, toast } from 'react-toastify';
 import Title from "./Title/components/TitleComponent";
 import Options from "./Options/App";
 import Spinner from "./Spinner/app";
+import LoadingSpinner from "./components/LoadingSpinner";
+import SaveIndicator from "./components/SaveIndicator";
+import ErrorNotification from "./components/ErrorNotification";
 
 import { Option } from "./Options/models";
 import { generateGuid } from "./Options/helpers";
@@ -16,7 +19,7 @@ import './App.scss'
 function App() {
     const dispatch = useAppDispatch();
     const { isAuthenticated } = useAuth();
-    const { options, isLoading, error } = useAppSelector((state) => state.options);
+    const { options, isLoading, isSaving } = useAppSelector((state) => state.options);
     const [ isSpinning, setIsSpinning ] = useState<boolean>(false);
 
     // Initialize with default options if no options exist and user is not authenticated
@@ -33,62 +36,28 @@ function App() {
     // Load options when user is authenticated
     useEffect(() => {
         if (isAuthenticated) {
-            dispatch(loadOptionsThunk());
+            // Import the OptionsService here to avoid circular dependencies
+            import('../../services/HttpOptionsService').then(({ HttpOptionsService }) => {
+                // Create auth token getter function
+                const getAuthToken = async () => {
+                    const { auth } = await import('../../Auth/Firebase/Config/Firebase');
+                    const user = auth.currentUser;
+                    if (!user) return null;
+                    try {
+                        return await user.getIdToken();
+                    } catch (error) {
+                        console.error('Failed to get auth token:', error);
+                        return null;
+                    }
+                };
+                
+                const optionsService = new HttpOptionsService(getAuthToken);
+                dispatch(loadOptionsThunk(optionsService));
+            });
         }
     }, [isAuthenticated, dispatch]);
 
-    // Helper function to convert technical errors to user-friendly messages
-    const getFriendlyErrorMessage = (error: string): string => {
-        // Network/connection errors
-        if (error.toLowerCase().includes('network') || 
-            error.toLowerCase().includes('connection') ||
-            error.toLowerCase().includes('fetch') ||
-            error.toLowerCase().includes('cors') ||
-            error.toLowerCase().includes('timeout')) {
-            return "We're having trouble connecting to our servers. Please check your internet connection and try again.";
-        }
-        
-        // Authentication errors
-        if (error.toLowerCase().includes('auth') || 
-            error.toLowerCase().includes('token') ||
-            error.toLowerCase().includes('unauthorized') ||
-            error.toLowerCase().includes('permission')) {
-            return "There was an issue with your login. Please try signing in again.";
-        }
-        
-        // Server errors
-        if (error.toLowerCase().includes('server') || 
-            error.toLowerCase().includes('500') ||
-            error.toLowerCase().includes('internal')) {
-            return "Our servers are experiencing some issues. Please try again in a few moments.";
-        }
-        
-        // Rate limiting
-        if (error.toLowerCase().includes('rate') || 
-            error.toLowerCase().includes('limit') ||
-            error.toLowerCase().includes('429')) {
-            return "You're making requests too quickly. Please wait a moment and try again.";
-        }
-        
-        // Generic load/save errors
-        if (error.toLowerCase().includes('failed to load')) {
-            return "We couldn't load your wheel options. Your changes are saved locally for now.";
-        }
-        
-        if (error.toLowerCase().includes('failed to save')) {
-            return "We couldn't save your changes right now. Don't worry, they're stored locally and we'll try again.";
-        }
-        
-        // Default friendly message for any other technical errors
-        return "Something went wrong, but don't worry - your wheel is still working! We'll try to fix this automatically.";
-    };
 
-    // Show error toast when there's an error
-    useEffect(() => {
-        if (error) {
-            toast.error(getFriendlyErrorMessage(error));
-        }
-    }, [error]);
 
     // Sort options by sequence before displaying in spinner
     const sortedOptions = [...options].sort((a, b) => a.sequence - b.sequence);
@@ -115,31 +84,56 @@ function App() {
         <>
             <Title greeting={"Wheel of Dooooooom"}></Title>
 
+            {/* Error notification handler */}
+            <ErrorNotification />
+
+            {/* Loading state for initial options load */}
             {isLoading && (
-                <div className="loading-indicator">
-                    <p>Loading your options...</p>
+                <LoadingSpinner 
+                    message="Loading your options..." 
+                    size="medium"
+                    className="initial-load-spinner"
+                />
+            )}
+
+            {/* Main wheel interface - only show when not loading */}
+            {!isLoading && (
+                <div className="c-wheel">
+                    <div className="c-wheel__options">
+                        {/* Save indicator for authenticated users */}
+                        {isAuthenticated && (
+                            <SaveIndicator className="options-save-indicator" />
+                        )}
+                        
+                        <Options
+                            options={options} 
+                            disabled={isSpinning || isSaving} 
+                            onChange={handleOptionsChanged}
+                        ></Options>
+                    </div>
+                    
+                    <div className="c-wheel__spinner">
+                        <Spinner 
+                            options={displayOptions} 
+                            onWin={handleWin} 
+                            onSpinStarted={handleSpinStarted}
+                        ></Spinner>
+                    </div>
                 </div>
             )}
 
-            <div className="c-wheel">
-                <div className="c-wheel__options">
-                    <Options
-                        options={options} 
-                        disabled={isSpinning || isLoading} 
-                        onChange={handleOptionsChanged}
-                    ></Options>
-                </div>
-                
-                <div className="c-wheel__spinner">
-                    <Spinner 
-                        options={displayOptions} 
-                        onWin={handleWin} 
-                        onSpinStarted={handleSpinStarted}
-                    ></Spinner>
-                </div>
-            </div>
-
-            <ToastContainer position="top-center"></ToastContainer>
+            <ToastContainer 
+                position="top-center"
+                autoClose={5000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+                theme="colored"
+            />
         </>
     )
 }

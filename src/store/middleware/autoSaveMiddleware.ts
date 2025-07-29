@@ -141,8 +141,9 @@ export const createAutoSaveMiddleware = (config: AutoSaveConfig): Middleware => 
           const currentState = store.getState();
           const currentOptions = currentState.options.options;
 
-          // Dispatch save thunk
+          // Dispatch save thunk with optionsService
           (store.dispatch as any)(saveOptionsThunk({
+            optionsService: config.optionsService,
             options: currentOptions
           }));
         });

@@ -49,11 +49,37 @@ main {
         display: flex;
         flex-direction: column;
         padding: 1em;
+        position: relative;
     }
 
     &__spinner {
         display: flex;
         flex-direction: column;
         padding: 1em;
+    }
+}
+
+// Visual feedback components
+.initial-load-spinner {
+    margin: 2rem 0;
+}
+
+.options-save-indicator {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    z-index: 10;
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+    .c-wheel {
+        flex-direction: column;
+    }
+
+    .options-save-indicator {
+        position: static;
+        margin-bottom: 1rem;
+        align-self: flex-end;
     }
 }
