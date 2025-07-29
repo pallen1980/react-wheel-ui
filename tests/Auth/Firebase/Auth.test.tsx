@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import Auth, { AuthType } from '../../../src/Auth/Firebase/Auth';
 import { Identity } from '../../../src/Auth/Models';
@@ -121,7 +121,9 @@ describe('Auth', () => {
       };
 
       // Simulate successful sign in
-      (window as any).mockAuthCallbacks.onSuccessfulSignIn(mockUser, 'mock-token');
+      await act(async () => {
+        (window as any).mockAuthCallbacks.onSuccessfulSignIn(mockUser, 'mock-token');
+      });
 
       await waitFor(() => {
         expect(screen.getByText('Logged in as: Test User')).toBeInTheDocument();
@@ -144,7 +146,9 @@ describe('Auth', () => {
         email: 'test@example.com'
       };
 
-      (window as any).mockAuthCallbacks.onSuccessfulSignIn(mockUser, 'mock-token');
+      await act(async () => {
+        (window as any).mockAuthCallbacks.onSuccessfulSignIn(mockUser, 'mock-token');
+      });
 
       await waitFor(() => {
         expect(screen.getByText('Logged in as: test@example.com')).toBeInTheDocument();
@@ -181,7 +185,9 @@ describe('Auth', () => {
         name: 'Test User',
         email: 'test@example.com'
       };
-      (window as any).mockAuthCallbacks.onSuccessfulSignIn(mockUser, 'mock-token');
+      await act(async () => {
+        (window as any).mockAuthCallbacks.onSuccessfulSignIn(mockUser, 'mock-token');
+      });
 
       await waitFor(() => {
         expect(screen.getByTestId('signout-button')).toBeInTheDocument();
@@ -232,7 +238,9 @@ describe('Auth', () => {
         email: 'test@example.com'
       };
 
-      (window as any).mockAuthCallbacks.onSuccessfulSignIn(mockUser, 'mock-token');
+      await act(async () => {
+        (window as any).mockAuthCallbacks.onSuccessfulSignIn(mockUser, 'mock-token');
+      });
 
       await waitFor(() => {
         expect(screen.getByText('Logged in as: Test User')).toBeInTheDocument();

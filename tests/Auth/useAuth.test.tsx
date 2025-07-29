@@ -59,11 +59,14 @@ describe('useAuth hook', () => {
       const { result } = renderHook(() => useAuth(), { wrapper });
 
       // The onLogin function should be async and return a promise
-      const loginResult = result.current.onLogin();
-      expect(loginResult).toBeInstanceOf(Promise);
+      let loginResult: Promise<void>;
+      act(() => {
+        loginResult = result.current.onLogin();
+      });
+      expect(loginResult!).toBeInstanceOf(Promise);
 
       await act(async () => {
-        await loginResult;
+        await loginResult!;
       });
       
       expect(result.current.isAuthenticated).toBe(true);

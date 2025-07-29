@@ -32,7 +32,8 @@ describe('HttpOptionsService', () => {
 
   beforeEach(() => {
     mockGetAuthToken = vi.fn().mockResolvedValue(mockAuthToken);
-    service = new HttpOptionsService(mockGetAuthToken);
+    // Use default configuration to match test expectations
+    service = new HttpOptionsService(mockGetAuthToken, '/api');
     vi.clearAllMocks();
   });
 
@@ -335,7 +336,13 @@ describe('HttpOptionsService', () => {
 
       expect(mockFetch).toHaveBeenCalledWith(
         'https://custom-api.com/v1/users/test-user-123/options',
-        expect.any(Object)
+        expect.objectContaining({
+          method: 'GET',
+          headers: expect.objectContaining({
+            'Authorization': 'Bearer mock-auth-token',
+            'Content-Type': 'application/json'
+          })
+        })
       );
     });
   });

@@ -85,7 +85,6 @@
   - _Requirements: 1.1, 1.2, 2.1, 2.2_
 
 - [x] 13. Refactor Options components to work with sequence property
-
   - Update Options/App.tsx to handle sequence-based ordering
   - Modify shuffle functionality to update sequence values properly
   - Update duplicate functionality to assign proper sequence values

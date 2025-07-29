@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, act } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router';
 import { describe, it, expect, vi } from 'vitest';
 import ProtectedRoute from '../../src/Auth/ProtectedRoute';
@@ -87,29 +87,35 @@ const AuthController = ({ onLogin, onLogout }: { onLogin?: () => void; onLogout?
 describe('ProtectedRoute', () => {
   describe('route protection logic', () => {
     it('should redirect to home page when user is not authenticated', () => {
-      render(
-        <TestWrapper initialEntries={['/protected']}>
-          <div />
-        </TestWrapper>
-      );
+      act(() => {
+        render(
+          <TestWrapper initialEntries={['/protected']}>
+            <div />
+          </TestWrapper>
+        );
+      });
 
       expect(screen.getByTestId('home-page')).toBeInTheDocument();
       expect(screen.queryByTestId('protected-content')).not.toBeInTheDocument();
     });
 
     it('should render protected content when user is authenticated', async () => {
-      render(
-        <TestWrapper initialEntries={['/protected']}>
-          <AuthController />
-        </TestWrapper>
-      );
+      act(() => {
+        render(
+          <TestWrapper initialEntries={['/protected']}>
+            <AuthController />
+          </TestWrapper>
+        );
+      });
 
       // Initially should redirect to home
       expect(screen.getByTestId('home-page')).toBeInTheDocument();
 
       // Login and check if protected content is accessible
       const loginButton = screen.getByTestId('test-login');
-      loginButton.click();
+      act(() => {
+        loginButton.click();
+      });
 
       // After login, should show protected content
       // Note: This test may need adjustment based on how React Router handles navigation
@@ -290,17 +296,21 @@ describe('ProtectedRoute', () => {
         );
       };
 
-      render(
-        <AuthenticatedWrapper>
-          <div />
-        </AuthenticatedWrapper>
-      );
+      act(() => {
+        render(
+          <AuthenticatedWrapper>
+            <div />
+          </AuthenticatedWrapper>
+        );
+      });
 
       // Initially redirected to home
       expect(screen.getByTestId('home-page')).toBeInTheDocument();
 
       // Login
-      screen.getByTestId('test-login').click();
+      act(() => {
+        screen.getByTestId('test-login').click();
+      });
 
       // Note: In a real application, after login you might need to navigate back to the protected route
       // This test structure shows the pattern, but the exact implementation depends on your routing logic

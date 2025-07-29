@@ -313,8 +313,10 @@ describe('optionsSlice async thunks', () => {
       const newOption: Option = { key: 'new', value: 'New Option', sequence: 4 };
 
       // Act - mix async and sync actions
+      vi.mocked(mockOptionsService.loadUserOptions).mockResolvedValue(mockOptions);
       await store.dispatch(loadOptionsThunk(mockOptionsService));
       store.dispatch(addOption(newOption));
+      vi.mocked(mockOptionsService.saveUserOptions).mockResolvedValue();
       await store.dispatch(saveOptionsThunk({ optionsService: mockOptionsService, options: [...mockOptions, newOption] }));
 
       // Assert
