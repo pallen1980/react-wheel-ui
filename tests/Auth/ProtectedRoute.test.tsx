@@ -347,13 +347,6 @@ describe('ProtectedRoute', () => {
 
   describe('component props and children handling', () => {
     it('should render any valid React children when authenticated', () => {
-      const ComplexChildren = () => (
-        <div>
-          <h1 data-testid="complex-title">Complex Protected Content</h1>
-          <p data-testid="complex-paragraph">This is a paragraph</p>
-          <button data-testid="complex-button">Action Button</button>
-        </div>
-      );
 
       // For this test, we'll mock the auth context to return authenticated
       const MockAuthenticatedWrapper = () => {
@@ -400,13 +393,6 @@ describe('ProtectedRoute', () => {
     });
 
     it('should preserve component tree structure when rendering children', () => {
-      const NestedChildren = () => (
-        <div data-testid="outer-container">
-          <div data-testid="inner-container">
-            <span data-testid="nested-content">Deeply nested content</span>
-          </div>
-        </div>
-      );
 
       // Mock authenticated state for this test
       const MockWrapper = () => (

@@ -20,7 +20,7 @@ vi.mock('../../../../src/Areas/Main/Spinner/components/SpinWheelComponent', () =
 }));
 
 vi.mock('../../../../src/Areas/Main/Spinner/components/ControlComponent', () => ({
-  default: ({ disabled, onDirectionChange, onStartSpin }: any) => (
+  default: ({ disabled, onDirectionChange, onStartSpin }: { disabled: boolean; onDirectionChange: () => void; onStartSpin: () => void }) => (
     <div data-testid="control-component">
       <button 
         data-testid="direction-button" 

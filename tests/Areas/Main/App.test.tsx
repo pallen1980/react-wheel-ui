@@ -414,7 +414,7 @@ describe('Main App Component', () => {
           { key: 'test-1', value: 'hello', sequence: 1 },
           { key: 'test-2', value: 'goodbye', sequence: 2 }
         ]);
-        const [isSpinning, setIsSpinning] = useState<boolean>(false);
+        const [, setIsSpinning] = useState<boolean>(false);
 
         const handleWin = (index: number) => {
           if (index > -1 && options.length > index) {
@@ -455,7 +455,7 @@ describe('Main App Component', () => {
           { key: 'test-1', value: 'hello', sequence: 1 },
           { key: 'test-2', value: 'goodbye', sequence: 2 }
         ]);
-        const [isSpinning, setIsSpinning] = useState<boolean>(false);
+        const [, setIsSpinning] = useState<boolean>(false);
 
         const handleWin = (index: number) => {
           if (index > -1 && options.length > index) {
@@ -520,7 +520,7 @@ describe('Main App Component', () => {
         const [options] = useState<Option[]>([
           { key: 'test-1', value: '', sequence: 1 }
         ]);
-        const [isSpinning, setIsSpinning] = useState<boolean>(false);
+        const [, setIsSpinning] = useState<boolean>(false);
 
         const capitalize = (str: string) => str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
 

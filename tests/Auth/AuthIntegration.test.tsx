@@ -6,8 +6,8 @@ import ProtectedRoute from '../../src/Auth/ProtectedRoute';
 
 
 // Mock Firebase auth
-let mockAuthStateCallback: ((user: any) => void) | null = null;
-let mockCurrentUser: any = null;
+let mockAuthStateCallback: ((user: { uid: string; displayName?: string; email?: string } | null) => void) | null = null;
+let mockCurrentUser: { uid: string; displayName?: string; email?: string } | null = null;
 
 vi.mock('../../src/Auth/Firebase/Config/Firebase', () => ({
   auth: {
@@ -23,7 +23,7 @@ vi.mock('../../src/Auth/Firebase/Config/Firebase', () => ({
 }));
 
 // Helper to simulate Firebase auth state changes
-const simulateAuthStateChange = (user: any) => {
+const simulateAuthStateChange = (user: { uid: string; displayName?: string; email?: string } | null) => {
   mockCurrentUser = user;
   if (mockAuthStateCallback) {
     act(() => {

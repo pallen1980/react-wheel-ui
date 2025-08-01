@@ -263,7 +263,7 @@ describe('Options Helper Functions', () => {
 
         it('should shuffle options and reassign sequential numbers', () => {
             // Mock Math.random to return predictable values for Fisher-Yates shuffle
-            (Math.random as any)
+            (Math.random as jest.MockedFunction<typeof Math.random>)
                 .mockReturnValueOnce(0.9) // For i=2, j=2 (no swap)
                 .mockReturnValueOnce(0.1); // For i=1, j=0 (swap positions 0 and 1)
 
@@ -313,7 +313,7 @@ describe('Options Helper Functions', () => {
 
         it('should handle two options correctly', () => {
             // Mock to force a swap
-            (Math.random as any).mockReturnValueOnce(0.1);
+            (Math.random as jest.MockedFunction<typeof Math.random>).mockReturnValueOnce(0.1);
 
             const options: Option[] = [
                 { key: 'key1', value: 'Option 1', sequence: 1 },

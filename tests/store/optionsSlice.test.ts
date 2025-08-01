@@ -47,11 +47,11 @@ describe('optionsSlice async thunks', () => {
     
     // Reset mocks
     vi.clearAllMocks();
-    (auth as any).currentUser = mockUser;
+    (auth as { currentUser: typeof mockUser }).currentUser = mockUser;
   });
 
   afterEach(() => {
-    (auth as any).currentUser = null;
+    (auth as { currentUser: null }).currentUser = null;
   });
 
   describe('loadOptionsThunk', () => {

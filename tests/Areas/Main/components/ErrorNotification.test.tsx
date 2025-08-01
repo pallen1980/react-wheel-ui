@@ -12,7 +12,7 @@ vi.mock('react-toastify', () => ({
   },
 }));
 
-const mockToast = toast as any;
+const mockToast = toast as { error: jest.MockedFunction<typeof toast.error> };
 
 // Mock store factory
 const createMockStore = (optionsState: Partial<OptionsState>) => {

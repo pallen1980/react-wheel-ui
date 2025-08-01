@@ -5,7 +5,7 @@ import { Option } from '../../../../../src/Areas/Main/Options/models';
 
 // Mock the ListItem component
 vi.mock('../../../../../src/Areas/Main/Options/components/ListItem', () => ({
-  default: ({ option, disabled, onDelete }: any) => (
+  default: ({ option, disabled, onDelete }: { option: { key: string; value: string }; disabled: boolean; onDelete: (key: string) => void }) => (
     <div data-testid={`list-item-${option.key}`}>
       <span>{option.value}</span>
       <button 
