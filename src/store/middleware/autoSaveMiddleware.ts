@@ -1,4 +1,4 @@
-import { Middleware, MiddlewareAPI, Dispatch, UnknownAction } from '@reduxjs/toolkit';
+import { Middleware, UnknownAction } from '@reduxjs/toolkit';
 import { 
   addOption, 
   updateOption, 
@@ -7,7 +7,8 @@ import {
   shuffleOptions, 
   setOptions,
   saveOptionsThunk,
-  loadOptionsThunk
+  loadOptionsThunk,
+  setOfflineMode
 } from '../optionsSlice';
 import { OptionsService } from '../../services/OptionsService';
 import { auth } from '../../Auth/Firebase/Config/Firebase';
@@ -23,9 +24,8 @@ export interface AutoSaveConfig {
 /**
  * Default configuration for auto-save middleware
  */
-const DEFAULT_CONFIG: AutoSaveConfig = {
+const DEFAULT_CONFIG: Omit<AutoSaveConfig, 'optionsService'> = {
   debounceMs: 500,
-  optionsService: null as any, // Will be injected when middleware is created
 };
 
 /**
@@ -100,16 +100,58 @@ const shouldTriggerAutoSave = (action: UnknownAction): boolean => {
 };
 
 /**
+ * Network connectivity detection
+ */
+const checkNetworkConnectivity = (): boolean => {
+  return navigator.onLine;
+};
+
+/**
  * Create auto-save middleware with configuration
  */
 export const createAutoSaveMiddleware = (config: AutoSaveConfig): Middleware => {
   const saveManager = new DebouncedSaveManager(config.debounceMs);
+
+  // Set up network connectivity listeners
+  const handleOnline = () => {
+    console.debug('Network connectivity restored');
+  };
+
+  const handleOffline = () => {
+    console.debug('Network connectivity lost');
+    saveManager.cancelSave();
+  };
+
+  // Add event listeners for network status
+  if (typeof window !== 'undefined') {
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+  }
 
   return (store) => 
     (next) => 
     (action) => {
       // Process the action first
       const result = next(action);
+
+      // Monitor network connectivity and update offline mode
+      const actionWithType = action as { type: string };
+      if (actionWithType.type === 'options/saveOptions/rejected' || 
+          actionWithType.type === 'options/loadOptions/rejected') {
+        // Check if we should enable offline mode based on network connectivity
+        if (!checkNetworkConnectivity()) {
+          store.dispatch(setOfflineMode(true));
+        }
+      }
+
+      // Re-enable online mode when network is restored and operations succeed
+      if (actionWithType.type === 'options/saveOptions/fulfilled' || 
+          actionWithType.type === 'options/loadOptions/fulfilled') {
+        const state = store.getState();
+        if (state.options.isOfflineMode && checkNetworkConnectivity()) {
+          store.dispatch(setOfflineMode(false));
+        }
+      }
 
       // Check if this action should trigger auto-save
       if (shouldTriggerAutoSave(action as UnknownAction)) {
@@ -122,11 +164,17 @@ export const createAutoSaveMiddleware = (config: AutoSaveConfig): Middleware => 
 
         // Get current state after action has been processed
         const state = store.getState();
-        const { isSaving } = state.options;
+        const { isSaving, isOfflineMode } = state.options;
 
         // Skip if already saving to prevent concurrent saves
         if (isSaving) {
           console.debug('Auto-save skipped: Save already in progress');
+          return result;
+        }
+
+        // Skip auto-save if in offline mode or no network connectivity
+        if (isOfflineMode || !checkNetworkConnectivity()) {
+          console.debug('Auto-save skipped: Application is in offline mode or no network connectivity');
           return result;
         }
 
@@ -141,7 +189,13 @@ export const createAutoSaveMiddleware = (config: AutoSaveConfig): Middleware => 
 
           // Get fresh state at save time
           const currentState = store.getState();
-          const currentOptions = currentState.options.options;
+          const { options: currentOptions, isOfflineMode: currentOfflineMode } = currentState.options;
+
+          // Skip auto-save if in offline mode or no network connectivity
+          if (currentOfflineMode || !checkNetworkConnectivity()) {
+            console.debug('Auto-save cancelled: Application is in offline mode or no network connectivity');
+            return;
+          }
 
           // Dispatch save thunk with optionsService and userId
           (store.dispatch as any)(saveOptionsThunk({
@@ -153,7 +207,6 @@ export const createAutoSaveMiddleware = (config: AutoSaveConfig): Middleware => 
       }
 
       // Cancel pending saves when user logs out or options are cleared
-      const actionWithType = action as { type: string };
       if (actionWithType.type === 'auth/logout' || actionWithType.type === 'options/clearOptions') {
         saveManager.cancelSave();
       }

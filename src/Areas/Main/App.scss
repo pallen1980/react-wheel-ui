@@ -71,6 +71,24 @@ main {
     z-index: 10;
 }
 
+// Status indicators
+.c-wheel__status-indicators {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding: 0.5rem;
+
+    .offline-indicator {
+        flex-shrink: 0;
+    }
+
+    .retry-button-main {
+        flex-shrink: 0;
+    }
+}
+
 // Responsive adjustments
 @media (max-width: 768px) {
     .c-wheel {
@@ -81,5 +99,10 @@ main {
         position: static;
         margin-bottom: 1rem;
         align-self: flex-end;
+    }
+
+    .c-wheel__status-indicators {
+        flex-direction: column;
+        gap: 0.5rem;
     }
 }

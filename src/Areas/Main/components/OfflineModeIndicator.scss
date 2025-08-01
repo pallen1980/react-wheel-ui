@@ -1,0 +1,108 @@
+.offline-mode-indicator {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  border: 1px solid;
+  transition: all 0.2s ease-in-out;
+
+  &__content {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__icon {
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: 0.125rem;
+  }
+
+  &__status {
+    font-weight: 500;
+    line-height: 1.2;
+  }
+
+  &__subtext {
+    font-size: 0.75rem;
+    opacity: 0.8;
+    line-height: 1.2;
+  }
+
+  // Network offline (no internet connection)
+  &--network-offline {
+    background-color: var(--color-error-bg, #fef2f2);
+    border-color: var(--color-error-border, #fecaca);
+    color: var(--color-error-text, #dc2626);
+
+    .offline-mode-indicator__icon {
+      animation: pulse 2s infinite;
+    }
+  }
+
+  // App offline mode (server issues)
+  &--app-offline {
+    background-color: var(--color-warning-bg, #fffbeb);
+    border-color: var(--color-warning-border, #fed7aa);
+    color: var(--color-warning-text, #d97706);
+  }
+
+  // Online mode
+  &--online {
+    background-color: var(--color-success-bg, #f0fdf4);
+    border-color: var(--color-success-border, #bbf7d0);
+    color: var(--color-success-text, #16a34a);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+// Dark theme support
+@media (prefers-color-scheme: dark) {
+  .offline-mode-indicator {
+    &--network-offline {
+      background-color: var(--color-error-bg-dark, #450a0a);
+      border-color: var(--color-error-border-dark, #7f1d1d);
+      color: var(--color-error-text-dark, #f87171);
+    }
+
+    &--app-offline {
+      background-color: var(--color-warning-bg-dark, #451a03);
+      border-color: var(--color-warning-border-dark, #92400e);
+      color: var(--color-warning-text-dark, #fbbf24);
+    }
+
+    &--online {
+      background-color: var(--color-success-bg-dark, #052e16);
+      border-color: var(--color-success-border-dark, #166534);
+      color: var(--color-success-text-dark, #4ade80);
+    }
+  }
+}
+
+// Compact variant for smaller spaces
+.offline-mode-indicator--compact {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+
+  .offline-mode-indicator__icon {
+    font-size: 0.875rem;
+  }
+
+  .offline-mode-indicator__subtext {
+    display: none;
+  }
+}

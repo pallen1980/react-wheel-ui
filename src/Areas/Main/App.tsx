@@ -7,19 +7,22 @@ import Spinner from "./Spinner/app";
 import LoadingSpinner from "./components/LoadingSpinner";
 import SaveIndicator from "./components/SaveIndicator";
 import ErrorNotification from "./components/ErrorNotification";
+import OfflineModeIndicator from "./components/OfflineModeIndicator";
+import RetryButton from "./components/RetryButton";
 
 import { Option } from "./Options/models";
 import { generateGuid } from "./Options/helpers";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { loadOptionsThunk, setOptions, clearOptions } from "../../store/optionsSlice";
+import { loadOptionsThunk, setOptions, clearOptions, setOfflineMode } from "../../store/optionsSlice";
 import { useAuth } from "../../Auth/AuthProvider";
+import { logOfflineModeEnabled, logOfflineModeDisabled } from "../../utils/errorLogger";
 
 import './App.scss'
 
 function App() {
     const dispatch = useAppDispatch();
     const { isAuthenticated, user } = useAuth();
-    const { options, isLoading, isSaving } = useAppSelector((state) => state.options);
+    const { options, isLoading, isSaving, isOfflineMode, lastError } = useAppSelector((state) => state.options);
     const [ isSpinning, setIsSpinning ] = useState<boolean>(false);
 
     // Initialize with default options if no options exist and user is not authenticated
@@ -32,6 +35,36 @@ function App() {
             dispatch(setOptions(defaultOptions));
         }
     }, [isAuthenticated, options.length, dispatch]);
+
+    // Monitor network connectivity
+    useEffect(() => {
+        const handleOnline = () => {
+            if (isOfflineMode) {
+                logOfflineModeDisabled({ userId: user?.id });
+                dispatch(setOfflineMode(false));
+            }
+        };
+
+        const handleOffline = () => {
+            if (!isOfflineMode) {
+                logOfflineModeEnabled('Network connectivity lost', { userId: user?.id });
+                dispatch(setOfflineMode(true));
+            }
+        };
+
+        window.addEventListener('online', handleOnline);
+        window.addEventListener('offline', handleOffline);
+
+        // Check initial network status
+        if (!navigator.onLine && !isOfflineMode) {
+            dispatch(setOfflineMode(true));
+        }
+
+        return () => {
+            window.removeEventListener('online', handleOnline);
+            window.removeEventListener('offline', handleOffline);
+        };
+    }, [isOfflineMode, user?.id, dispatch]);
 
     // Handle authentication state changes
     useEffect(() => {
@@ -90,6 +123,16 @@ function App() {
             {/* Error notification handler */}
             <ErrorNotification />
 
+            {/* Offline mode indicator */}
+            {isAuthenticated && (
+                <div className="c-wheel__status-indicators">
+                    <OfflineModeIndicator className="offline-indicator" />
+                    {lastError?.retryable && (
+                        <RetryButton className="retry-button-main" />
+                    )}
+                </div>
+            )}
+
             {/* Loading state for initial options load */}
             {isLoading && (
                 <LoadingSpinner 
@@ -110,7 +153,7 @@ function App() {
                         
                         <Options
                             options={options} 
-                            disabled={isSpinning || isSaving} 
+                            disabled={isSpinning || isSaving || (isOfflineMode && isAuthenticated)} 
                             onChange={handleOptionsChanged}
                         ></Options>
                     </div>

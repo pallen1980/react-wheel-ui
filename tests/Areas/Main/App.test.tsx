@@ -22,7 +22,7 @@ vi.mock('../../../src/Areas/Main/Options/App', () => ({
     onChange: (options: Option[]) => void
   }) => (
     <div data-testid="options">
-      <div data-testid="options-disabled">{disabled.toString()}</div>
+      <div data-testid="options-disabled">{(disabled || false).toString()}</div>
       <div data-testid="options-count">{options.length}</div>
       <button
         data-testid="add-option"

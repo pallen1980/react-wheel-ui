@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { Option } from '../Areas/Main/Options/models';
 import { OptionsService, OptionsServiceError } from '../services/OptionsService';
-import { auth } from '../Auth/Firebase/Config/Firebase';
+
 
 export interface OptionsState {
   options: Option[];
@@ -9,6 +9,14 @@ export interface OptionsState {
   isSaving: boolean;
   error: string | null;
   lastSaved: string | null;
+  isOfflineMode: boolean;
+  retryCount: number;
+  lastError: {
+    type: string;
+    message: string;
+    retryable: boolean;
+    timestamp: string;
+  } | null;
 }
 
 export interface ReorderPayload {
@@ -22,6 +30,9 @@ const initialState: OptionsState = {
   isSaving: false,
   error: null,
   lastSaved: null,
+  isOfflineMode: false,
+  retryCount: 0,
+  lastError: null,
 };
 
 // Async thunk for loading user options
@@ -90,6 +101,58 @@ export const saveOptionsThunk = createAsyncThunk(
       return rejectWithValue({
         type: 'network',
         message: error instanceof Error ? error.message : 'Unknown error occurred',
+        retryable: false
+      });
+    }
+  }
+);
+
+// Async thunk for user-initiated retry operations
+export const retryLastOperationThunk = createAsyncThunk(
+  'options/retryLastOperation',
+  async (
+    { optionsService, userId, options, operationType }: { 
+      optionsService: OptionsService; 
+      userId: string; 
+      options?: Option[];
+      operationType: 'load' | 'save';
+    },
+    { rejectWithValue, getState }
+  ) => {
+    try {
+      const state = getState() as { options: OptionsState };
+      
+      // Check if we should retry based on last error
+      if (!state.options.lastError?.retryable) {
+        return rejectWithValue({
+          type: 'retry',
+          message: 'This operation cannot be retried',
+          retryable: false
+        });
+      }
+
+      if (operationType === 'load') {
+        const loadedOptions = await optionsService.loadUserOptions(userId);
+        return { type: 'load', options: loadedOptions };
+      } else {
+        if (!options) {
+          throw new Error('Options required for save retry');
+        }
+        await optionsService.saveUserOptions(userId, options);
+        return { type: 'save', savedAt: new Date().toISOString() };
+      }
+    } catch (error) {
+      if (error instanceof OptionsServiceError) {
+        return rejectWithValue({
+          type: error.type,
+          message: error.message,
+          retryable: error.retryable
+        });
+      }
+      
+      return rejectWithValue({
+        type: 'network',
+        message: error instanceof Error ? error.message : 'Retry failed',
         retryable: false
       });
     }
@@ -190,6 +253,35 @@ const optionsSlice = createSlice({
     },
     clearError: (state) => {
       state.error = null;
+      state.lastError = null;
+    },
+    setOfflineMode: (state, action: PayloadAction<boolean>) => {
+      state.isOfflineMode = action.payload;
+      if (action.payload) {
+        // Clear loading states when going offline
+        state.isLoading = false;
+        state.isSaving = false;
+      }
+    },
+    incrementRetryCount: (state) => {
+      state.retryCount += 1;
+    },
+    resetRetryCount: (state) => {
+      state.retryCount = 0;
+    },
+    setLastError: (state, action: PayloadAction<{
+      type: string;
+      message: string;
+      retryable: boolean;
+    } | null>) => {
+      if (action.payload) {
+        state.lastError = {
+          ...action.payload,
+          timestamp: new Date().toISOString()
+        };
+      } else {
+        state.lastError = null;
+      }
     },
   },
   extraReducers: (builder) => {
@@ -207,7 +299,20 @@ const optionsSlice = createSlice({
       .addCase(loadOptionsThunk.rejected, (state, action) => {
         state.isLoading = false;
         const errorPayload = action.payload as { type: string; message: string; retryable: boolean };
-        state.error = errorPayload?.message || 'Unable to load your saved options';
+        const errorMessage = errorPayload?.message || 'Unable to load your saved options';
+        
+        state.error = errorMessage;
+        state.lastError = {
+          type: errorPayload?.type || 'unknown',
+          message: errorMessage,
+          retryable: errorPayload?.retryable || false,
+          timestamp: new Date().toISOString()
+        };
+
+        // Enable offline mode for network errors
+        if (errorPayload?.type === 'network') {
+          state.isOfflineMode = true;
+        }
       });
 
     // Save options thunk
@@ -224,7 +329,58 @@ const optionsSlice = createSlice({
       .addCase(saveOptionsThunk.rejected, (state, action) => {
         state.isSaving = false;
         const errorPayload = action.payload as { type: string; message: string; retryable: boolean };
-        state.error = errorPayload?.message || 'Unable to save your changes';
+        const errorMessage = errorPayload?.message || 'Unable to save your changes';
+        
+        state.error = errorMessage;
+        state.lastError = {
+          type: errorPayload?.type || 'unknown',
+          message: errorMessage,
+          retryable: errorPayload?.retryable || false,
+          timestamp: new Date().toISOString()
+        };
+
+        // Enable offline mode for network errors
+        if (errorPayload?.type === 'network') {
+          state.isOfflineMode = true;
+        }
+      });
+
+    // Retry operation thunk
+    builder
+      .addCase(retryLastOperationThunk.pending, (state) => {
+        state.error = null;
+        state.retryCount += 1;
+      })
+      .addCase(retryLastOperationThunk.fulfilled, (state, action) => {
+        const { type, options, savedAt } = action.payload;
+        
+        if (type === 'load' && options) {
+          state.options = [...options].sort((a, b) => a.sequence - b.sequence);
+        } else if (type === 'save' && savedAt) {
+          state.lastSaved = savedAt;
+        }
+        
+        // Clear error states and disable offline mode on successful retry
+        state.error = null;
+        state.lastError = null;
+        state.isOfflineMode = false;
+        state.retryCount = 0;
+        state.isLoading = false;
+        state.isSaving = false;
+      })
+      .addCase(retryLastOperationThunk.rejected, (state, action) => {
+        const errorPayload = action.payload as { type: string; message: string; retryable: boolean };
+        const errorMessage = errorPayload?.message || 'Retry operation failed';
+        
+        state.error = errorMessage;
+        state.lastError = {
+          type: errorPayload?.type || 'unknown',
+          message: errorMessage,
+          retryable: errorPayload?.retryable || false,
+          timestamp: new Date().toISOString()
+        };
+        state.isLoading = false;
+        state.isSaving = false;
       });
   },
 });
@@ -242,6 +398,10 @@ export const {
   setError,
   setLastSaved,
   clearError,
+  setOfflineMode,
+  incrementRetryCount,
+  resetRetryCount,
+  setLastError,
 } = optionsSlice.actions;
 
 export default optionsSlice.reducer;
