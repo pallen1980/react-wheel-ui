@@ -11,14 +11,14 @@ import ErrorNotification from "./components/ErrorNotification";
 import { Option } from "./Options/models";
 import { generateGuid } from "./Options/helpers";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
-import { loadOptionsThunk, setOptions } from "../../store/optionsSlice";
+import { loadOptionsThunk, setOptions, clearOptions } from "../../store/optionsSlice";
 import { useAuth } from "../../Auth/AuthProvider";
 
 import './App.scss'
 
 function App() {
     const dispatch = useAppDispatch();
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, user } = useAuth();
     const { options, isLoading, isSaving } = useAppSelector((state) => state.options);
     const [ isSpinning, setIsSpinning ] = useState<boolean>(false);
 
@@ -33,18 +33,18 @@ function App() {
         }
     }, [isAuthenticated, options.length, dispatch]);
 
-    // Load options when user is authenticated
+    // Handle authentication state changes
     useEffect(() => {
-        if (isAuthenticated) {
-            // Import the OptionsService here to avoid circular dependencies
+        if (isAuthenticated && user?.id) {
+            // User logged in - load their options
             import('../../services/HttpOptionsService').then(({ HttpOptionsService }) => {
                 // Create auth token getter function
                 const getAuthToken = async () => {
                     const { auth } = await import('../../Auth/Firebase/Config/Firebase');
-                    const user = auth.currentUser;
-                    if (!user) return null;
+                    const firebaseUser = auth.currentUser;
+                    if (!firebaseUser) return null;
                     try {
-                        return await user.getIdToken();
+                        return await firebaseUser.getIdToken();
                     } catch (error) {
                         console.error('Failed to get auth token:', error);
                         return null;
@@ -52,10 +52,13 @@ function App() {
                 };
                 
                 const optionsService = new HttpOptionsService(getAuthToken);
-                dispatch(loadOptionsThunk(optionsService));
+                dispatch(loadOptionsThunk({ optionsService, userId: user.id }));
             });
+        } else if (!isAuthenticated) {
+            // User logged out - clear options from store
+            dispatch(clearOptions());
         }
-    }, [isAuthenticated, dispatch]);
+    }, [isAuthenticated, user?.id, dispatch]);
 
 
 

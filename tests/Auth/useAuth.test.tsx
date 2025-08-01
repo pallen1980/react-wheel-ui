@@ -1,11 +1,19 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
 import AuthProvider, { useAuth } from '../../src/Auth/AuthProvider';
+import { Identity } from '../../src/Auth/Models';
 
 // Wrapper component for the hook tests
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <AuthProvider>{children}</AuthProvider>
 );
+
+// Mock user for testing
+const mockUser: Identity = {
+  id: 'test-user-123',
+  name: 'Test User',
+  email: 'test@example.com'
+};
 
 describe('useAuth hook', () => {
   describe('hook behavior and state management', () => {
@@ -13,6 +21,7 @@ describe('useAuth hook', () => {
       const { result } = renderHook(() => useAuth(), { wrapper });
 
       expect(result.current.isAuthenticated).toBe(false);
+      expect(result.current.user).toBe(null);
       expect(typeof result.current.onLogin).toBe('function');
       expect(typeof result.current.onLogout).toBe('function');
     });
@@ -43,90 +52,97 @@ describe('useAuth hook', () => {
   });
 
   describe('login operations', () => {
-    it('should update isAuthenticated to true when onLogin is called', async () => {
+    it('should update isAuthenticated to true when onLogin is called', () => {
       const { result } = renderHook(() => useAuth(), { wrapper });
 
       expect(result.current.isAuthenticated).toBe(false);
+      expect(result.current.user).toBe(null);
 
-      await act(async () => {
-        await result.current.onLogin();
+      act(() => {
+        result.current.onLogin(mockUser);
       });
 
       expect(result.current.isAuthenticated).toBe(true);
+      expect(result.current.user).toEqual(mockUser);
     });
 
-    it('should handle onLogin as async operation', async () => {
+    it('should handle onLogin as synchronous operation', () => {
       const { result } = renderHook(() => useAuth(), { wrapper });
 
-      // The onLogin function should be async and return a promise
-      let loginResult: Promise<void>;
+      // The onLogin function should be synchronous
       act(() => {
-        loginResult = result.current.onLogin();
-      });
-      expect(loginResult!).toBeInstanceOf(Promise);
-
-      await act(async () => {
-        await loginResult!;
+        const loginResult = result.current.onLogin(mockUser);
+        expect(loginResult).toBeUndefined();
       });
       
       expect(result.current.isAuthenticated).toBe(true);
+      expect(result.current.user).toEqual(mockUser);
     });
 
-    it('should maintain authentication state after login', async () => {
+    it('should maintain authentication state after login', () => {
       const { result, rerender } = renderHook(() => useAuth(), { wrapper });
 
-      await act(async () => {
-        await result.current.onLogin();
+      act(() => {
+        result.current.onLogin(mockUser);
       });
 
       expect(result.current.isAuthenticated).toBe(true);
+      expect(result.current.user).toEqual(mockUser);
 
       // Rerender should maintain state
       rerender();
       expect(result.current.isAuthenticated).toBe(true);
+      expect(result.current.user).toEqual(mockUser);
     });
 
-    it('should handle multiple consecutive login calls', async () => {
+    it('should handle multiple consecutive login calls', () => {
       const { result } = renderHook(() => useAuth(), { wrapper });
 
-      await act(async () => {
-        await result.current.onLogin();
+      act(() => {
+        result.current.onLogin(mockUser);
       });
       expect(result.current.isAuthenticated).toBe(true);
+      expect(result.current.user).toEqual(mockUser);
 
-      await act(async () => {
-        await result.current.onLogin();
+      const anotherUser: Identity = { id: 'user-456', name: 'Another User', email: 'another@example.com' };
+      act(() => {
+        result.current.onLogin(anotherUser);
       });
       expect(result.current.isAuthenticated).toBe(true);
+      expect(result.current.user).toEqual(anotherUser);
     });
   });
 
   describe('logout operations', () => {
-    it('should update isAuthenticated to false when onLogout is called', async () => {
+    it('should update isAuthenticated to false when onLogout is called', () => {
       const { result } = renderHook(() => useAuth(), { wrapper });
 
       // First login
-      await act(async () => {
-        await result.current.onLogin();
+      act(() => {
+        result.current.onLogin(mockUser);
       });
       expect(result.current.isAuthenticated).toBe(true);
+      expect(result.current.user).toEqual(mockUser);
 
       // Then logout
       act(() => {
         result.current.onLogout();
       });
       expect(result.current.isAuthenticated).toBe(false);
+      expect(result.current.user).toBe(null);
     });
 
     it('should handle logout when already logged out', () => {
       const { result } = renderHook(() => useAuth(), { wrapper });
 
       expect(result.current.isAuthenticated).toBe(false);
+      expect(result.current.user).toBe(null);
 
       act(() => {
         result.current.onLogout();
       });
       expect(result.current.isAuthenticated).toBe(false);
+      expect(result.current.user).toBe(null);
     });
 
     it('should handle onLogout as synchronous operation', () => {
@@ -139,12 +155,12 @@ describe('useAuth hook', () => {
       });
     });
 
-    it('should maintain logout state after logout', async () => {
+    it('should maintain logout state after logout', () => {
       const { result, rerender } = renderHook(() => useAuth(), { wrapper });
 
       // Login first
-      await act(async () => {
-        await result.current.onLogin();
+      act(() => {
+        result.current.onLogin(mockUser);
       });
 
       // Then logout
@@ -152,18 +168,20 @@ describe('useAuth hook', () => {
         result.current.onLogout();
       });
       expect(result.current.isAuthenticated).toBe(false);
+      expect(result.current.user).toBe(null);
 
       // Rerender should maintain state
       rerender();
       expect(result.current.isAuthenticated).toBe(false);
+      expect(result.current.user).toBe(null);
     });
 
-    it('should handle multiple consecutive logout calls', async () => {
+    it('should handle multiple consecutive logout calls', () => {
       const { result } = renderHook(() => useAuth(), { wrapper });
 
       // Login first
-      await act(async () => {
-        await result.current.onLogin();
+      act(() => {
+        result.current.onLogin(mockUser);
       });
 
       // Multiple logouts
@@ -171,57 +189,66 @@ describe('useAuth hook', () => {
         result.current.onLogout();
       });
       expect(result.current.isAuthenticated).toBe(false);
+      expect(result.current.user).toBe(null);
 
       act(() => {
         result.current.onLogout();
       });
       expect(result.current.isAuthenticated).toBe(false);
+      expect(result.current.user).toBe(null);
     });
   });
 
   describe('state consistency', () => {
-    it('should maintain consistent state within the same provider context', async () => {
+    it('should maintain consistent state within the same provider context', () => {
       const { result } = renderHook(() => useAuth(), { wrapper });
 
       // Initial state
       expect(result.current.isAuthenticated).toBe(false);
+      expect(result.current.user).toBe(null);
 
       // Login and verify state change
-      await act(async () => {
-        await result.current.onLogin();
+      act(() => {
+        result.current.onLogin(mockUser);
       });
       expect(result.current.isAuthenticated).toBe(true);
+      expect(result.current.user).toEqual(mockUser);
 
       // Logout and verify state change
       act(() => {
         result.current.onLogout();
       });
       expect(result.current.isAuthenticated).toBe(false);
+      expect(result.current.user).toBe(null);
     });
 
-    it('should handle complete authentication cycle', async () => {
+    it('should handle complete authentication cycle', () => {
       const { result } = renderHook(() => useAuth(), { wrapper });
 
       // Initial state
       expect(result.current.isAuthenticated).toBe(false);
+      expect(result.current.user).toBe(null);
 
       // Login
-      await act(async () => {
-        await result.current.onLogin();
+      act(() => {
+        result.current.onLogin(mockUser);
       });
       expect(result.current.isAuthenticated).toBe(true);
+      expect(result.current.user).toEqual(mockUser);
 
       // Logout
       act(() => {
         result.current.onLogout();
       });
       expect(result.current.isAuthenticated).toBe(false);
+      expect(result.current.user).toBe(null);
 
       // Login again
-      await act(async () => {
-        await result.current.onLogin();
+      act(() => {
+        result.current.onLogin(mockUser);
       });
       expect(result.current.isAuthenticated).toBe(true);
+      expect(result.current.user).toEqual(mockUser);
     });
   });
 });

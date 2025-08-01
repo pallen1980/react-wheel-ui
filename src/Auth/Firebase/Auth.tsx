@@ -28,7 +28,7 @@ const Auth = (props: AuthProps) => {
     const handleSuccessfulSignIn = (user?: Identity, token?: string | undefined) => {
         if (user) {
             setUser(user);
-            onLogin();   
+            onLogin(user);   
             setIsLoading(false);
         }
     }

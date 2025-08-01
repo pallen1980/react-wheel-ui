@@ -1,10 +1,16 @@
-import { createContext, useContext, useState, useCallback } from "react";
+import { createContext, useContext, useState, useCallback, useEffect } from "react";
+import { onAuthStateChanged, User } from "firebase/auth";
+import { auth } from "./Firebase/Config/Firebase";
+import { Identity } from "./Models";
 
-const AuthContext = createContext<{
+interface AuthContextType {
     isAuthenticated: boolean;
-    onLogin: () => Promise<void>;
+    user: Identity | null;
+    onLogin: (user: Identity) => void;
     onLogout: () => void;
-} | null>(null);
+}
+
+const AuthContext = createContext<AuthContextType | null>(null);
 
 type AuthProviderProps = {
     children: React.ReactNode;
@@ -12,17 +18,41 @@ type AuthProviderProps = {
   
 export default ({ children }: AuthProviderProps) => {
     const [isAuthenticated, setAuthenticated] = useState(false);
+    const [user, setUser] = useState<Identity | null>(null);
 
-    const handleLogin = useCallback(async () => {
+    // Listen to Firebase auth state changes
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (firebaseUser: User | null) => {
+            if (firebaseUser) {
+                const userIdentity: Identity = {
+                    id: firebaseUser.uid,
+                    name: firebaseUser.displayName || undefined,
+                    email: firebaseUser.email || undefined,
+                };
+                setUser(userIdentity);
+                setAuthenticated(true);
+            } else {
+                setUser(null);
+                setAuthenticated(false);
+            }
+        });
+
+        return () => unsubscribe();
+    }, []);
+
+    const handleLogin = useCallback((userIdentity: Identity) => {
+        setUser(userIdentity);
         setAuthenticated(true);
     }, []);
 
     const handleLogout = useCallback(() => {
+        setUser(null);
         setAuthenticated(false);
     }, []);
 
     const value = {
         isAuthenticated,
+        user,
         onLogin: handleLogin,
         onLogout: handleLogout,
     };

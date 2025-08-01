@@ -74,10 +74,10 @@ class DebouncedSaveManager {
 }
 
 /**
- * Check if the current user is authenticated
+ * Get current user ID from Firebase auth
  */
-const isUserAuthenticated = (): boolean => {
-  return auth.currentUser !== null;
+const getCurrentUserId = (): string | null => {
+  return auth.currentUser?.uid || null;
 };
 
 /**
@@ -114,7 +114,8 @@ export const createAutoSaveMiddleware = (config: AutoSaveConfig): Middleware => 
       // Check if this action should trigger auto-save
       if (shouldTriggerAutoSave(action as UnknownAction)) {
         // Check authentication before attempting save
-        if (!isUserAuthenticated()) {
+        const userId = getCurrentUserId();
+        if (!userId) {
           console.debug('Auto-save skipped: User not authenticated');
           return result;
         }
@@ -132,7 +133,8 @@ export const createAutoSaveMiddleware = (config: AutoSaveConfig): Middleware => 
         // Schedule debounced save
         saveManager.scheduleSave(() => {
           // Double-check authentication at save time
-          if (!isUserAuthenticated()) {
+          const currentUserId = getCurrentUserId();
+          if (!currentUserId) {
             console.debug('Auto-save cancelled: User no longer authenticated');
             return;
           }
@@ -141,9 +143,10 @@ export const createAutoSaveMiddleware = (config: AutoSaveConfig): Middleware => 
           const currentState = store.getState();
           const currentOptions = currentState.options.options;
 
-          // Dispatch save thunk with optionsService
+          // Dispatch save thunk with optionsService and userId
           (store.dispatch as any)(saveOptionsThunk({
             optionsService: config.optionsService,
+            userId: currentUserId,
             options: currentOptions
           }));
         });

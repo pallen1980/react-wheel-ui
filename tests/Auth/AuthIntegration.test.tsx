@@ -1,8 +1,36 @@
 import { render, screen, act } from '@testing-library/react';
 import { MemoryRouter, Routes, Route, useLocation } from 'react-router';
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import AuthProvider, { useAuth } from '../../src/Auth/AuthProvider';
 import ProtectedRoute from '../../src/Auth/ProtectedRoute';
+import { Identity } from '../../src/Auth/Models';
+
+// Mock Firebase auth
+let mockAuthStateCallback: ((user: any) => void) | null = null;
+let mockCurrentUser: any = null;
+
+vi.mock('../../src/Auth/Firebase/Config/Firebase', () => ({
+  auth: {
+    currentUser: null,
+    onAuthStateChanged: vi.fn((callback) => {
+      mockAuthStateCallback = callback;
+      // Call immediately with current state
+      callback(mockCurrentUser);
+      // Return unsubscribe function
+      return vi.fn();
+    }),
+  },
+}));
+
+// Helper to simulate Firebase auth state changes
+const simulateAuthStateChange = (user: any) => {
+  mockCurrentUser = user;
+  if (mockAuthStateCallback) {
+    act(() => {
+      mockAuthStateCallback(user);
+    });
+  }
+};
 
 // Test components
 const HomePage = () => {
@@ -26,15 +54,30 @@ const DashboardPage = () => (
 const AuthControls = () => {
   const { isAuthenticated, onLogin, onLogout } = useAuth();
   
+  const handleLogin = () => {
+    // Simulate Firebase login
+    const mockUser = {
+      uid: 'test-user-123',
+      displayName: 'Test User',
+      email: 'test@example.com',
+    };
+    simulateAuthStateChange(mockUser);
+  };
+
+  const handleLogout = () => {
+    // Simulate Firebase logout
+    simulateAuthStateChange(null);
+  };
+  
   return (
     <div>
       <div data-testid="auth-status">
         Status: {isAuthenticated ? 'Authenticated' : 'Not Authenticated'}
       </div>
-      <button data-testid="login-button" onClick={onLogin}>
+      <button data-testid="login-button" onClick={handleLogin}>
         Login
       </button>
-      <button data-testid="logout-button" onClick={onLogout}>
+      <button data-testid="logout-button" onClick={handleLogout}>
         Logout
       </button>
     </div>
@@ -86,6 +129,11 @@ const TestApp = ({ initialEntries = ['/'] }: { initialEntries?: string[] }) => (
 );
 
 describe('Authentication Integration Tests', () => {
+  beforeEach(() => {
+    // Reset mock auth state before each test
+    mockCurrentUser = null;
+    mockAuthStateCallback = null;
+  });
   describe('complete authentication flow', () => {
     it('should handle full user authentication journey', async () => {
       render(<TestApp />);

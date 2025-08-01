@@ -24,34 +24,14 @@ const initialState: OptionsState = {
   lastSaved: null,
 };
 
-// Helper function to get current user ID
-const getCurrentUserId = (): string | null => {
-  return auth.currentUser?.uid || null;
-};
-
-// Helper function to get auth token
-const getAuthToken = async (): Promise<string | null> => {
-  const user = auth.currentUser;
-  if (!user) return null;
-  
-  try {
-    return await user.getIdToken();
-  } catch (error) {
-    console.error('Failed to get auth token:', error);
-    throw new OptionsServiceError(
-      'auth' as any,
-      'Failed to get authentication token',
-      false
-    );
-  }
-};
-
 // Async thunk for loading user options
 export const loadOptionsThunk = createAsyncThunk(
   'options/loadOptions',
-  async (optionsService: OptionsService, { rejectWithValue }) => {
+  async (
+    { optionsService, userId }: { optionsService: OptionsService; userId: string },
+    { rejectWithValue }
+  ) => {
     try {
-      const userId = getCurrentUserId();
       if (!userId) {
         throw new OptionsServiceError(
           'auth' as any,
@@ -59,9 +39,6 @@ export const loadOptionsThunk = createAsyncThunk(
           false
         );
       }
-
-      // Verify we can get auth token before proceeding
-      await getAuthToken();
 
       const options = await optionsService.loadUserOptions(userId);
       return options;
@@ -87,11 +64,10 @@ export const loadOptionsThunk = createAsyncThunk(
 export const saveOptionsThunk = createAsyncThunk(
   'options/saveOptions',
   async (
-    { optionsService, options }: { optionsService: OptionsService; options: Option[] },
+    { optionsService, userId, options }: { optionsService: OptionsService; userId: string; options: Option[] },
     { rejectWithValue }
   ) => {
     try {
-      const userId = getCurrentUserId();
       if (!userId) {
         throw new OptionsServiceError(
           'auth' as any,
@@ -99,9 +75,6 @@ export const saveOptionsThunk = createAsyncThunk(
           false
         );
       }
-
-      // Verify we can get auth token before proceeding
-      await getAuthToken();
 
       await optionsService.saveUserOptions(userId, options);
       return { savedAt: new Date().toISOString() };

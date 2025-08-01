@@ -64,7 +64,10 @@ describe('optionsSlice async thunks', () => {
       vi.mocked(mockOptionsService.loadUserOptions).mockResolvedValue(mockOptions);
 
       // Act
-      const result = await store.dispatch(loadOptionsThunk(mockOptionsService));
+      const result = await store.dispatch(loadOptionsThunk({ 
+        optionsService: mockOptionsService, 
+        userId: 'test-user-123' 
+      }));
 
       // Assert
       expect(result.type).toBe('options/loadOptions/fulfilled');
@@ -78,11 +81,13 @@ describe('optionsSlice async thunks', () => {
     });
 
     it('should handle loading when user is not authenticated', async () => {
-      // Arrange
-      (auth as any).currentUser = null;
+      // Arrange - empty userId simulates unauthenticated user
 
       // Act
-      const result = await store.dispatch(loadOptionsThunk(mockOptionsService));
+      const result = await store.dispatch(loadOptionsThunk({ 
+        optionsService: mockOptionsService, 
+        userId: '' 
+      }));
 
       // Assert
       expect(result.type).toBe('options/loadOptions/rejected');
@@ -108,7 +113,10 @@ describe('optionsSlice async thunks', () => {
       vi.mocked(mockOptionsService.loadUserOptions).mockRejectedValue(serviceError);
 
       // Act
-      const result = await store.dispatch(loadOptionsThunk(mockOptionsService));
+      const result = await store.dispatch(loadOptionsThunk({ 
+        optionsService: mockOptionsService, 
+        userId: 'test-user-123' 
+      }));
 
       // Assert
       expect(result.type).toBe('options/loadOptions/rejected');
@@ -129,7 +137,10 @@ describe('optionsSlice async thunks', () => {
       vi.mocked(mockOptionsService.loadUserOptions).mockRejectedValue(unknownError);
 
       // Act
-      const result = await store.dispatch(loadOptionsThunk(mockOptionsService));
+      const result = await store.dispatch(loadOptionsThunk({ 
+        optionsService: mockOptionsService, 
+        userId: 'test-user-123' 
+      }));
 
       // Assert
       expect(result.type).toBe('options/loadOptions/rejected');
@@ -151,7 +162,10 @@ describe('optionsSlice async thunks', () => {
       );
 
       // Act
-      const promise = store.dispatch(loadOptionsThunk(mockOptionsService));
+      const promise = store.dispatch(loadOptionsThunk({ 
+        optionsService: mockOptionsService, 
+        userId: 'test-user-123' 
+      }));
       
       // Assert loading state
       const loadingState = store.getState().options;
@@ -175,7 +189,10 @@ describe('optionsSlice async thunks', () => {
       vi.mocked(mockOptionsService.loadUserOptions).mockResolvedValue(unsortedOptions);
 
       // Act
-      await store.dispatch(loadOptionsThunk(mockOptionsService));
+      await store.dispatch(loadOptionsThunk({ 
+        optionsService: mockOptionsService, 
+        userId: 'test-user-123' 
+      }));
 
       // Assert
       const state = store.getState().options;
@@ -195,7 +212,7 @@ describe('optionsSlice async thunks', () => {
 
       // Act
       const result = await store.dispatch(
-        saveOptionsThunk({ optionsService: mockOptionsService, options: mockOptions })
+        saveOptionsThunk({ optionsService: mockOptionsService, userId: 'test-user-123', options: mockOptions })
       );
 
       // Assert
@@ -211,12 +228,11 @@ describe('optionsSlice async thunks', () => {
     });
 
     it('should handle saving when user is not authenticated', async () => {
-      // Arrange
-      (auth as any).currentUser = null;
+      // Arrange - empty userId simulates unauthenticated user
 
       // Act
       const result = await store.dispatch(
-        saveOptionsThunk({ optionsService: mockOptionsService, options: mockOptions })
+        saveOptionsThunk({ optionsService: mockOptionsService, userId: '', options: mockOptions })
       );
 
       // Assert
@@ -244,7 +260,7 @@ describe('optionsSlice async thunks', () => {
 
       // Act
       const result = await store.dispatch(
-        saveOptionsThunk({ optionsService: mockOptionsService, options: mockOptions })
+        saveOptionsThunk({ optionsService: mockOptionsService, userId: 'test-user-123', options: mockOptions })
       );
 
       // Assert
@@ -267,7 +283,7 @@ describe('optionsSlice async thunks', () => {
 
       // Act
       const result = await store.dispatch(
-        saveOptionsThunk({ optionsService: mockOptionsService, options: mockOptions })
+        saveOptionsThunk({ optionsService: mockOptionsService, userId: 'test-user-123', options: mockOptions })
       );
 
       // Assert
@@ -291,7 +307,7 @@ describe('optionsSlice async thunks', () => {
 
       // Act
       const promise = store.dispatch(
-        saveOptionsThunk({ optionsService: mockOptionsService, options: mockOptions })
+        saveOptionsThunk({ optionsService: mockOptionsService, userId: 'test-user-123', options: mockOptions })
       );
       
       // Assert saving state
@@ -314,10 +330,13 @@ describe('optionsSlice async thunks', () => {
 
       // Act - mix async and sync actions
       vi.mocked(mockOptionsService.loadUserOptions).mockResolvedValue(mockOptions);
-      await store.dispatch(loadOptionsThunk(mockOptionsService));
+      await store.dispatch(loadOptionsThunk({ 
+        optionsService: mockOptionsService, 
+        userId: 'test-user-123' 
+      }));
       store.dispatch(addOption(newOption));
       vi.mocked(mockOptionsService.saveUserOptions).mockResolvedValue();
-      await store.dispatch(saveOptionsThunk({ optionsService: mockOptionsService, options: [...mockOptions, newOption] }));
+      await store.dispatch(saveOptionsThunk({ optionsService: mockOptionsService, userId: 'test-user-123', options: [...mockOptions, newOption] }));
 
       // Assert
       const state = store.getState().options;
@@ -332,12 +351,18 @@ describe('optionsSlice async thunks', () => {
       vi.mocked(mockOptionsService.loadUserOptions).mockRejectedValueOnce(
         new Error('Initial error')
       );
-      await store.dispatch(loadOptionsThunk(mockOptionsService));
+      await store.dispatch(loadOptionsThunk({ 
+        optionsService: mockOptionsService, 
+        userId: 'test-user-123' 
+      }));
       expect(store.getState().options.error).toBe('Initial error');
 
       // Act - start new successful operation
       vi.mocked(mockOptionsService.loadUserOptions).mockResolvedValueOnce(mockOptions);
-      await store.dispatch(loadOptionsThunk(mockOptionsService));
+      await store.dispatch(loadOptionsThunk({ 
+        optionsService: mockOptionsService, 
+        userId: 'test-user-123' 
+      }));
 
       // Assert
       const state = store.getState().options;
@@ -347,18 +372,23 @@ describe('optionsSlice async thunks', () => {
   });
 
   describe('error handling edge cases', () => {
-    it('should handle auth token retrieval failure', async () => {
+    it('should handle service errors properly', async () => {
       // Arrange
-      mockUser.getIdToken.mockRejectedValueOnce(new Error('Token expired'));
+      vi.mocked(mockOptionsService.loadUserOptions).mockRejectedValueOnce(
+        new Error('Service unavailable')
+      );
 
       // Act
-      const result = await store.dispatch(loadOptionsThunk(mockOptionsService));
+      const result = await store.dispatch(loadOptionsThunk({ 
+        optionsService: mockOptionsService, 
+        userId: 'test-user-123' 
+      }));
 
-      // Assert - should fail when token retrieval fails
+      // Assert - should fail when service fails
       expect(result.type).toBe('options/loadOptions/rejected');
       expect(result.payload).toEqual({
-        type: 'auth',
-        message: 'Failed to get authentication token',
+        type: 'network',
+        message: 'Service unavailable',
         retryable: false,
       });
     });
@@ -368,7 +398,10 @@ describe('optionsSlice async thunks', () => {
       vi.mocked(mockOptionsService.loadUserOptions).mockRejectedValue('String error');
 
       // Act
-      const result = await store.dispatch(loadOptionsThunk(mockOptionsService));
+      const result = await store.dispatch(loadOptionsThunk({ 
+        optionsService: mockOptionsService, 
+        userId: 'test-user-123' 
+      }));
 
       // Assert
       expect(result.type).toBe('options/loadOptions/rejected');
