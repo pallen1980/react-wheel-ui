@@ -3,7 +3,7 @@ import { MemoryRouter, Routes, Route, useLocation } from 'react-router';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import AuthProvider, { useAuth } from '../../src/Auth/AuthProvider';
 import ProtectedRoute from '../../src/Auth/ProtectedRoute';
-import { Identity } from '../../src/Auth/Models';
+
 
 // Mock Firebase auth
 let mockAuthStateCallback: ((user: any) => void) | null = null;
@@ -52,7 +52,7 @@ const DashboardPage = () => (
 );
 
 const AuthControls = () => {
-  const { isAuthenticated, onLogin, onLogout } = useAuth();
+  const { isAuthenticated } = useAuth();
   
   const handleLogin = () => {
     // Simulate Firebase login

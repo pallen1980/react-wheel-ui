@@ -3,12 +3,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import optionsReducer, {
   loadOptionsThunk,
   saveOptionsThunk,
-  OptionsState,
   setOptions,
   addOption,
-  updateOption,
-  deleteOption,
-  clearOptions,
 } from '../../src/store/optionsSlice';
 import { OptionsService, OptionsServiceError, OptionsErrorType } from '../../src/services/OptionsService';
 import { Option } from '../../src/Areas/Main/Options/models';

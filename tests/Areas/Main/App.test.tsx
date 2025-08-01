@@ -8,7 +8,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import App from '../../../src/Areas/Main/App';
 import { Option } from '../../../src/Areas/Main/Options/models';
 import optionsReducer from '../../../src/store/optionsSlice';
-import AuthProvider from '../../../src/Auth/AuthProvider';
+
 
 // Mock the child components
 vi.mock('../../../src/Areas/Main/Title/components/TitleComponent', () => ({
@@ -130,7 +130,7 @@ const createStoreWithDefaults = () => configureStore({
 });
 
 // Test wrapper component
-const TestWrapper = ({ children, isAuthenticated = false }: { children: React.ReactNode, isAuthenticated?: boolean }) => {
+const TestWrapper = ({ children }: { children: React.ReactNode }) => {
   const store = configureStore({
     reducer: {
       options: optionsReducer,

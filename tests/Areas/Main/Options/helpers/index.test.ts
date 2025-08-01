@@ -31,7 +31,7 @@ describe('Options Helper Functions', () => {
         });
 
         it('should return empty string when crypto.randomUUID is not a function', () => {
-            // @ts-ignore - Intentionally setting to undefined for testing
+            // @ts-expect-error - Intentionally setting to undefined for testing
             crypto.randomUUID = undefined;
 
             const result = generateGuid();

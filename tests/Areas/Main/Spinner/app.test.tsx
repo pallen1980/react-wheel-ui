@@ -5,7 +5,7 @@ import SpinnerApp from '../../../../src/Areas/Main/Spinner/app';
 
 // Mock the child components
 vi.mock('../../../../src/Areas/Main/Spinner/components/SpinWheelComponent', () => ({
-  default: React.forwardRef(({ options, direction, onWin }, ref) => {
+  default: React.forwardRef(({ options, direction }, ref) => {
     // Simulate the ref functionality
     React.useImperativeHandle(ref, () => ({
       startSpin: vi.fn()

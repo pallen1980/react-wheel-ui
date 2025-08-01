@@ -304,7 +304,7 @@ describe('Options App Component', () => {
       render(<OptionsApp {...defaultProps} />);
       
       // Mock editing a non-existent option
-      const entryComponent = screen.getByTestId('entry-component');
+      screen.getByTestId('entry-component');
       const editButton = document.createElement('button');
       editButton.onclick = () => {
         const mockSubmit = vi.fn();

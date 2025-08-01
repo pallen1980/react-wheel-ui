@@ -1,9 +1,9 @@
-import { render, act } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { toast } from 'react-toastify';
 import ErrorNotification from '../../../../src/Areas/Main/components/ErrorNotification';
-import optionsReducer, { OptionsState, clearError } from '../../../../src/store/optionsSlice';
+import optionsReducer, { OptionsState } from '../../../../src/store/optionsSlice';
 
 // Mock react-toastify
 vi.mock('react-toastify', () => ({
