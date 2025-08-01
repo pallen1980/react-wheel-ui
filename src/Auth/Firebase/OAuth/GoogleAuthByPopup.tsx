@@ -6,7 +6,7 @@ import { Identity } from "../../Models";
 interface GoogleAuthByPopupCallbackProps {
     onSuccessfulSignIn: (user?: Identity, token?: string | undefined) => void;
     onSuccessfulSignOut: () => void;
-    onFailedSignIn: (error: any) => void;
+    onFailedSignIn: (error: Error) => void;
 }
 
 const GoogleAuthByPopupCallback = (props: GoogleAuthByPopupCallbackProps) => {
@@ -14,7 +14,7 @@ const GoogleAuthByPopupCallback = (props: GoogleAuthByPopupCallbackProps) => {
         const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
             if (authUser) {
                 const accessToken = await authUser.getIdToken(true);
-                
+
                 const user: Identity = {
                     id: authUser.uid,
                     name: authUser.displayName ?? "",
@@ -32,14 +32,14 @@ const GoogleAuthByPopupCallback = (props: GoogleAuthByPopupCallbackProps) => {
 
         // Clean up the listener when the component unmounts
         return () => unsubscribe();
-     }, []);
+    }, [props]);
 
-     return null;
+    return null;
 }
 
 interface GoogleAuthByPopupProps {
     onSigningIn: () => void;
-    onFailedSignIn: (error: any) => void;
+    onFailedSignIn: (error: Error) => void;
 }
 
 const GoogleAuthByPopup = (props: GoogleAuthByPopupProps) => {
@@ -52,10 +52,10 @@ const GoogleAuthByPopup = (props: GoogleAuthByPopupProps) => {
             const provider = new GoogleAuthProvider();
             await signInWithPopup(auth, provider);
         } catch (error) {
-            props.onFailedSignIn(error);
+            props.onFailedSignIn(error instanceof Error ? error : new Error(String(error)));
         }
     };
-    
+
     return (
         <>
             <button onClick={handleGoogleSignIn}>Sign in with Google</button>

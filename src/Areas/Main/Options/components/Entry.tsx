@@ -10,7 +10,7 @@ interface EntryProps {
     onSubmit: (newOption: Option) => void;
 }
 
-export default (props: EntryProps) => {
+const EntryComponent = (props: EntryProps) => {
     const [ entry, setEntry ] = useState(props.initialOption ? props.initialOption.value : "");
     const inputEl = useRef<HTMLInputElement>(null);
 
@@ -56,3 +56,5 @@ export default (props: EntryProps) => {
         </>
     );
 }
+
+export default EntryComponent;

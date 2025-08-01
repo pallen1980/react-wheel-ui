@@ -9,7 +9,7 @@ const generateGuid = () => {
             // Fallback to another method when crypto.randomUUID is not available
             return "";
         }
-    } catch (error) {
+    } catch {
         // Handle any errors that might occur when calling crypto.randomUUID
         return "";
     }

@@ -8,7 +8,7 @@ interface OptionProps {
     onDelete: (key: string) => void;
 }
 
-export default (props: OptionProps) => {
+const ListItemComponent = (props: OptionProps) => {
     const handleDelete: React.MouseEventHandler<HTMLButtonElement> = (e) => {
         e.preventDefault();
 
@@ -24,3 +24,5 @@ export default (props: OptionProps) => {
         </>
     );
 }
+
+export default ListItemComponent;

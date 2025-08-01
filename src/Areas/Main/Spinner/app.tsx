@@ -12,7 +12,7 @@ interface AppProps {
     onSpinStarted?: () => void,
 }
 
-export default (props: AppProps) => {
+const SpinnerApp = (props: AppProps) => {
     const [spinDirection, setSpinDirection] = useState<Direction>(Direction.Clockwise);
     const [isSpinning, setIsSpinning] = useState<boolean>(false);
 
@@ -48,3 +48,5 @@ export default (props: AppProps) => {
         </>
     );
 }
+
+export default SpinnerApp;

@@ -5,7 +5,7 @@ type ProtectedRouteProps = {
   children: React.ReactNode;
 };
 
-export default ({ children }: ProtectedRouteProps) => {
+const ProtectedRoute = ({ children }: ProtectedRouteProps) => {
   const { isAuthenticated } = useAuth();
 
   if (!isAuthenticated) {
@@ -14,3 +14,5 @@ export default ({ children }: ProtectedRouteProps) => {
 
   return children;
 };
+
+export default ProtectedRoute;

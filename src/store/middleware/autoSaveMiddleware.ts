@@ -1,10 +1,10 @@
 import { Middleware, UnknownAction } from '@reduxjs/toolkit';
-import { 
-  addOption, 
-  updateOption, 
-  deleteOption, 
-  reorderOptions, 
-  shuffleOptions, 
+import {
+  addOption,
+  updateOption,
+  deleteOption,
+  reorderOptions,
+  shuffleOptions,
   setOptions,
   saveOptionsThunk,
   loadOptionsThunk,
@@ -128,91 +128,92 @@ export const createAutoSaveMiddleware = (config: AutoSaveConfig): Middleware => 
     window.addEventListener('offline', handleOffline);
   }
 
-  return (store) => 
-    (next) => 
-    (action) => {
-      // Process the action first
-      const result = next(action);
+  return (store) =>
+    (next) =>
+      (action) => {
+        // Process the action first
+        const result = next(action);
 
-      // Monitor network connectivity and update offline mode
-      const actionWithType = action as { type: string };
-      if (actionWithType.type === 'options/saveOptions/rejected' || 
+        // Monitor network connectivity and update offline mode
+        const actionWithType = action as { type: string };
+        if (actionWithType.type === 'options/saveOptions/rejected' ||
           actionWithType.type === 'options/loadOptions/rejected') {
-        // Check if we should enable offline mode based on network connectivity
-        if (!checkNetworkConnectivity()) {
-          store.dispatch(setOfflineMode(true));
+          // Check if we should enable offline mode based on network connectivity
+          if (!checkNetworkConnectivity()) {
+            store.dispatch(setOfflineMode(true));
+          }
         }
-      }
 
-      // Re-enable online mode when network is restored and operations succeed
-      if (actionWithType.type === 'options/saveOptions/fulfilled' || 
+        // Re-enable online mode when network is restored and operations succeed
+        if (actionWithType.type === 'options/saveOptions/fulfilled' ||
           actionWithType.type === 'options/loadOptions/fulfilled') {
-        const state = store.getState();
-        if (state.options.isOfflineMode && checkNetworkConnectivity()) {
-          store.dispatch(setOfflineMode(false));
-        }
-      }
-
-      // Check if this action should trigger auto-save
-      if (shouldTriggerAutoSave(action as UnknownAction)) {
-        // Check authentication before attempting save
-        const userId = getCurrentUserId();
-        if (!userId) {
-          console.debug('Auto-save skipped: User not authenticated');
-          return result;
+          const state = store.getState();
+          if (state.options.isOfflineMode && checkNetworkConnectivity()) {
+            store.dispatch(setOfflineMode(false));
+          }
         }
 
-        // Get current state after action has been processed
-        const state = store.getState();
-        const { isSaving, isOfflineMode } = state.options;
-
-        // Skip if already saving to prevent concurrent saves
-        if (isSaving) {
-          console.debug('Auto-save skipped: Save already in progress');
-          return result;
-        }
-
-        // Skip auto-save if in offline mode or no network connectivity
-        if (isOfflineMode || !checkNetworkConnectivity()) {
-          console.debug('Auto-save skipped: Application is in offline mode or no network connectivity');
-          return result;
-        }
-
-        // Schedule debounced save
-        saveManager.scheduleSave(() => {
-          // Double-check authentication at save time
-          const currentUserId = getCurrentUserId();
-          if (!currentUserId) {
-            console.debug('Auto-save cancelled: User no longer authenticated');
-            return;
+        // Check if this action should trigger auto-save
+        if (shouldTriggerAutoSave(action as UnknownAction)) {
+          // Check authentication before attempting save
+          const userId = getCurrentUserId();
+          if (!userId) {
+            console.debug('Auto-save skipped: User not authenticated');
+            return result;
           }
 
-          // Get fresh state at save time
-          const currentState = store.getState();
-          const { options: currentOptions, isOfflineMode: currentOfflineMode } = currentState.options;
+          // Get current state after action has been processed
+          const state = store.getState();
+          const { isSaving, isOfflineMode } = state.options;
+
+          // Skip if already saving to prevent concurrent saves
+          if (isSaving) {
+            console.debug('Auto-save skipped: Save already in progress');
+            return result;
+          }
 
           // Skip auto-save if in offline mode or no network connectivity
-          if (currentOfflineMode || !checkNetworkConnectivity()) {
-            console.debug('Auto-save cancelled: Application is in offline mode or no network connectivity');
-            return;
+          if (isOfflineMode || !checkNetworkConnectivity()) {
+            console.debug('Auto-save skipped: Application is in offline mode or no network connectivity');
+            return result;
           }
 
-          // Dispatch save thunk with optionsService and userId
-          (store.dispatch as any)(saveOptionsThunk({
-            optionsService: config.optionsService,
-            userId: currentUserId,
-            options: currentOptions
-          }));
-        });
-      }
+          // Schedule debounced save
+          saveManager.scheduleSave(() => {
+            // Double-check authentication at save time
+            const currentUserId = getCurrentUserId();
+            if (!currentUserId) {
+              console.debug('Auto-save cancelled: User no longer authenticated');
+              return;
+            }
 
-      // Cancel pending saves when user logs out or options are cleared
-      if (actionWithType.type === 'auth/logout' || actionWithType.type === 'options/clearOptions') {
-        saveManager.cancelSave();
-      }
+            // Get fresh state at save time
+            const currentState = store.getState();
+            const { options: currentOptions, isOfflineMode: currentOfflineMode } = currentState.options;
 
-      return result;
-    };
+            // Skip auto-save if in offline mode or no network connectivity
+            if (currentOfflineMode || !checkNetworkConnectivity()) {
+              console.debug('Auto-save cancelled: Application is in offline mode or no network connectivity');
+              return;
+            }
+
+            // Dispatch save thunk with optionsService and userId
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            (store.dispatch as any)(saveOptionsThunk({
+              optionsService: config.optionsService,
+              userId: currentUserId,
+              options: currentOptions
+            }));
+          });
+        }
+
+        // Cancel pending saves when user logs out or options are cleared
+        if (actionWithType.type === 'auth/logout' || actionWithType.type === 'options/clearOptions') {
+          saveManager.cancelSave();
+        }
+
+        return result;
+      };
 };
 
 /**

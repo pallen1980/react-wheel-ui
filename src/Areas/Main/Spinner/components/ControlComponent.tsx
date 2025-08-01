@@ -6,7 +6,7 @@ interface ControlComponentProps {
     onStartSpin: () => void
 }
 
-export default (props: ControlComponentProps) => {
+const ControlComponent = (props: ControlComponentProps) => {
     const [direction, setDirection] = useState(true);
 
     const clockwiseText = direction ? "Clockwise" : "Anti-Clockwise";
@@ -34,3 +34,5 @@ export default (props: ControlComponentProps) => {
         </>
     );
 }
+
+export default ControlComponent;

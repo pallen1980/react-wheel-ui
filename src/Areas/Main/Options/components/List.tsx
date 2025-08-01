@@ -9,7 +9,7 @@ interface ListProps {
     onDelete: (key: string) => void;
 }
 
-export default (props: ListProps) => {
+const ListComponent = (props: ListProps) => {
     // Sort options by sequence to ensure proper display order
     const sortedOptions = [...props.options].sort((a, b) => a.sequence - b.sequence);
 
@@ -34,3 +34,5 @@ export default (props: ListProps) => {
         </>
     );
 }
+
+export default ListComponent;

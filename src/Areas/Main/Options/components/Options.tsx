@@ -4,8 +4,8 @@ interface OptionsProps {
     onDuplicate: () => void;
 }
 
-export default (props: OptionsProps) => {
-    
+const OptionsComponent = (props: OptionsProps) => {
+
     const handleShuffle: React.MouseEventHandler<HTMLButtonElement> = (e) => {
         e.preventDefault();
         props.onShuffle();
@@ -23,3 +23,5 @@ export default (props: OptionsProps) => {
         </>
     )
 }
+
+export default OptionsComponent;

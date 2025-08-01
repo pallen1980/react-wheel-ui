@@ -11,7 +11,7 @@ interface AppProps {
     onChange: (newOptions: Option[]) => void
 }
 
-export default (props: AppProps) => {
+const OptionsApp = (props: AppProps) => {
 
     const handleShuffle = () => {
         props.onChange(shuffleWithSequence(props.options));
@@ -52,3 +52,5 @@ export default (props: AppProps) => {
         </>
     );
 }
+
+export default OptionsApp;

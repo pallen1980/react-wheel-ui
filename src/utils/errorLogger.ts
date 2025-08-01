@@ -7,7 +7,7 @@ export interface ErrorLogEntry {
   level: 'error' | 'warn' | 'info' | 'debug';
   category: 'network' | 'auth' | 'data' | 'ui' | 'system';
   message: string;
-  details?: Record<string, any>;
+  details?: Record<string, unknown>;
   stack?: string;
   userAgent?: string;
   url?: string;
@@ -19,10 +19,10 @@ export interface ErrorContext {
   operation?: string;
   retryCount?: number;
   networkStatus?: boolean;
-  additionalData?: Record<string, any>;
+  additionalData?: Record<string, unknown>;
   statusCode?: number;
-  responseData?: any;
-  invalidOption?: any;
+  responseData?: unknown;
+  invalidOption?: unknown;
   errorType?: string;
   optionsCount?: number;
   originalError?: string;

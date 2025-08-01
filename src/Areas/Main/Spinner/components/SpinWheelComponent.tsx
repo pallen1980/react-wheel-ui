@@ -1,4 +1,4 @@
-import { useState, useImperativeHandle, forwardRef, Ref } from "react";
+import { useState, useImperativeHandle, forwardRef, Ref, useCallback } from "react";
 
 import Wheel from "./WheelComponent";
 import { Direction } from "../enums";
@@ -10,14 +10,34 @@ interface SpinnerProps {
   onWin?: (winningIndex: number) => void;
 }
 
-export default forwardRef((props: SpinnerProps, ref: Ref<DelegateFunc>) => {
+const SpinWheelComponent = forwardRef((props: SpinnerProps, ref: Ref<DelegateFunc>) => {
   const [rotation, setRotation] = useState(0);
   const [isSpinning, setSpinning] = useState(false);
 
   const optionCount = props.options?.length ?? 0;
   const currentDirection: Direction = props.direction ?? Direction.Clockwise;
 
-  const onStartSpin = () => {
+  const { onWin } = props;
+  
+  const determineWinner = useCallback((finalRotation: number) => {
+    const sliceAngle = 360 / optionCount; //how many degrees each sector has
+
+    //1. remove any additional rotations past 360 degrees (finalRotation % 360)
+    //2. Add on 360 degrees to avoid negative numbers
+    //3. Add on 270 degrees, as the indicators is now at the top (270 degrees on from the right hand side where 0 degrees rotation starts from)
+    //4. remove an additional rotations the previous 2 rotations applied (% 360)
+    const normalizedRotation = ((finalRotation % 360) + 360 + 270) % 360; //top of circle (measure 3/4 round)
+
+    //how many sliceAngles in the final rotation (that is now normalised between 0 and 359)
+    //and "floor" it to remove anything right of the decimal point 
+    const winningSector = Math.floor((normalizedRotation) / sliceAngle);
+    
+    if (onWin) {
+      onWin(winningSector);
+    }
+  }, [optionCount, onWin]);
+
+  const onStartSpin = useCallback(() => {
     if (isSpinning)
       return;
 
@@ -58,34 +78,9 @@ export default forwardRef((props: SpinnerProps, ref: Ref<DelegateFunc>) => {
     };
 
     requestAnimationFrame(animate);
-  };
+  }, [isSpinning, rotation, currentDirection, determineWinner]);
 
-  const determineWinner = (finalRotation: number) => {
-    
-    const sliceAngle = 360 / optionCount; //how many degrees each sector has
 
-    //1. remove any additional rotations past 360 degrees (finalRotation % 360)
-    //2. Add on 360 degrees to avoid negative numbers
-    //3. Add on 270 degrees, as the indicators is now at the top (270 degrees on from the right hand side where 0 degrees rotation starts from)
-    //4. remove an additional rotations the previous 2 rotations applied (% 360)
-    const normalizedRotation = ((finalRotation % 360) + 360 + 270) % 360; //top of circle (measure 3/4 round)
-
-    //how many sliceAngles in the final rotation (that is now normalised between 0 and 359)
-    //and "floor" it to remove anything right of the decimal point 
-    const winningSector = Math.floor((normalizedRotation) / sliceAngle);
-    
-    // console.log({
-    //   finalRotation: finalRotation,
-    //   optionCount: optionCount,
-    //   sliceAngle: sliceAngle,
-    //   normalizedRotation: normalizedRotation,
-    //   winningSector: winningSector
-    // });
-
-    if (props.onWin) {
-      props.onWin(winningSector);
-    }
-  };
 
   useImperativeHandle(ref, () => {
     return {
@@ -93,7 +88,7 @@ export default forwardRef((props: SpinnerProps, ref: Ref<DelegateFunc>) => {
         onStartSpin();
       },
     };
-  }, [optionCount, currentDirection]);
+  }, [onStartSpin]);
 
   return (
     <>
@@ -104,3 +99,5 @@ export default forwardRef((props: SpinnerProps, ref: Ref<DelegateFunc>) => {
     </>
   )
 });
+
+export default SpinWheelComponent;

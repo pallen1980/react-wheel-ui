@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
 import { Option } from '../Areas/Main/Options/models';
-import { OptionsService, OptionsServiceError } from '../services/OptionsService';
+import { OptionsService, OptionsServiceError, OptionsErrorType } from '../services/OptionsService';
 
 
 export interface OptionsState {
@@ -45,7 +45,7 @@ export const loadOptionsThunk = createAsyncThunk(
     try {
       if (!userId) {
         throw new OptionsServiceError(
-          'auth' as any,
+          OptionsErrorType.AUTH,
           'User not authenticated',
           false
         );
@@ -61,7 +61,7 @@ export const loadOptionsThunk = createAsyncThunk(
           retryable: error.retryable
         });
       }
-      
+
       return rejectWithValue({
         type: 'network',
         message: error instanceof Error ? error.message : 'Unknown error occurred',
@@ -81,7 +81,7 @@ export const saveOptionsThunk = createAsyncThunk(
     try {
       if (!userId) {
         throw new OptionsServiceError(
-          'auth' as any,
+          OptionsErrorType.AUTH,
           'User not authenticated',
           false
         );
@@ -97,7 +97,7 @@ export const saveOptionsThunk = createAsyncThunk(
           retryable: error.retryable
         });
       }
-      
+
       return rejectWithValue({
         type: 'network',
         message: error instanceof Error ? error.message : 'Unknown error occurred',
@@ -111,9 +111,9 @@ export const saveOptionsThunk = createAsyncThunk(
 export const retryLastOperationThunk = createAsyncThunk(
   'options/retryLastOperation',
   async (
-    { optionsService, userId, options, operationType }: { 
-      optionsService: OptionsService; 
-      userId: string; 
+    { optionsService, userId, options, operationType }: {
+      optionsService: OptionsService;
+      userId: string;
       options?: Option[];
       operationType: 'load' | 'save';
     },
@@ -121,7 +121,7 @@ export const retryLastOperationThunk = createAsyncThunk(
   ) => {
     try {
       const state = getState() as { options: OptionsState };
-      
+
       // Check if we should retry based on last error
       if (!state.options.lastError?.retryable) {
         return rejectWithValue({
@@ -149,7 +149,7 @@ export const retryLastOperationThunk = createAsyncThunk(
           retryable: error.retryable
         });
       }
-      
+
       return rejectWithValue({
         type: 'network',
         message: error instanceof Error ? error.message : 'Retry failed',
@@ -168,11 +168,11 @@ const optionsSlice = createSlice({
     },
     addOption: (state, action: PayloadAction<Option>) => {
       // Ensure new option has proper sequence
-      const maxSequence = state.options.reduce((max, option) => 
+      const maxSequence = state.options.reduce((max, option) =>
         Math.max(max, option.sequence), 0);
-      const newOption = { 
-        ...action.payload, 
-        sequence: action.payload.sequence || maxSequence + 1 
+      const newOption = {
+        ...action.payload,
+        sequence: action.payload.sequence || maxSequence + 1
       };
       state.options.push(newOption);
       state.options.sort((a, b) => a.sequence - b.sequence);
@@ -193,15 +193,15 @@ const optionsSlice = createSlice({
     },
     reorderOptions: (state, action: PayloadAction<ReorderPayload>) => {
       const { fromIndex, toIndex } = action.payload;
-      if (fromIndex >= 0 && fromIndex < state.options.length && 
-          toIndex >= 0 && toIndex < state.options.length && 
-          fromIndex !== toIndex) {
-        
+      if (fromIndex >= 0 && fromIndex < state.options.length &&
+        toIndex >= 0 && toIndex < state.options.length &&
+        fromIndex !== toIndex) {
+
         // Remove the item from the array
         const [movedOption] = state.options.splice(fromIndex, 1);
         // Insert it at the new position
         state.options.splice(toIndex, 0, movedOption);
-        
+
         // Update sequence numbers to match new order
         state.options.forEach((option, index) => {
           option.sequence = index + 1;
@@ -215,12 +215,12 @@ const optionsSlice = createSlice({
         const j = Math.floor(Math.random() * (i + 1));
         [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
       }
-      
+
       // Update sequence numbers to match new order
       shuffled.forEach((option, index) => {
         option.sequence = index + 1;
       });
-      
+
       state.options = shuffled;
     },
     clearOptions: (state) => {
@@ -300,7 +300,7 @@ const optionsSlice = createSlice({
         state.isLoading = false;
         const errorPayload = action.payload as { type: string; message: string; retryable: boolean };
         const errorMessage = errorPayload?.message || 'Unable to load your saved options';
-        
+
         state.error = errorMessage;
         state.lastError = {
           type: errorPayload?.type || 'unknown',
@@ -330,7 +330,7 @@ const optionsSlice = createSlice({
         state.isSaving = false;
         const errorPayload = action.payload as { type: string; message: string; retryable: boolean };
         const errorMessage = errorPayload?.message || 'Unable to save your changes';
-        
+
         state.error = errorMessage;
         state.lastError = {
           type: errorPayload?.type || 'unknown',
@@ -353,13 +353,13 @@ const optionsSlice = createSlice({
       })
       .addCase(retryLastOperationThunk.fulfilled, (state, action) => {
         const { type, options, savedAt } = action.payload;
-        
+
         if (type === 'load' && options) {
           state.options = [...options].sort((a, b) => a.sequence - b.sequence);
         } else if (type === 'save' && savedAt) {
           state.lastSaved = savedAt;
         }
-        
+
         // Clear error states and disable offline mode on successful retry
         state.error = null;
         state.lastError = null;
@@ -371,7 +371,7 @@ const optionsSlice = createSlice({
       .addCase(retryLastOperationThunk.rejected, (state, action) => {
         const errorPayload = action.payload as { type: string; message: string; retryable: boolean };
         const errorMessage = errorPayload?.message || 'Retry operation failed';
-        
+
         state.error = errorMessage;
         state.lastError = {
           type: errorPayload?.type || 'unknown',

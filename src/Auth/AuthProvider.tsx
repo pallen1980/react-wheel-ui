@@ -16,7 +16,7 @@ type AuthProviderProps = {
     children: React.ReactNode;
 };
   
-export default ({ children }: AuthProviderProps) => {
+const AuthProvider = ({ children }: AuthProviderProps) => {
     const [isAuthenticated, setAuthenticated] = useState(false);
     const [user, setUser] = useState<Identity | null>(null);
 
@@ -59,6 +59,8 @@ export default ({ children }: AuthProviderProps) => {
 
     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
+
+export default AuthProvider;
 
 const useAuth = () => {
     const context = useContext(AuthContext);

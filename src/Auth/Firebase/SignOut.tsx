@@ -1,10 +1,9 @@
-import { useEffect } from "react";
-import { signOut, onAuthStateChanged } from "firebase/auth";
+import { signOut } from "firebase/auth";
 import { auth } from "./Config/Firebase";
 
 interface FirebaseSignOutProps {
     onSigningOut: () => void;
-    onError: (error: any) => void;
+    onError: (error: Error) => void;
 }
 
 const SignOutButton = (props: FirebaseSignOutProps) => {
@@ -18,7 +17,7 @@ const SignOutButton = (props: FirebaseSignOutProps) => {
             await signOut(auth);
             // The onAuthStateChanged listener will handle the user state update
         } catch (err) {
-            props.onError(err);
+            props.onError(err instanceof Error ? err : new Error(String(err)));
         }
     };
 
