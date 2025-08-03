@@ -4,7 +4,7 @@ import Home from '../../../src/Areas/Home/Home';
 
 // Mock the useAuth hook
 const mockUseAuth = vi.fn();
-vi.mock('../../../src/Auth/AuthProvider', () => ({
+vi.mock('../../../src/Auth/hooks', () => ({
   useAuth: () => mockUseAuth()
 }));
 

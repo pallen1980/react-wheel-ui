@@ -5,9 +5,13 @@ import Nav from '../../../src/Areas/Nav/Nav';
 
 // Mock the Auth component since it's complex and has external dependencies
 vi.mock('../../../src/Auth/Firebase/Auth', () => ({
-  default: ({ type }: { type: string }) => <div data-testid="auth-component">Auth Component ({type})</div>,
+  default: ({ type }: { type: number }) => <div data-testid="auth-component">Auth Component ({type === 0 ? 'popup' : 'redirect'})</div>
+}));
+
+vi.mock('../../../src/Auth/Firebase/types', () => ({
   AuthType: {
-    Popup: 'popup'
+    Popup: 0,
+    Redirect: 1
   }
 }));
 

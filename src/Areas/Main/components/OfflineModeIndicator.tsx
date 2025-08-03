@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAppSelector } from '../../../store/hooks';
-import { useAuth } from '../../../Auth/AuthProvider';
+import { useAuth } from '../../../Auth/hooks';
 import './OfflineModeIndicator.scss';
 
 interface OfflineModeIndicatorProps {

@@ -14,7 +14,7 @@ import { Option } from "./Options/models";
 import { generateGuid } from "./Options/helpers";
 import { useAppDispatch, useAppSelector } from "../../store/hooks";
 import { loadOptionsThunk, setOptions, clearOptions, setOfflineMode } from "../../store/optionsSlice";
-import { useAuth } from "../../Auth/AuthProvider";
+import { useAuth } from "../../Auth/hooks";
 import { logOfflineModeEnabled, logOfflineModeDisabled } from "../../utils/errorLogger";
 
 import './App.scss'

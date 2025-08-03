@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAppSelector, useAppDispatch } from '../../../store/hooks';
 import { retryLastOperationThunk } from '../../../store/optionsSlice';
-import { useAuth } from '../../../Auth/AuthProvider';
+import { useAuth } from '../../../Auth/hooks';
 import { createOptionsService } from '../../../services';
 import { logRetryAttempt } from '../../../utils/errorLogger';
 import './RetryButton.scss';

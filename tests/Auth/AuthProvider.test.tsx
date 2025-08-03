@@ -1,6 +1,7 @@
 import { render, screen, act } from '@testing-library/react';
 import { describe, it, expect, vi } from 'vitest';
-import AuthProvider, { useAuth } from '../../src/Auth/AuthProvider';
+import AuthProvider from '../../src/Auth/AuthProvider';
+import { useAuth } from '../../src/Auth/hooks';
 
 // Test component to access the auth context
 const TestComponent = () => {

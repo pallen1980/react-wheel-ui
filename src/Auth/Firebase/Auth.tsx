@@ -5,12 +5,8 @@ import GoogleAuthByRedirect, { GoogleAuthByRedirectCallback } from './OAuth/Goog
 
 import SignOut from './SignOut';
 import { Identity } from '../Models';
-import { useAuth } from '../AuthProvider';
-
-export enum AuthType {
-    Popup = 0,
-    Redirect = 1
-}
+import { useAuth } from '../hooks';
+import { AuthType } from './types';
 
 interface AuthProps {
     type: AuthType;

@@ -1,7 +1,8 @@
 import { render, screen, act } from '@testing-library/react';
 import { MemoryRouter, Routes, Route, useLocation } from 'react-router';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import AuthProvider, { useAuth } from '../../src/Auth/AuthProvider';
+import AuthProvider from '../../src/Auth/AuthProvider';
+import { useAuth } from '../../src/Auth/hooks';
 import ProtectedRoute from '../../src/Auth/ProtectedRoute';
 
 

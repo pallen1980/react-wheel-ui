@@ -1,4 +1,4 @@
-import { useAuth } from "../../Auth/AuthProvider";
+import { useAuth } from "../../Auth/hooks";
 
 function Home() {
     const { isAuthenticated } = useAuth();

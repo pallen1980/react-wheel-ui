@@ -1,5 +1,6 @@
 import { NavLink } from "react-router";
-import Auth, { AuthType } from "../../Auth/Firebase/Auth";
+import Auth from "../../Auth/Firebase/Auth";
+import { AuthType } from "../../Auth/Firebase/types";
 
 import "./nav.scss";
 

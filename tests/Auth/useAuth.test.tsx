@@ -1,6 +1,7 @@
 import { renderHook, act } from '@testing-library/react';
 import { describe, it, expect } from 'vitest';
-import AuthProvider, { useAuth } from '../../src/Auth/AuthProvider';
+import AuthProvider from '../../src/Auth/AuthProvider';
+import { useAuth } from '../../src/Auth/hooks';
 import { Identity } from '../../src/Auth/Models';
 
 // Wrapper component for the hook tests

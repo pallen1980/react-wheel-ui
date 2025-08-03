@@ -2,7 +2,9 @@ import { render, screen, act } from '@testing-library/react';
 import { MemoryRouter, Routes, Route } from 'react-router';
 import { describe, it, expect, vi } from 'vitest';
 import ProtectedRoute from '../../src/Auth/ProtectedRoute';
-import AuthProvider, { useAuth } from '../../src/Auth/AuthProvider';
+import AuthProvider from '../../src/Auth/AuthProvider';
+import { useAuth } from '../../src/Auth/hooks';
+import React from 'react';
 
 // Mock components for testing
 const ProtectedContent = () => <div data-testid="protected-content">Protected Content</div>;
@@ -19,8 +21,9 @@ const TestWrapper = ({
   initialEntries?: string[];
   isAuthenticated?: boolean;
 }) => {
-  // Mock AuthProvider for controlled testing
-  const MockAuthProvider = ({ children }: { children: React.ReactNode }) => {
+  // Mock AuthProvider for controlled testing - unused but kept for potential future use
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const _MockAuthProvider = ({ children }: { children: React.ReactNode }) => {
     const mockAuth = {
       isAuthenticated,
       onLogin: vi.fn(),

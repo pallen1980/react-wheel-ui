@@ -8,6 +8,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import App from '../../../src/Areas/Main/App';
 import { Option } from '../../../src/Areas/Main/Options/models';
 import optionsReducer from '../../../src/store/optionsSlice';
+// AuthProvider is mocked, so we don't need to import it
 
 
 // Mock the child components
@@ -90,7 +91,10 @@ vi.mock('../../../src/Auth/Firebase/Config/Firebase', () => ({
 
 // Mock the AuthProvider with the new interface but synchronous behavior for tests
 vi.mock('../../../src/Auth/AuthProvider', () => ({
-  default: ({ children }: { children: React.ReactNode }) => children,
+  default: ({ children }: { children: React.ReactNode }) => children
+}));
+
+vi.mock('../../../src/Auth/hooks', () => ({
   useAuth: () => ({
     isAuthenticated: false,
     user: null,

@@ -138,7 +138,7 @@ describe('autoSaveMiddleware', () => {
     
     // Import and reset auth mock
     const { auth } = await import('../../../src/Auth/Firebase/Config/Firebase');
-    (auth as any).currentUser = null;
+    (auth as unknown as { currentUser: null }).currentUser = null;
 
     store = createTestStore();
   });
@@ -150,7 +150,7 @@ describe('autoSaveMiddleware', () => {
   describe('authentication checks', () => {
     it('should not trigger save when user is not authenticated', async () => {
       const { auth } = await import('../../../src/Auth/Firebase/Config/Firebase');
-      (auth as any).currentUser = null;
+      (auth as unknown as { currentUser: null }).currentUser = null;
       
       const dispatchSpy = vi.spyOn(store, 'dispatch');
       
@@ -168,7 +168,7 @@ describe('autoSaveMiddleware', () => {
 
     it('should trigger save when user is authenticated', async () => {
       const { auth } = await import('../../../src/Auth/Firebase/Config/Firebase');
-      (auth as any).currentUser = mockUser;
+      (auth as unknown as { currentUser: typeof mockUser }).currentUser = mockUser;
       
       // Create a spy on the saveManager.scheduleSave method to verify it's called
       const saveManagerSpy = vi.fn();
@@ -186,14 +186,14 @@ describe('autoSaveMiddleware', () => {
 
     it('should cancel save if user logs out before debounce completes', async () => {
       const { auth } = await import('../../../src/Auth/Firebase/Config/Firebase');
-      (auth as any).currentUser = mockUser;
+      (auth as unknown as { currentUser: typeof mockUser }).currentUser = mockUser;
       
       const dispatchSpy = vi.spyOn(store, 'dispatch');
       
       store.dispatch(addOption({ key: 'test', value: 'Test', sequence: 1 }));
       
       // Simulate logout before debounce completes
-      (auth as any).currentUser = null;
+      (auth as unknown as { currentUser: null }).currentUser = null;
       store.dispatch({ type: 'auth/logout' });
       
       vi.advanceTimersByTime(200);
@@ -208,7 +208,7 @@ describe('autoSaveMiddleware', () => {
   describe('debouncing behavior', () => {
     beforeEach(async () => {
       const { auth } = await import('../../../src/Auth/Firebase/Config/Firebase');
-      (auth as any).currentUser = mockUser;
+      (auth as unknown as { currentUser: typeof mockUser }).currentUser = mockUser;
     });
 
     it('should debounce multiple rapid changes', () => {
@@ -284,7 +284,7 @@ describe('autoSaveMiddleware', () => {
   describe('action filtering', () => {
     beforeEach(async () => {
       const { auth } = await import('../../../src/Auth/Firebase/Config/Firebase');
-      (auth as any).currentUser = mockUser;
+      (auth as unknown as { currentUser: typeof mockUser }).currentUser = mockUser;
     });
 
     it('should trigger auto-save for option modification actions', () => {
@@ -353,7 +353,7 @@ describe('autoSaveMiddleware', () => {
   describe('error handling', () => {
     beforeEach(async () => {
       const { auth } = await import('../../../src/Auth/Firebase/Config/Firebase');
-      (auth as any).currentUser = mockUser;
+      (auth as unknown as { currentUser: typeof mockUser }).currentUser = mockUser;
     });
 
     it('should handle authentication errors gracefully', async () => {
@@ -363,7 +363,7 @@ describe('autoSaveMiddleware', () => {
       store.dispatch(addOption({ key: 'test', value: 'Test', sequence: 1 }));
       
       // Simulate auth failure during save
-      (auth as any).currentUser = null;
+      (auth as unknown as { currentUser: null }).currentUser = null;
       vi.advanceTimersByTime(200);
       
       expect(consoleDebugSpy).toHaveBeenCalledWith(
@@ -377,7 +377,7 @@ describe('autoSaveMiddleware', () => {
   describe('configuration', () => {
     it('should respect custom debounce timing', async () => {
       const { auth } = await import('../../../src/Auth/Firebase/Config/Firebase');
-      (auth as any).currentUser = mockUser;
+      (auth as unknown as { currentUser: typeof mockUser }).currentUser = mockUser;
       
       const customStore = createTestStore({ debounceMs: 500 });
       
