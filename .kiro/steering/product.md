@@ -1,19 +1,16 @@
 # Product Overview
 
-**The Wheel** (react-wheel) is a React-based web application featuring a spinner/wheel component with Firebase authentication integration.
+**The Wheel** is a React-based web application featuring an interactive spinner/wheel component with Firebase authentication integration.
 
-## Key Features
-- Interactive spinner/wheel functionality
-- User authentication via Firebase
-- Protected routes for authenticated users
-- Responsive web design with dark/light theme support
-- Dockerized deployment ready
+## Core Features
+- Interactive spinning wheel component with customizable options
+- Firebase authentication (OAuth integration)
+- User profile management
+- Persistent wheel configuration options
+- Responsive web interface
 
 ## Target Users
-Users who need an interactive wheel/spinner application with user account management and personalized experiences.
+Users who need a customizable decision-making wheel tool with the ability to save and manage their wheel configurations through authenticated accounts.
 
-## Core Functionality
-- Home page with public access
-- Spinner component as the main interactive feature
-- User profile management for authenticated users
-- Session-based user state management
+## Key Value Proposition
+Combines the simplicity of a decision wheel with the power of user authentication and data persistence, allowing users to create, save, and reuse their custom wheel configurations.

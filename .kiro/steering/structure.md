@@ -1,68 +1,71 @@
 # Project Structure
 
-## Root Directory
+## Root Level Organization
 ```
 ├── src/                    # Source code
-├── public/                 # Static assets
+├── tests/                  # Test files (mirrors src structure)
+├── docs/                   # Documentation
+├── coverage/               # Test coverage reports
 ├── dist/                   # Build output
-├── .kiro/                  # Kiro configuration
-├── .env                    # Environment variables
-├── package.json            # Dependencies and scripts
-├── vite.config.ts          # Vite configuration
-├── tsconfig.json           # TypeScript configuration
-├── eslint.config.js        # ESLint configuration
-├── Dockerfile              # Docker build configuration
-└── docker-compose.yml      # Docker Compose setup
+├── public/                 # Static assets
+├── setup/                  # Deployment scripts
+└── scripts/                # Utility scripts
 ```
 
-## Source Code Organization (`src/`)
+## Source Code Structure (`src/`)
 
-### Areas-Based Architecture
-The application follows an **Areas pattern** where each major feature/page has its own folder:
+### Feature-Based Architecture
+The project follows a feature-based folder structure under `src/Areas/`:
 
 ```
 src/
-├── Areas/
-│   ├── Header/             # Header component
-│   ├── Home/               # Home page
-│   ├── Main/               # Main app/spinner component
-│   ├── Nav/                # Navigation component
-│   └── Profile/            # User profile page
-├── Auth/                   # Authentication logic
-│   ├── Firebase/           # Firebase configuration
-│   ├── Models/             # Auth-related types/models
-│   ├── AuthProvider.tsx    # Auth context provider
-│   └── ProtectedRoute.tsx  # Route protection component
-├── assets/                 # Static assets (images, icons)
-├── main.tsx                # Application entry point
-├── main.scss               # Global styles
-└── vite-env.d.ts          # Vite type definitions
+├── Areas/                  # Feature-based components
+│   ├── Header/            # Header component
+│   ├── Home/              # Home page
+│   ├── Main/              # Main spinner application
+│   ├── Nav/               # Navigation component
+│   └── Profile/           # User profile page
+├── Auth/                  # Authentication logic
+│   ├── Firebase/          # Firebase integration
+│   ├── Models/            # Auth-related types
+│   ├── AuthProvider.tsx   # Auth context provider
+│   ├── ProtectedRoute.tsx # Route protection
+│   └── hooks.ts           # Auth hooks
+├── services/              # API and data services
+├── store/                 # Redux store and slices
+├── utils/                 # Utility functions
+├── assets/                # Static assets
+├── main.tsx              # Application entry point
+└── main.scss             # Global styles
 ```
 
-## Architectural Patterns
+## Key Architectural Patterns
 
 ### Component Organization
-- **Areas**: Feature-based folders for major app sections
-- **Shared Auth**: Centralized authentication logic
-- **Provider Pattern**: Context-based state management for auth
+- **Areas**: Feature-based components grouped by functionality
+- **Components within Areas**: Each area can contain its own components, helpers, and models
+- **Shared Services**: Common functionality in `src/services/`
+- **Global State**: Redux store in `src/store/`
 
-### Routing Structure
-- `/` - Home page (public)
-- `/Spinner` - Main spinner application
-- `/Profile` - User profile (protected route)
+### Authentication Flow
+- `AuthProvider.tsx` wraps the entire application
+- `ProtectedRoute.tsx` guards authenticated routes
+- Firebase integration isolated in `Auth/Firebase/`
 
-### File Naming Conventions
-- React components: PascalCase (e.g., `AuthProvider.tsx`)
-- Folders: PascalCase for Areas, camelCase for utilities
-- Styles: kebab-case or match component name
+### Testing Structure
+- Tests mirror the `src/` structure in `tests/`
+- Integration tests in `tests/integration/`
+- Shared test setup in `tests/setup.ts`
 
-### Import Patterns
-- Relative imports for local components
-- Absolute imports from `src/` root when needed
-- Group imports: React first, then third-party, then local
+## File Naming Conventions
+- **Components**: PascalCase (e.g., `AuthProvider.tsx`)
+- **Services**: PascalCase with "Service" suffix (e.g., `OptionsService.ts`)
+- **Hooks**: camelCase with "hooks" suffix (e.g., `hooks.ts`)
+- **Types/Models**: PascalCase in dedicated folders
+- **Utilities**: camelCase (e.g., `errorLogger.ts`)
 
-## Configuration Files
-- **TypeScript**: Project references pattern with separate app/node configs
-- **ESLint**: Modern flat config with React-specific rules
-- **Vite**: Minimal configuration with React plugin
-- **Docker**: Multi-stage build with Nginx serving
+## Import/Export Patterns
+- Each major folder has an `index.ts` for clean imports
+- Services exported from `src/services/index.ts`
+- Store exports from `src/store/index.ts`
+- Relative imports for local components, absolute for shared services
