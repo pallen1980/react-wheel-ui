@@ -40,7 +40,12 @@
     - _Requirements: 2.1, 2.2, 8.1, 9.1, 9.4_
 
 - [ ] 4. Create authentication middleware and controllers
-  - [ ] 4.1 Implement MockFirebaseAuthMiddleware
+  - [x] 4.1 Implement MockFirebaseAuthMiddleware
+
+
+
+
+
     - Extract Bearer tokens from Authorization headers
     - Validate tokens using MockTokenService
     - Set user context for authenticated requests

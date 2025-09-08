@@ -1,4 +1,5 @@
 using MockApiService.Extensions;
+using MockApiService.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +26,9 @@ app.UseCors();
 // Don't use HTTPS redirection for development
 // app.UseHttpsRedirection();
 
+// Add authentication middleware before authorization
+app.UseMiddleware<MockFirebaseAuthMiddleware>();
+
 app.UseAuthorization();
 
 app.MapControllers();
@@ -33,3 +37,6 @@ app.MapControllers();
 app.MapGet("/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
 
 app.Run();
+
+// Make Program class accessible for testing
+public partial class Program { }
