@@ -41,18 +41,13 @@
 
 - [ ] 4. Create authentication middleware and controllers
   - [x] 4.1 Implement MockFirebaseAuthMiddleware
-
-
-
-
-
     - Extract Bearer tokens from Authorization headers
     - Validate tokens using MockTokenService
     - Set user context for authenticated requests
     - Handle authentication errors with appropriate HTTP status codes
     - _Requirements: 2.3, 2.4, 2.5, 2.6_
 
-  - [ ] 4.2 Create AuthController for authentication endpoints
+  - [x] 4.2 Create AuthController for authentication endpoints
     - Implement POST /api/auth/login endpoint
     - Add POST /api/auth/register endpoint
     - Create POST /api/auth/refresh endpoint for token refresh

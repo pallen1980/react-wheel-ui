@@ -1,6 +1,41 @@
-@MockApiService_HostAddress = http://localhost:5126
+@MockApiService_HostAddress = http://localhost:3001
 
-GET {{MockApiService_HostAddress}}/weatherforecast/
+# Health check
+GET {{MockApiService_HostAddress}}/health
 Accept: application/json
+
+###
+
+# Login with test user
+POST {{MockApiService_HostAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "test@example.com",
+  "password": "password123"
+}
+
+###
+
+# Register new user
+POST {{MockApiService_HostAddress}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "newuser@example.com",
+  "password": "password123",
+  "displayName": "New User"
+}
+
+###
+
+# Refresh token (requires Authorization header with current access token)
+POST {{MockApiService_HostAddress}}/api/auth/refresh
+Content-Type: application/json
+Authorization: Bearer YOUR_ACCESS_TOKEN_HERE
+
+{
+  "refreshToken": "YOUR_REFRESH_TOKEN_HERE"
+}
 
 ###
