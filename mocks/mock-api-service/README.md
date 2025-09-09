@@ -4,7 +4,41 @@ A .NET 8 Web API that provides backend functionality for The Wheel application, 
 
 ## 🚀 Quick Start
 
-### Development Environment
+### Using Automated Scripts (Recommended)
+
+**Windows Command Prompt:**
+```cmd
+# Deploy and start the service
+scripts\run.bat deploy
+
+# Run API tests
+scripts\run.bat test
+
+# Run full integration tests with frontend
+scripts\run.bat integration
+
+# Check service status
+scripts\run.bat status
+```
+
+**Windows PowerShell:**
+```powershell
+# Deploy and start the service
+.\scripts\run.ps1 deploy
+
+# Run API tests
+.\scripts\run.ps1 test
+
+# Run full integration tests with frontend
+.\scripts\run.ps1 integration
+
+# Check service status
+.\scripts\run.ps1 status
+```
+
+### Manual Docker Commands
+
+**Development Environment:**
 ```bash
 # Start the service in development mode
 docker-compose up -d
@@ -16,7 +50,7 @@ docker-compose logs -f mock-api
 docker-compose down
 ```
 
-### Production Environment
+**Production Environment:**
 ```bash
 # Start the service in production mode
 docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
@@ -33,7 +67,18 @@ docker-compose -f docker-compose.yml -f docker-compose.prod.yml down
 - **[Quick Start Guide](docs/quick-start.md)** - Get up and running in 2 minutes
 - **[Complete API Documentation](docs/api-documentation.md)** - Full API reference with examples
 - **[Deployment Guide](docs/deployment-guide.md)** - Comprehensive deployment instructions
-- **[Error Handling Guide](docs/error-handling.md)** - Error simulation and troubleshooting
+- **[Scripts Documentation](scripts/README.md)** - Automated deployment and testing scripts
+
+## 🛠️ Automated Scripts
+
+The `scripts/` directory contains comprehensive automation for deployment, testing, and integration:
+
+- **`run.bat` / `run.ps1`** - Main script runner with all commands
+- **`deploy.bat` / `deploy.ps1`** - Deployment automation
+- **`test-api.bat` / `test-api.ps1`** - API endpoint testing
+- **`integration-test.bat` / `integration-test.ps1`** - Full integration testing with frontend
+
+See [Scripts Documentation](scripts/README.md) for detailed usage instructions.
 
 ## Configuration Files
 
