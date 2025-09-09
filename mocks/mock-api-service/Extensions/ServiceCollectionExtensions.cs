@@ -31,7 +31,19 @@ public static class ServiceCollectionExtensions
                     .WithOrigins(allowedOrigins)
                     .AllowAnyMethod()
                     .AllowAnyHeader()
-                    .AllowCredentials();
+                    .AllowCredentials()
+                    // Allow any localhost origin for development (requirement 7.3)
+                    .SetIsOriginAllowed(origin =>
+                    {
+                        if (string.IsNullOrEmpty(origin)) return false;
+                        
+                        // Allow configured origins
+                        if (allowedOrigins.Contains(origin)) return true;
+                        
+                        // Allow any localhost origin regardless of port
+                        var uri = new Uri(origin);
+                        return uri.Host == "localhost" || uri.Host == "127.0.0.1";
+                    });
             });
         });
         
