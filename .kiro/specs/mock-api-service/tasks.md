@@ -96,19 +96,14 @@
     - Add logging and error handling middleware
     - _Requirements: 5.3, 7.1_
 
-- [-] 8. Create Docker containerization
+- [X] 8. Create Docker containerization
   - [x] 8.1 Write Dockerfile with multi-stage build
-
-
-
-
-
     - Use mcr.microsoft.com/dotnet/sdk:8.0 for build stage
     - Use mcr.microsoft.com/dotnet/aspnet:8.0 for runtime
     - Configure port exposure and environment variables
     - _Requirements: 5.1, 5.2, 5.4_
 
-  - [ ] 8.2 Add docker-compose configuration
+  - [x] 8.2 Add docker-compose configuration
     - Create docker-compose.yml for easy local deployment
     - Configure environment variables and port mapping
     - Set up networking for frontend integration

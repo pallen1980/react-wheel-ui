@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  mock-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3001:3001"
+    container_name: mock-api-service
+    environment:
+      # ASP.NET Core Configuration
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:3001
+      - ASPNETCORE_HTTP_PORTS=3001
+      
+      # Firebase Configuration
+      - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID:-myauth-1569840907611}
+      
+      # CORS Configuration - Allow frontend origins
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:5173,http://localhost:3000,http://localhost:51235}
+      
+      # Logging Configuration
+      - Logging__LogLevel__Default=Information
+      - Logging__LogLevel__Microsoft.AspNetCore=Warning
+      
+    volumes:
+      # Optional: Mount configuration files for development
+      # - ./appsettings.Development.json:/app/appsettings.Development.json:ro
+      
+      # Optional: Mount logs directory for persistence
+      # - ./logs:/app/logs
+      
+    networks:
+      - mock-api-network
+      
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+      
+    restart: unless-stopped
+
+networks:
+  mock-api-network:
+    driver: bridge
+    name: mock-api-network
+
+# Optional: Define volumes for data persistence
+# volumes:
+#   mock-api-logs:
+#     driver: local
