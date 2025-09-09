@@ -12,6 +12,7 @@ public class AuthControllerTests
 {
     private readonly Mock<IAuthService> _mockAuthService;
     private readonly Mock<ITokenService> _mockTokenService;
+    private readonly Mock<IErrorSimulationService> _mockErrorSimulationService;
     private readonly Mock<ILogger<AuthController>> _mockLogger;
     private readonly AuthController _controller;
 
@@ -19,8 +20,9 @@ public class AuthControllerTests
     {
         _mockAuthService = new Mock<IAuthService>();
         _mockTokenService = new Mock<ITokenService>();
+        _mockErrorSimulationService = new Mock<IErrorSimulationService>();
         _mockLogger = new Mock<ILogger<AuthController>>();
-        _controller = new AuthController(_mockAuthService.Object, _mockTokenService.Object, _mockLogger.Object);
+        _controller = new AuthController(_mockAuthService.Object, _mockTokenService.Object, _mockErrorSimulationService.Object, _mockLogger.Object);
     }
 
     [Fact]

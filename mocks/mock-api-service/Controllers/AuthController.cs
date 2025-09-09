@@ -10,12 +10,14 @@ public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
     private readonly ITokenService _tokenService;
+    private readonly IErrorSimulationService _errorSimulationService;
     private readonly ILogger<AuthController> _logger;
 
-    public AuthController(IAuthService authService, ITokenService tokenService, ILogger<AuthController> logger)
+    public AuthController(IAuthService authService, ITokenService tokenService, IErrorSimulationService errorSimulationService, ILogger<AuthController> logger)
     {
         _authService = authService;
         _tokenService = tokenService;
+        _errorSimulationService = errorSimulationService;
         _logger = logger;
     }
 
@@ -24,6 +26,20 @@ public class AuthController : ControllerBase
     {
         try
         {
+            // Check for error simulation
+            var endpoint = "/api/auth/login";
+            if (await _errorSimulationService.ShouldSimulateErrorAsync(endpoint))
+            {
+                var (errorType, delayMs) = await _errorSimulationService.GetConfiguredErrorAsync(endpoint);
+                if (delayMs.HasValue)
+                {
+                    await _errorSimulationService.SimulateNetworkDelayAsync(delayMs.Value);
+                }
+                if (!string.IsNullOrEmpty(errorType))
+                {
+                    throw ErrorSimulationService.CreateExceptionForErrorType(errorType);
+                }
+            }
             if (!ModelState.IsValid)
             {
                 return BadRequest(new ErrorResponse
@@ -75,6 +91,20 @@ public class AuthController : ControllerBase
     {
         try
         {
+            // Check for error simulation
+            var endpoint = "/api/auth/register";
+            if (await _errorSimulationService.ShouldSimulateErrorAsync(endpoint))
+            {
+                var (errorType, delayMs) = await _errorSimulationService.GetConfiguredErrorAsync(endpoint);
+                if (delayMs.HasValue)
+                {
+                    await _errorSimulationService.SimulateNetworkDelayAsync(delayMs.Value);
+                }
+                if (!string.IsNullOrEmpty(errorType))
+                {
+                    throw ErrorSimulationService.CreateExceptionForErrorType(errorType);
+                }
+            }
             if (!ModelState.IsValid)
             {
                 return BadRequest(new ErrorResponse
@@ -126,6 +156,20 @@ public class AuthController : ControllerBase
     {
         try
         {
+            // Check for error simulation
+            var endpoint = "/api/auth/refresh";
+            if (await _errorSimulationService.ShouldSimulateErrorAsync(endpoint))
+            {
+                var (errorType, delayMs) = await _errorSimulationService.GetConfiguredErrorAsync(endpoint);
+                if (delayMs.HasValue)
+                {
+                    await _errorSimulationService.SimulateNetworkDelayAsync(delayMs.Value);
+                }
+                if (!string.IsNullOrEmpty(errorType))
+                {
+                    throw ErrorSimulationService.CreateExceptionForErrorType(errorType);
+                }
+            }
             if (!ModelState.IsValid)
             {
                 return BadRequest(new ErrorResponse

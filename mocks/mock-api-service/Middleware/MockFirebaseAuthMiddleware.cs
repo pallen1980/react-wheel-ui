@@ -112,6 +112,7 @@ public class MockFirebaseAuthMiddleware
             "/api/auth/login",
             "/api/auth/register",
             "/api/auth/refresh",
+            "/api/error-simulation",
             "/swagger",
             "/favicon.ico"
         };

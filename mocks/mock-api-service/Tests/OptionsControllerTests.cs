@@ -14,6 +14,7 @@ public class OptionsControllerTests
 {
     private readonly Mock<IStorageService> _mockStorageService;
     private readonly Mock<IValidationService> _mockValidationService;
+    private readonly Mock<IErrorSimulationService> _mockErrorSimulationService;
     private readonly Mock<ILogger<OptionsController>> _mockLogger;
     private readonly OptionsController _controller;
 
@@ -21,8 +22,9 @@ public class OptionsControllerTests
     {
         _mockStorageService = new Mock<IStorageService>();
         _mockValidationService = new Mock<IValidationService>();
+        _mockErrorSimulationService = new Mock<IErrorSimulationService>();
         _mockLogger = new Mock<ILogger<OptionsController>>();
-        _controller = new OptionsController(_mockStorageService.Object, _mockValidationService.Object, _mockLogger.Object);
+        _controller = new OptionsController(_mockStorageService.Object, _mockValidationService.Object, _mockErrorSimulationService.Object, _mockLogger.Object);
     }
 
     [Fact]

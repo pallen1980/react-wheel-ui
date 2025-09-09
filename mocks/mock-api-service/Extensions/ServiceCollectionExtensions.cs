@@ -16,6 +16,9 @@ public static class ServiceCollectionExtensions
         // Register validation service
         services.AddScoped<IValidationService, OptionsValidationService>();
         
+        // Register error simulation service
+        services.AddSingleton<IErrorSimulationService, ErrorSimulationService>();
+        
         // Configure CORS
         services.AddCors(options =>
         {

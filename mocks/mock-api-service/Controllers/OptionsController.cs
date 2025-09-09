@@ -11,12 +11,14 @@ public class OptionsController : ControllerBase
 {
     private readonly IStorageService _storageService;
     private readonly IValidationService _validationService;
+    private readonly IErrorSimulationService _errorSimulationService;
     private readonly ILogger<OptionsController> _logger;
 
-    public OptionsController(IStorageService storageService, IValidationService validationService, ILogger<OptionsController> logger)
+    public OptionsController(IStorageService storageService, IValidationService validationService, IErrorSimulationService errorSimulationService, ILogger<OptionsController> logger)
     {
         _storageService = storageService;
         _validationService = validationService;
+        _errorSimulationService = errorSimulationService;
         _logger = logger;
     }
 
@@ -25,6 +27,20 @@ public class OptionsController : ControllerBase
     {
         try
         {
+            // Check for error simulation
+            var endpoint = $"/api/users/{userId}/options";
+            if (await _errorSimulationService.ShouldSimulateErrorAsync(endpoint))
+            {
+                var (errorType, delayMs) = await _errorSimulationService.GetConfiguredErrorAsync(endpoint);
+                if (delayMs.HasValue)
+                {
+                    await _errorSimulationService.SimulateNetworkDelayAsync(delayMs.Value);
+                }
+                if (!string.IsNullOrEmpty(errorType))
+                {
+                    throw ErrorSimulationService.CreateExceptionForErrorType(errorType);
+                }
+            }
             // Validate user ID matches authenticated user
             if (!IsAuthorizedForUser(userId))
             {
@@ -84,6 +100,20 @@ public class OptionsController : ControllerBase
     {
         try
         {
+            // Check for error simulation
+            var endpoint = $"/api/users/{userId}/options";
+            if (await _errorSimulationService.ShouldSimulateErrorAsync(endpoint))
+            {
+                var (errorType, delayMs) = await _errorSimulationService.GetConfiguredErrorAsync(endpoint);
+                if (delayMs.HasValue)
+                {
+                    await _errorSimulationService.SimulateNetworkDelayAsync(delayMs.Value);
+                }
+                if (!string.IsNullOrEmpty(errorType))
+                {
+                    throw ErrorSimulationService.CreateExceptionForErrorType(errorType);
+                }
+            }
             // Validate user ID matches authenticated user
             if (!IsAuthorizedForUser(userId))
             {

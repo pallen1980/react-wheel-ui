@@ -20,6 +20,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+// Add global exception handling middleware first
+app.UseMiddleware<GlobalExceptionHandlingMiddleware>();
+
 // Use CORS before other middleware
 app.UseCors();
 
