@@ -39,7 +39,7 @@
     - Load default test users from configuration
     - _Requirements: 2.1, 2.2, 8.1, 9.1, 9.4_
 
-- [ ] 4. Create authentication middleware and controllers
+- [X] 4. Create authentication middleware and controllers
   - [x] 4.1 Implement MockFirebaseAuthMiddleware
     - Extract Bearer tokens from Authorization headers
     - Validate tokens using MockTokenService
@@ -54,14 +54,14 @@
     - Handle authentication errors and validation
     - _Requirements: 2.1, 2.2, 8.1, 8.2, 8.3, 8.4_
 
-- [ ] 5. Implement data storage and options management
-  - [ ] 5.1 Create InMemoryStorageService
+- [X] 5. Implement data storage and options management
+  - [x] 5.1 Create InMemoryStorageService
     - Implement thread-safe in-memory storage using ConcurrentDictionary
     - Add methods for saving and retrieving user options
     - Include data validation and error handling
     - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
-  - [ ] 5.2 Implement OptionsController
+  - [x] 5.2 Implement OptionsController
     - Create GET /api/users/{userId}/options endpoint
     - Add POST /api/users/{userId}/options endpoint
     - Validate user ID matches authenticated user
