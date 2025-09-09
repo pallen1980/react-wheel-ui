@@ -1,8 +1,8 @@
-# Mock API Service Docker Deployment
+# Mock API Service
 
-This directory contains Docker Compose configurations for deploying the Mock API Service in different environments.
+A .NET 8 Web API that provides backend functionality for The Wheel application, including Firebase-compatible authentication and user options persistence.
 
-## Quick Start
+## 🚀 Quick Start
 
 ### Development Environment
 ```bash
@@ -27,6 +27,13 @@ docker-compose logs -f mock-api
 # Stop the service
 docker-compose -f docker-compose.yml -f docker-compose.prod.yml down
 ```
+
+## 📚 Documentation
+
+- **[Quick Start Guide](docs/quick-start.md)** - Get up and running in 2 minutes
+- **[Complete API Documentation](docs/api-documentation.md)** - Full API reference with examples
+- **[Deployment Guide](docs/deployment-guide.md)** - Comprehensive deployment instructions
+- **[Error Handling Guide](docs/error-handling.md)** - Error simulation and troubleshooting
 
 ## Configuration Files
 
