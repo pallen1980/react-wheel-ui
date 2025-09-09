@@ -13,6 +13,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IAuthService, MockAuthService>();
         services.AddScoped<ITokenService, MockTokenService>();
         
+        // Register validation service
+        services.AddScoped<IValidationService, OptionsValidationService>();
+        
         // Configure CORS
         services.AddCors(options =>
         {

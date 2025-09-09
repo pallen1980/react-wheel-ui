@@ -10,11 +10,13 @@ namespace MockApiService.Controllers;
 public class OptionsController : ControllerBase
 {
     private readonly IStorageService _storageService;
+    private readonly IValidationService _validationService;
     private readonly ILogger<OptionsController> _logger;
 
-    public OptionsController(IStorageService storageService, ILogger<OptionsController> logger)
+    public OptionsController(IStorageService storageService, IValidationService validationService, ILogger<OptionsController> logger)
     {
         _storageService = storageService;
+        _validationService = validationService;
         _logger = logger;
     }
 
@@ -99,6 +101,19 @@ public class OptionsController : ControllerBase
                     Error = "VALIDATION_ERROR",
                     Message = "Invalid request data",
                     Details = ModelState
+                });
+            }
+
+            // Validate option data structure
+            var validationResult = _validationService.ValidateOptions(request.Options);
+            if (!validationResult.IsValid)
+            {
+                _logger.LogWarning("Option validation failed for user {UserId}: {ErrorMessage}", userId, validationResult.ErrorMessage);
+                return BadRequest(new ErrorResponse
+                {
+                    Error = "VALIDATION_ERROR",
+                    Message = validationResult.ErrorMessage ?? "Invalid option data",
+                    Details = validationResult.ErrorDetails
                 });
             }
 

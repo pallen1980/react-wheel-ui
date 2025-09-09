@@ -13,14 +13,16 @@ namespace MockApiService.Tests;
 public class OptionsControllerTests
 {
     private readonly Mock<IStorageService> _mockStorageService;
+    private readonly Mock<IValidationService> _mockValidationService;
     private readonly Mock<ILogger<OptionsController>> _mockLogger;
     private readonly OptionsController _controller;
 
     public OptionsControllerTests()
     {
         _mockStorageService = new Mock<IStorageService>();
+        _mockValidationService = new Mock<IValidationService>();
         _mockLogger = new Mock<ILogger<OptionsController>>();
-        _controller = new OptionsController(_mockStorageService.Object, _mockLogger.Object);
+        _controller = new OptionsController(_mockStorageService.Object, _mockValidationService.Object, _mockLogger.Object);
     }
 
     [Fact]
@@ -100,6 +102,8 @@ public class OptionsControllerTests
         };
 
         SetupAuthenticatedUser(userId);
+        _mockValidationService.Setup(x => x.ValidateOptions(request.Options))
+            .Returns(new ValidationResult { IsValid = true });
         _mockStorageService.Setup(x => x.SaveUserOptionsAsync(userId, request.Options))
             .Returns(Task.CompletedTask);
 
@@ -133,6 +137,7 @@ public class OptionsControllerTests
         // Assert
         Assert.IsType<ForbidResult>(result);
         _mockStorageService.Verify(x => x.SaveUserOptionsAsync(It.IsAny<string>(), It.IsAny<Option[]>()), Times.Never);
+        _mockValidationService.Verify(x => x.ValidateOptions(It.IsAny<Option[]>()), Times.Never);
     }
 
     [Fact]
@@ -149,8 +154,13 @@ public class OptionsControllerTests
         };
 
         SetupAuthenticatedUser(userId);
-        _mockStorageService.Setup(x => x.SaveUserOptionsAsync(userId, request.Options))
-            .ThrowsAsync(new ArgumentException("Duplicate key found"));
+        _mockValidationService.Setup(x => x.ValidateOptions(request.Options))
+            .Returns(new ValidationResult 
+            { 
+                IsValid = false, 
+                ErrorMessage = "Duplicate key found",
+                ErrorDetails = new { DuplicateKeys = new[] { "option1" } }
+            });
 
         // Act
         var result = await _controller.SaveUserOptions(userId, request);
@@ -160,6 +170,7 @@ public class OptionsControllerTests
         var errorResponse = Assert.IsType<ErrorResponse>(badRequestResult.Value);
         Assert.Equal("VALIDATION_ERROR", errorResponse.Error);
         Assert.Contains("Duplicate key found", errorResponse.Message);
+        _mockStorageService.Verify(x => x.SaveUserOptionsAsync(It.IsAny<string>(), It.IsAny<Option[]>()), Times.Never);
     }
 
     [Fact]
@@ -173,6 +184,8 @@ public class OptionsControllerTests
         };
 
         SetupAuthenticatedUser(userId);
+        _mockValidationService.Setup(x => x.ValidateOptions(request.Options))
+            .Returns(new ValidationResult { IsValid = true });
         _mockStorageService.Setup(x => x.SaveUserOptionsAsync(userId, request.Options))
             .Returns(Task.CompletedTask);
 
@@ -182,6 +195,40 @@ public class OptionsControllerTests
         // Assert
         Assert.IsType<OkResult>(result);
         _mockStorageService.Verify(x => x.SaveUserOptionsAsync(userId, request.Options), Times.Once);
+    }
+
+    [Fact]
+    public async Task SaveUserOptions_WithInvalidOptionData_ReturnsBadRequest()
+    {
+        // Arrange
+        var userId = "test-user-id";
+        var request = new SaveOptionsRequest
+        {
+            Options = new Option[]
+            {
+                new() { Key = "", Value = "Option 1", Sequence = 1 } // Invalid empty key
+            }
+        };
+
+        SetupAuthenticatedUser(userId);
+        _mockValidationService.Setup(x => x.ValidateOptions(request.Options))
+            .Returns(new ValidationResult 
+            { 
+                IsValid = false, 
+                ErrorMessage = "Option key is required and cannot be empty",
+                ErrorDetails = new { Index = 0, Field = "key", Value = "" }
+            });
+
+        // Act
+        var result = await _controller.SaveUserOptions(userId, request);
+
+        // Assert
+        var badRequestResult = Assert.IsType<BadRequestObjectResult>(result);
+        var errorResponse = Assert.IsType<ErrorResponse>(badRequestResult.Value);
+        Assert.Equal("VALIDATION_ERROR", errorResponse.Error);
+        Assert.Equal("Option key is required and cannot be empty", errorResponse.Message);
+        Assert.NotNull(errorResponse.Details);
+        _mockStorageService.Verify(x => x.SaveUserOptionsAsync(It.IsAny<string>(), It.IsAny<Option[]>()), Times.Never);
     }
 
     private void SetupAuthenticatedUser(string userId)
