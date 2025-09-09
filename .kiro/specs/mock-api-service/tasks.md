@@ -110,7 +110,7 @@
     - _Requirements: 5.3, 5.4_
 
 - [ ] 9. Write comprehensive tests
-  - [ ] 9.1 Create unit tests for services
+  - [x] 9.1 Create unit tests for services
     - Test MockTokenService JWT generation and validation
     - Test MockAuthService authentication logic
     - Test InMemoryStorageService data operations
