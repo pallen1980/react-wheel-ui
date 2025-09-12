@@ -1,0 +1,35 @@
+# Docker Compose Override for Development
+# This file provides development-specific configurations
+# It automatically merges with docker-compose.yml when running docker-compose commands
+
+services:
+  web:
+    # Development-specific environment variables for main app
+    environment:
+      - NODE_ENV=development
+    # Optional: Enable hot reload by mounting source code
+    # volumes:
+    #   - ./src:/app/src
+    #   - ./public:/app/public
+
+  mock-api:
+    # Development-specific environment variables
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_LOGGING__LOGLEVEL__DEFAULT=Information
+      - ASPNETCORE_LOGGING__LOGLEVEL__MICROSOFT=Warning
+    # Optional: Enable hot reload by mounting source code
+    # volumes:
+    #   - ./mocks/mock-api-service/src:/app/src
+
+  mock-user-ui:
+    # Development-specific environment variables
+    environment:
+      - NODE_ENV=development
+      - VITE_API_BASE_URL=http://localhost:3001  # Use localhost for browser access
+      - VITE_MAIN_APP_URL=http://localhost:5173
+      - VITE_APP_TITLE=User Management (Dev)
+    # Optional: Enable hot reload by mounting source code
+    # volumes:
+    #   - ./mocks/mock-user-ui/src:/app/src
+    #   - ./mocks/mock-user-ui/public:/app/public

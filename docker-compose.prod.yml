@@ -1,0 +1,43 @@
+# Docker Compose Production Configuration
+# Use this file for production deployments
+# Run with: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
+
+services:
+  web:
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    # Remove development ports and use production settings
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  mock-api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_LOGGING__LOGLEVEL__DEFAULT=Warning
+      - ASPNETCORE_LOGGING__LOGLEVEL__MICROSOFT=Error
+      - USER_MANAGEMENT_ENABLED=true
+      - TEST_USER_PREFIX=prod_test_
+      - MAX_TEST_USERS=50
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  mock-user-ui:
+    environment:
+      - NODE_ENV=production
+      - VITE_API_BASE_URL=http://localhost:3001
+      - VITE_MAIN_APP_URL=http://localhost:5173
+      - VITE_APP_TITLE=User Management
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

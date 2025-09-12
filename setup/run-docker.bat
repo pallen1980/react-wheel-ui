@@ -1,6 +1,7 @@
 @echo off
 
 echo Starting The Wheel Application with Docker Compose
+echo Includes: Main App, Mock API Service, and User Management UI
 echo ====================================================
 
 REM Check if Docker is running
@@ -49,10 +50,20 @@ goto end
 echo Starting containers in background...
 docker-compose up -d
 echo.
-echo Application started! Access at: http://localhost:51235
+echo ✅ Applications started successfully!
 echo.
-echo To view logs: docker-compose logs -f
-echo To stop: docker-compose down
+echo 🌐 Access points:
+echo   Main Application:     http://localhost:51235
+echo   Mock API Service:     http://localhost:3001
+echo   User Management UI:   http://localhost:3002
+echo.
+echo 📋 Useful commands:
+echo   View logs:            docker-compose logs -f
+echo   View specific logs:   docker-compose logs -f [web^|mock-api^|mock-user-ui]
+echo   Stop all services:    docker-compose down
+echo   Restart services:     docker-compose restart
+echo   Health check:         docker-compose ps
+echo.
 goto end
 
 :rebuild

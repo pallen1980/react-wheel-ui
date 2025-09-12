@@ -123,6 +123,7 @@ function Show-ConfigSummary {
 # Main execution
 try {
     Write-Host "🎡 Starting The Wheel Application with Docker Compose" -ForegroundColor Magenta
+    Write-Host "Includes: Main App, Mock API Service, and User Management UI" -ForegroundColor Magenta
     Write-Host "======================================================" -ForegroundColor Magenta
     
     # Check if Docker is running
@@ -175,14 +176,20 @@ try {
     & docker-compose @composeArgs
     
     if ($LASTEXITCODE -eq 0) {
-        Write-Host "`n✅ Application started successfully!" -ForegroundColor Green
-        Write-Host "🌐 Access the application at: http://localhost:51235" -ForegroundColor Cyan
+        Write-Host "`n✅ Applications started successfully!" -ForegroundColor Green
+        Write-Host "`n🌐 Access Points:" -ForegroundColor Cyan
+        Write-Host "  Main Application:     http://localhost:51235" -ForegroundColor White
+        Write-Host "  Mock API Service:     http://localhost:3001" -ForegroundColor White
+        Write-Host "  User Management UI:   http://localhost:3002" -ForegroundColor White
         
         if ($Detached) {
-            Write-Host "`nUseful commands:" -ForegroundColor Yellow
-            Write-Host "  View logs: docker-compose logs -f" -ForegroundColor Gray
-            Write-Host "  Stop app:  docker-compose down" -ForegroundColor Gray
-            Write-Host "  Restart:   docker-compose restart" -ForegroundColor Gray
+            Write-Host "`n📋 Useful Commands:" -ForegroundColor Yellow
+            Write-Host "  View all logs:        docker-compose logs -f" -ForegroundColor Gray
+            Write-Host "  View specific logs:   docker-compose logs -f [web|mock-api|mock-user-ui]" -ForegroundColor Gray
+            Write-Host "  Stop all services:    docker-compose down" -ForegroundColor Gray
+            Write-Host "  Restart services:     docker-compose restart" -ForegroundColor Gray
+            Write-Host "  Health check:         docker-compose ps" -ForegroundColor Gray
+            Write-Host "  Service status:       docker-compose top" -ForegroundColor Gray
         }
     } else {
         Write-Error "Failed to start the application. Check the logs above for details."
