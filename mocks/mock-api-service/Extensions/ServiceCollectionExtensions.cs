@@ -10,8 +10,8 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<IStorageService, InMemoryStorageService>();
         
         // Register authentication services
-        services.AddScoped<IAuthService, MockAuthService>();
-        services.AddScoped<ITokenService, MockTokenService>();
+        services.AddSingleton<IAuthService, MockAuthService>();
+        services.AddSingleton<ITokenService, MockTokenService>();
         
         // Register validation service
         services.AddScoped<IValidationService, OptionsValidationService>();

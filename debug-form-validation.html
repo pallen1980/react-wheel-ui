@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Validation Debug</title>
+</head>
+
+<body>
+    <h1>Email Validation Debug</h1>
+    <p>Test the email regex pattern used in the UserForm:</p>
+
+    <input type="email" id="emailInput" placeholder="Enter email to test">
+    <button onclick="testEmail()">Test Email</button>
+
+    <div id="results"></div>
+
+    <script>
+        const emailPattern = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+
+        function testEmail() {
+            const email = document.getElementById('emailInput').value;
+            const isValid = emailPattern.test(email);
+            const browserValid = document.getElementById('emailInput').validity.valid;
+
+            document.getElementById('results').innerHTML = `
+                <h3>Results for: "${email}"</h3>
+                <p>Custom regex valid: ${isValid}</p>
+                <p>Browser validation valid: ${browserValid}</p>
+                <p>Email length: ${email.length}</p>
+                <p>Has @ symbol: ${email.includes('@')}</p>
+                <p>Has domain: ${email.split('@')[1] ? 'Yes' : 'No'}</p>
+            `;
+        }
+
+        // Test some common emails
+        const testEmails = [
+            'test@example.com',
+            'user@domain.co.uk',
+            'invalid-email',
+            'test@',
+            '@domain.com',
+            'test@domain',
+            'test.email@domain.com'
+        ];
+
+        console.log('Testing emails with regex:');
+        testEmails.forEach(email => {
+            console.log(`${email}: ${emailPattern.test(email)}`);
+        });
+    </script>
+</body>
+
+</html>
