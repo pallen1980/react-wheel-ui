@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { User, ApiError } from '../types';
 import { userService } from '../services';
+import { ConfirmDialog } from './ConfirmDialog';
+import { ErrorMessage } from './ErrorMessage';
 import './UserList.scss';
 
 interface UserListProps {
@@ -64,13 +66,63 @@ export const UserList: React.FC<UserListProps> = ({
     }
   };
 
+  const [impersonatingUserId, setImpersonatingUserId] = useState<string | null>(null);
+  const [userToDelete, setUserToDelete] = useState<User | null>(null);
+  const [isDeletingUser, setIsDeletingUser] = useState(false);
+
   const handleLoginAsUser = async (user: User) => {
     try {
-      await userService.loginAsUser(user.uid);
+      setImpersonatingUserId(user.uid);
+      setError(null);
+      
+      // Get main app URL from environment or use default
+      const mainAppUrl = import.meta.env.VITE_MAIN_APP_URL || 'http://localhost:5173';
+      
+      await userService.loginAsUser(user.uid, mainAppUrl);
+      
+      // If we reach here, something went wrong with the redirect
+      setImpersonatingUserId(null);
+      setError('Redirect to main application failed. Please try again.');
+    } catch (err) {
+      setImpersonatingUserId(null);
+      const apiError = err as ApiError;
+      setError(`Failed to login as ${user.email}: ${apiError.message}`);
+    }
+  };
+
+  const handleDeleteUser = (user: User) => {
+    setUserToDelete(user);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!userToDelete) return;
+
+    try {
+      setIsDeletingUser(true);
+      setError(null);
+      
+      await userService.deleteUser(userToDelete.uid);
+      
+      // Update the users list by removing the deleted user
+      setUsers(prevUsers => prevUsers.filter(u => u.uid !== userToDelete.uid));
+      
+      // Close the dialog
+      setUserToDelete(null);
+      
+      // Call the onDeleteUser callback if provided
+      if (onDeleteUser) {
+        onDeleteUser(userToDelete);
+      }
     } catch (err) {
       const apiError = err as ApiError;
-      alert(`Failed to login as user: ${apiError.message}`);
+      setError(`Failed to delete user ${userToDelete.email}: ${apiError.message}`);
+    } finally {
+      setIsDeletingUser(false);
     }
+  };
+
+  const handleCancelDelete = () => {
+    setUserToDelete(null);
   };
 
   const handleRetry = () => {
@@ -107,24 +159,29 @@ export const UserList: React.FC<UserListProps> = ({
     );
   }
 
-  if (error) {
+  if (error && users.length === 0) {
     return (
       <div className="user-list">
-        <div className="error-container">
-          <div className="error-message">
-            <h3>Error Loading Users</h3>
-            <p>{error}</p>
-            <button onClick={handleRetry} className="retry-button">
-              Try Again
-            </button>
-          </div>
-        </div>
+        <ErrorMessage
+          message={error}
+          onRetry={handleRetry}
+          onDismiss={() => setError(null)}
+        />
       </div>
     );
   }
 
   return (
     <div className="user-list">
+      {error && (
+        <ErrorMessage
+          message={error}
+          onRetry={handleRetry}
+          onDismiss={() => setError(null)}
+          className="inline"
+        />
+      )}
+      
       <div className="user-list-header">
         <div className="search-container">
           <input
@@ -190,10 +247,18 @@ export const UserList: React.FC<UserListProps> = ({
                     <div className="action-buttons">
                       <button
                         onClick={() => handleLoginAsUser(user)}
-                        className="action-button login-button"
-                        title="Login as this user"
+                        className={`action-button login-button ${impersonatingUserId === user.uid ? 'loading' : ''}`}
+                        disabled={impersonatingUserId === user.uid}
+                        title={impersonatingUserId === user.uid ? 'Logging in...' : 'Login as this user'}
                       >
-                        Login as User
+                        {impersonatingUserId === user.uid ? (
+                          <>
+                            <span className="loading-spinner-small"></span>
+                            Logging in...
+                          </>
+                        ) : (
+                          'Login as User'
+                        )}
                       </button>
                       {onEditUser && (
                         <button
@@ -204,15 +269,13 @@ export const UserList: React.FC<UserListProps> = ({
                           Edit
                         </button>
                       )}
-                      {onDeleteUser && (
-                        <button
-                          onClick={() => onDeleteUser(user)}
-                          className="action-button delete-button"
-                          title="Delete user"
-                        >
-                          Delete
-                        </button>
-                      )}
+                      <button
+                        onClick={() => handleDeleteUser(user)}
+                        className="action-button delete-button"
+                        title="Delete user"
+                      >
+                        Delete
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -221,6 +284,22 @@ export const UserList: React.FC<UserListProps> = ({
           </table>
         </div>
       )}
+
+      <ConfirmDialog
+        isOpen={userToDelete !== null}
+        title="Delete User"
+        message={
+          userToDelete 
+            ? `Are you sure you want to delete the user "${userToDelete.email}"? This action cannot be undone.`
+            : ''
+        }
+        confirmText="Delete User"
+        cancelText="Cancel"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        isDestructive={true}
+        isLoading={isDeletingUser}
+      />
     </div>
   );
 };

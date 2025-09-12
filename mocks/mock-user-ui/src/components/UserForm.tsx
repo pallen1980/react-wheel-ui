@@ -12,14 +12,14 @@ interface UserFormData {
 
 interface UserFormProps {
   user?: User | null; // If provided, form is in edit mode
-  onSuccess?: (user: User) => void;
+  onSave?: (user: User, isNew: boolean) => void;
   onCancel?: () => void;
   onError?: (error: string) => void;
 }
 
 export const UserForm: React.FC<UserFormProps> = ({
   user,
-  onSuccess,
+  onSave,
   onCancel,
   onError
 }) => {
@@ -104,8 +104,8 @@ export const UserForm: React.FC<UserFormProps> = ({
       }
 
       // Call success callback
-      if (onSuccess) {
-        onSuccess(result);
+      if (onSave) {
+        onSave(result, !isEditMode);
       }
 
     } catch (err) {
@@ -152,8 +152,26 @@ export const UserForm: React.FC<UserFormProps> = ({
 
   const passwordStrength = getPasswordStrength(password || '');
 
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      handleCancel();
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      handleCancel();
+    }
+  };
+
   return (
-    <div className="user-form">
+    <div 
+      className="user-form-overlay" 
+      onClick={handleBackdropClick}
+      onKeyDown={handleKeyDown}
+      tabIndex={-1}
+    >
+      <div className="user-form">
       <div className="form-header">
         <h2>{isEditMode ? 'Edit User' : 'Create New User'}</h2>
         <p className="form-description">
@@ -302,6 +320,7 @@ export const UserForm: React.FC<UserFormProps> = ({
             Only modified fields will be updated.
           </p>
         )}
+      </div>
       </div>
     </div>
   );
