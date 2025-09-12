@@ -28,16 +28,18 @@ export const UserForm: React.FC<UserFormProps> = ({
   const [submitError, setSubmitError] = React.useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = React.useState<string | null>(null);
   const formRef = React.useRef<HTMLDivElement>(null);
-  const firstInputRef = React.useRef<HTMLInputElement>(null);
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid, isDirty },
+    formState: { errors, isDirty },
     reset,
-    watch
+    watch,
+    clearErrors,
+    setFocus
   } = useForm<UserFormData>({
-    mode: 'onChange',
+    mode: 'onSubmit',
+    reValidateMode: 'onBlur',
     defaultValues: {
       email: user?.email || '',
       password: '',
@@ -62,14 +64,14 @@ export const UserForm: React.FC<UserFormProps> = ({
     }
     setSubmitError(null);
     setSubmitSuccess(null);
-  }, [user, reset]);
+    // Clear any existing errors when form opens
+    clearErrors();
+  }, [user, reset, clearErrors]);
 
   // Focus management
   useEffect(() => {
     // Focus the first input when the form opens
-    if (firstInputRef.current) {
-      firstInputRef.current.focus();
-    }
+    setFocus('email');
 
     // Trap focus within the modal
     const handleTabKey = (e: KeyboardEvent) => {
@@ -116,7 +118,7 @@ export const UserForm: React.FC<UserFormProps> = ({
 
         // Only send fields that have changed
         const hasChanges = Object.values(updateData).some(value => value !== undefined);
-        
+
         if (!hasChanges) {
           setSubmitError('No changes detected');
           return;
@@ -134,7 +136,7 @@ export const UserForm: React.FC<UserFormProps> = ({
 
         result = await userService.createUser(createData);
         setSubmitSuccess('User created successfully!');
-        
+
         // Reset form after successful creation
         reset();
       }
@@ -148,7 +150,7 @@ export const UserForm: React.FC<UserFormProps> = ({
       const apiError = err as ApiError;
       const errorMessage = apiError.message || 'An unexpected error occurred';
       setSubmitError(errorMessage);
-      
+
       if (onError) {
         onError(errorMessage);
       }
@@ -161,7 +163,7 @@ export const UserForm: React.FC<UserFormProps> = ({
     reset();
     setSubmitError(null);
     setSubmitSuccess(null);
-    
+
     if (onCancel) {
       onCancel();
     }
@@ -172,7 +174,7 @@ export const UserForm: React.FC<UserFormProps> = ({
 
   const getPasswordStrength = (pwd: string): { strength: number; label: string; color: string } => {
     if (!pwd) return { strength: 0, label: '', color: '' };
-    
+
     let strength = 0;
     if (pwd.length >= 6) strength++;
     if (pwd.length >= 8) strength++;
@@ -201,8 +203,8 @@ export const UserForm: React.FC<UserFormProps> = ({
   };
 
   return (
-    <div 
-      className="user-form-overlay" 
+    <div
+      className="user-form-overlay"
       onClick={handleBackdropClick}
       onKeyDown={handleKeyDown}
       role="dialog"
@@ -211,182 +213,188 @@ export const UserForm: React.FC<UserFormProps> = ({
       aria-describedby="user-form-description"
     >
       <div className="user-form" ref={formRef}>
-      <div className="form-header">
-        <h2 id="user-form-title">{isEditMode ? 'Edit User' : 'Create New User'}</h2>
-        <p id="user-form-description" className="form-description">
-          {isEditMode 
-            ? 'Update user information. Leave password empty to keep current password.'
-            : 'Fill in the details to create a new test user account.'
-          }
-        </p>
-      </div>
-
-      {submitError && (
-        <div className="alert alert-error" role="alert" aria-live="polite">
-          <strong>Error:</strong> {submitError}
-        </div>
-      )}
-
-      {submitSuccess && (
-        <div className="alert alert-success" role="alert" aria-live="polite">
-          <strong>Success:</strong> {submitSuccess}
-        </div>
-      )}
-
-      <form onSubmit={handleSubmit(onSubmit)} className="form">
-        <div className="form-group">
-          <label htmlFor="email" className="form-label">
-            Email Address *
-          </label>
-          <input
-            id="email"
-            type="email"
-            className={`form-input ${errors.email ? 'error' : ''}`}
-            {...register('email', {
-              required: 'Email is required',
-              pattern: {
-                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                message: 'Please enter a valid email address'
-              }
-            })}
-            ref={firstInputRef}
-            placeholder="user@example.com"
-            aria-invalid={errors.email ? 'true' : 'false'}
-            aria-describedby={errors.email ? 'email-error' : undefined}
-          />
-          {errors.email && (
-            <span id="email-error" className="error-message" role="alert">
-              {errors.email.message}
-            </span>
-          )}
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="displayName" className="form-label">
-            Display Name *
-          </label>
-          <input
-            id="displayName"
-            type="text"
-            className={`form-input ${errors.displayName ? 'error' : ''}`}
-            {...register('displayName', {
-              required: 'Display name is required',
-              minLength: {
-                value: 2,
-                message: 'Display name must be at least 2 characters'
-              },
-              maxLength: {
-                value: 50,
-                message: 'Display name must be less than 50 characters'
-              }
-            })}
-            placeholder="John Doe"
-            aria-invalid={errors.displayName ? 'true' : 'false'}
-            aria-describedby={errors.displayName ? 'displayName-error' : undefined}
-          />
-          {errors.displayName && (
-            <span id="displayName-error" className="error-message" role="alert">
-              {errors.displayName.message}
-            </span>
-          )}
-        </div>
-
-        <div className="form-group">
-          <label htmlFor="password" className="form-label">
-            Password {isEditMode ? '(leave empty to keep current)' : '*'}
-          </label>
-          <input
-            id="password"
-            type="password"
-            className={`form-input ${errors.password ? 'error' : ''}`}
-            {...register('password', {
-              required: isEditMode ? false : 'Password is required',
-              minLength: {
-                value: 6,
-                message: 'Password must be at least 6 characters'
-              }
-            })}
-            placeholder={isEditMode ? 'Enter new password (optional)' : 'Enter password'}
-            aria-invalid={errors.password ? 'true' : 'false'}
-            aria-describedby={
-              errors.password 
-                ? 'password-error' 
-                : password 
-                  ? 'password-strength' 
-                  : undefined
+        <div className="form-header">
+          <h2 id="user-form-title">{isEditMode ? 'Edit User' : 'Create New User'}</h2>
+          <p id="user-form-description" className="form-description">
+            {isEditMode
+              ? 'Update user information. Leave password empty to keep current password.'
+              : 'Fill in the details to create a new test user account.'
             }
-          />
-          {errors.password && (
-            <span id="password-error" className="error-message" role="alert">
-              {errors.password.message}
-            </span>
-          )}
-          
-          {password && (
-            <div id="password-strength" className="password-strength" aria-live="polite">
-              <div 
-                className="strength-bar" 
-                role="progressbar" 
-                aria-valuenow={passwordStrength.strength} 
-                aria-valuemin={0} 
-                aria-valuemax={6}
-                aria-label="Password strength"
-              >
-                <div 
-                  className="strength-fill" 
-                  style={{ 
-                    width: `${(passwordStrength.strength / 6) * 100}%`,
-                    backgroundColor: passwordStrength.color
-                  }}
-                />
-              </div>
-              <span 
-                className="strength-label"
-                style={{ color: passwordStrength.color }}
-                aria-label={`Password strength: ${passwordStrength.label}`}
-              >
-                {passwordStrength.label}
-              </span>
-            </div>
-          )}
-        </div>
-
-        <div className="form-actions">
-          <button
-            type="button"
-            onClick={handleCancel}
-            className="button button-secondary"
-            disabled={isSubmitting}
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="button button-primary"
-            disabled={isSubmitting || !isValid || (!isDirty && isEditMode)}
-          >
-            {isSubmitting ? (
-              <>
-                <span className="loading-spinner small"></span>
-                {isEditMode ? 'Updating...' : 'Creating...'}
-              </>
-            ) : (
-              isEditMode ? 'Update User' : 'Create User'
-            )}
-          </button>
-        </div>
-      </form>
-
-      <div className="form-footer">
-        <p className="help-text">
-          * Required fields
-        </p>
-        {isEditMode && (
-          <p className="help-text">
-            Only modified fields will be updated.
           </p>
+        </div>
+
+        {submitError && (
+          <div className="alert alert-error" role="alert" aria-live="polite">
+            <strong>Error:</strong> {submitError}
+          </div>
         )}
-      </div>
+
+        {submitSuccess && (
+          <div className="alert alert-success" role="alert" aria-live="polite">
+            <strong>Success:</strong> {submitSuccess}
+          </div>
+        )}
+
+
+
+        <form onSubmit={handleSubmit(onSubmit)} className="form">
+          <div className="form-group">
+            <label htmlFor="email" className="form-label">
+              Email Address *
+            </label>
+            <input
+              id="email"
+              type="email"
+              className={`form-input ${errors.email ? 'error' : ''}`}
+              {...register('email', {
+                required: 'Email is required',
+                validate: (value) => {
+                  if (!value || value.trim() === '') {
+                    return 'Email is required';
+                  }
+                  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+                    return 'Please enter a valid email address';
+                  }
+                  return true;
+                }
+              })}
+              placeholder="user@example.com"
+              aria-invalid={errors.email ? 'true' : 'false'}
+              aria-describedby={errors.email ? 'email-error' : undefined}
+            />
+            {errors.email && (
+              <span id="email-error" className="error-message" role="alert">
+                {errors.email.message}
+              </span>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="displayName" className="form-label">
+              Display Name *
+            </label>
+            <input
+              id="displayName"
+              type="text"
+              className={`form-input ${errors.displayName ? 'error' : ''}`}
+              {...register('displayName', {
+                required: 'Display name is required',
+                minLength: {
+                  value: 2,
+                  message: 'Display name must be at least 2 characters'
+                },
+                maxLength: {
+                  value: 50,
+                  message: 'Display name must be less than 50 characters'
+                }
+              })}
+              placeholder="John Doe"
+              aria-invalid={errors.displayName ? 'true' : 'false'}
+              aria-describedby={errors.displayName ? 'displayName-error' : undefined}
+            />
+            {errors.displayName && (
+              <span id="displayName-error" className="error-message" role="alert">
+                {errors.displayName.message}
+              </span>
+            )}
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="password" className="form-label">
+              Password {isEditMode ? '(leave empty to keep current)' : '*'}
+            </label>
+            <input
+              id="password"
+              type="password"
+              className={`form-input ${errors.password ? 'error' : ''}`}
+              {...register('password', {
+                required: isEditMode ? false : 'Password is required',
+                minLength: {
+                  value: 6,
+                  message: 'Password must be at least 6 characters'
+                }
+              })}
+              placeholder={isEditMode ? 'Enter new password (optional)' : 'Enter password'}
+              aria-invalid={errors.password ? 'true' : 'false'}
+              aria-describedby={
+                errors.password
+                  ? 'password-error'
+                  : password
+                    ? 'password-strength'
+                    : undefined
+              }
+            />
+            {errors.password && (
+              <span id="password-error" className="error-message" role="alert">
+                {errors.password.message}
+              </span>
+            )}
+
+            {password && (
+              <div id="password-strength" className="password-strength" aria-live="polite">
+                <div
+                  className="strength-bar"
+                  role="progressbar"
+                  aria-valuenow={passwordStrength.strength}
+                  aria-valuemin={0}
+                  aria-valuemax={6}
+                  aria-label="Password strength"
+                >
+                  <div
+                    className="strength-fill"
+                    style={{
+                      width: `${(passwordStrength.strength / 6) * 100}%`,
+                      backgroundColor: passwordStrength.color
+                    }}
+                  />
+                </div>
+                <span
+                  className="strength-label"
+                  style={{ color: passwordStrength.color }}
+                  aria-label={`Password strength: ${passwordStrength.label}`}
+                >
+                  {passwordStrength.label}
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div className="form-actions">
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="button button-secondary"
+              disabled={isSubmitting}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="button button-primary"
+              disabled={isSubmitting || (!isDirty && isEditMode)}
+            >
+              {isSubmitting ? (
+                <>
+                  <span className="loading-spinner small"></span>
+                  {isEditMode ? 'Updating...' : 'Creating...'}
+                </>
+              ) : (
+                isEditMode ? 'Update User' : 'Create User'
+              )}
+            </button>
+          </div>
+        </form>
+
+        <div className="form-footer">
+          <p className="help-text">
+            * Required fields
+          </p>
+          {isEditMode && (
+            <p className="help-text">
+              Only modified fields will be updated.
+            </p>
+          )}
+        </div>
       </div>
     </div>
   );
