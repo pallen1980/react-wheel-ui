@@ -12,13 +12,15 @@ public class AuthController : ControllerBase
     private readonly ITokenService _tokenService;
     private readonly IErrorSimulationService _errorSimulationService;
     private readonly ILogger<AuthController> _logger;
+    private readonly IWebHostEnvironment _environment;
 
-    public AuthController(IAuthService authService, ITokenService tokenService, IErrorSimulationService errorSimulationService, ILogger<AuthController> logger)
+    public AuthController(IAuthService authService, ITokenService tokenService, IErrorSimulationService errorSimulationService, ILogger<AuthController> logger, IWebHostEnvironment environment)
     {
         _authService = authService;
         _tokenService = tokenService;
         _errorSimulationService = errorSimulationService;
         _logger = logger;
+        _environment = environment;
     }
 
     [HttpPost("login")]
@@ -266,6 +268,94 @@ public class AuthController : ControllerBase
             {
                 Error = "INTERNAL_ERROR",
                 Message = "An internal error occurred during token refresh"
+            });
+        }
+    }
+
+    [HttpPost("impersonate")]
+    public async Task<ActionResult<LoginResponse>> ImpersonateUser([FromBody] ImpersonateRequest request)
+    {
+        // Only allow impersonation in development environment
+        if (!string.Equals(_environment.EnvironmentName, "Development", StringComparison.OrdinalIgnoreCase))
+        {
+            _logger.LogWarning("Impersonation attempt blocked - not in development environment");
+            return NotFound(new ErrorResponse
+            {
+                Error = "ENDPOINT_NOT_FOUND",
+                Message = "This endpoint is only available in development mode"
+            });
+        }
+
+        try
+        {
+            // Check for error simulation
+            var endpoint = "/api/auth/impersonate";
+            if (await _errorSimulationService.ShouldSimulateErrorAsync(endpoint))
+            {
+                var (errorType, delayMs) = await _errorSimulationService.GetConfiguredErrorAsync(endpoint);
+                if (delayMs.HasValue)
+                {
+                    await _errorSimulationService.SimulateNetworkDelayAsync(delayMs.Value);
+                }
+                if (!string.IsNullOrEmpty(errorType))
+                {
+                    throw ErrorSimulationService.CreateExceptionForErrorType(errorType);
+                }
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(new ErrorResponse
+                {
+                    Error = "VALIDATION_ERROR",
+                    Message = "Invalid request data",
+                    Details = ModelState
+                });
+            }
+
+            if (string.IsNullOrWhiteSpace(request.UserId))
+            {
+                return BadRequest(new ErrorResponse
+                {
+                    Error = "INVALID_USER_ID",
+                    Message = "User ID is required for impersonation"
+                });
+            }
+
+            // Validate that the user exists
+            var user = await _authService.GetUserByIdAsync(request.UserId);
+            if (user == null)
+            {
+                _logger.LogWarning("Impersonation attempt failed - user not found: {UserId}", request.UserId);
+                return NotFound(new ErrorResponse
+                {
+                    Error = "USER_NOT_FOUND",
+                    Message = "User not found"
+                });
+            }
+
+            // Generate authentication token for the specified user
+            var accessToken = await _authService.CreateTokenAsync(user.Uid, user.Email);
+            var refreshToken = _tokenService.GenerateRefreshToken(user.Uid);
+
+            _logger.LogInformation("User impersonation successful for user: {UserId}", user.Uid);
+
+            return Ok(new LoginResponse
+            {
+                IdToken = accessToken,
+                RefreshToken = refreshToken,
+                LocalId = user.Uid,
+                Email = user.Email,
+                ExpiresIn = 3600 // 1 hour in seconds
+            });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during user impersonation for user: {UserId}", request.UserId);
+            return StatusCode(500, new ErrorResponse
+            {
+                Error = "INTERNAL_ERROR",
+                Message = "An internal error occurred during user impersonation"
             });
         }
     }

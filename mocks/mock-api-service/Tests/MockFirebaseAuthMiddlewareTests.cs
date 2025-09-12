@@ -14,6 +14,7 @@ public class MockFirebaseAuthMiddlewareTests
     private readonly Mock<ITokenService> _mockTokenService;
     private readonly Mock<ILogger<MockFirebaseAuthMiddleware>> _mockLogger;
     private readonly Mock<RequestDelegate> _mockNext;
+    private readonly Mock<IWebHostEnvironment> _mockEnvironment;
     private readonly MockFirebaseAuthMiddleware _middleware;
 
     public MockFirebaseAuthMiddlewareTests()
@@ -21,7 +22,12 @@ public class MockFirebaseAuthMiddlewareTests
         _mockTokenService = new Mock<ITokenService>();
         _mockLogger = new Mock<ILogger<MockFirebaseAuthMiddleware>>();
         _mockNext = new Mock<RequestDelegate>();
-        _middleware = new MockFirebaseAuthMiddleware(_mockNext.Object, _mockLogger.Object);
+        _mockEnvironment = new Mock<IWebHostEnvironment>();
+        
+        // Default to development environment for tests
+        _mockEnvironment.Setup(x => x.EnvironmentName).Returns("Development");
+        
+        _middleware = new MockFirebaseAuthMiddleware(_mockNext.Object, _mockLogger.Object, _mockEnvironment.Object);
     }
 
     [Fact]
@@ -149,5 +155,43 @@ public class MockFirebaseAuthMiddlewareTests
         _mockNext.Verify(x => x(context), Times.Never);
         Assert.Equal(401, context.Response.StatusCode);
         _mockTokenService.Verify(x => x.ValidateTokenAsync(It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task InvokeAsync_WithImpersonateEndpointInDevelopment_SkipsAuthentication()
+    {
+        // Arrange
+        var context = new DefaultHttpContext();
+        context.Request.Path = "/api/auth/impersonate";
+        
+        // Ensure we're in development mode
+        _mockEnvironment.Setup(x => x.EnvironmentName).Returns("Development");
+
+        // Act
+        await _middleware.InvokeAsync(context, _mockTokenService.Object);
+
+        // Assert
+        _mockNext.Verify(x => x(context), Times.Once);
+        _mockTokenService.Verify(x => x.ValidateTokenAsync(It.IsAny<string>()), Times.Never);
+    }
+
+    [Fact]
+    public async Task InvokeAsync_WithImpersonateEndpointInProduction_RequiresAuthentication()
+    {
+        // Arrange
+        var context = new DefaultHttpContext();
+        context.Request.Path = "/api/auth/impersonate";
+        context.Response.Body = new MemoryStream();
+        
+        // Set to production mode
+        _mockEnvironment.Setup(x => x.EnvironmentName).Returns("Production");
+
+        // Act
+        await _middleware.InvokeAsync(context, _mockTokenService.Object);
+
+        // Assert
+        _mockNext.Verify(x => x(context), Times.Never);
+        Assert.Equal(401, context.Response.StatusCode);
+        Assert.Equal("application/json", context.Response.ContentType);
     }
 }

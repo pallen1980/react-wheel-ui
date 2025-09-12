@@ -14,6 +14,7 @@ public class AuthControllerTests
     private readonly Mock<ITokenService> _mockTokenService;
     private readonly Mock<IErrorSimulationService> _mockErrorSimulationService;
     private readonly Mock<ILogger<AuthController>> _mockLogger;
+    private readonly Mock<IWebHostEnvironment> _mockEnvironment;
     private readonly AuthController _controller;
 
     public AuthControllerTests()
@@ -22,7 +23,12 @@ public class AuthControllerTests
         _mockTokenService = new Mock<ITokenService>();
         _mockErrorSimulationService = new Mock<IErrorSimulationService>();
         _mockLogger = new Mock<ILogger<AuthController>>();
-        _controller = new AuthController(_mockAuthService.Object, _mockTokenService.Object, _mockErrorSimulationService.Object, _mockLogger.Object);
+        _mockEnvironment = new Mock<IWebHostEnvironment>();
+        
+        // Default to development environment for tests
+        _mockEnvironment.Setup(x => x.EnvironmentName).Returns("Development");
+        
+        _controller = new AuthController(_mockAuthService.Object, _mockTokenService.Object, _mockErrorSimulationService.Object, _mockLogger.Object, _mockEnvironment.Object);
     }
 
     [Fact]
@@ -262,5 +268,115 @@ public class AuthControllerTests
         
         Assert.Equal("MISSING_ACCESS_TOKEN", errorResponse.Error);
         Assert.Equal("Current access token is required for refresh", errorResponse.Message);
+    }
+
+    [Fact]
+    public async Task ImpersonateUser_WithValidUserId_ReturnsOkWithToken()
+    {
+        // Arrange
+        var impersonateRequest = new ImpersonateRequest
+        {
+            UserId = "target-user-id"
+        };
+
+        var mockUser = new MockUser
+        {
+            Uid = "target-user-id",
+            Email = "target@example.com",
+            DisplayName = "Target User"
+        };
+
+        _mockErrorSimulationService.Setup(x => x.ShouldSimulateErrorAsync(It.IsAny<string>()))
+            .ReturnsAsync(false);
+        _mockAuthService.Setup(x => x.GetUserByIdAsync("target-user-id"))
+            .ReturnsAsync(mockUser);
+        _mockAuthService.Setup(x => x.CreateTokenAsync(mockUser.Uid, mockUser.Email))
+            .ReturnsAsync("impersonation-access-token");
+        _mockTokenService.Setup(x => x.GenerateRefreshToken(mockUser.Uid))
+            .Returns("impersonation-refresh-token");
+
+        // Act
+        var result = await _controller.ImpersonateUser(impersonateRequest);
+
+        // Assert
+        var okResult = Assert.IsType<OkObjectResult>(result.Result);
+        var response = Assert.IsType<LoginResponse>(okResult.Value);
+        
+        Assert.Equal("impersonation-access-token", response.IdToken);
+        Assert.Equal("impersonation-refresh-token", response.RefreshToken);
+        Assert.Equal("target-user-id", response.LocalId);
+        Assert.Equal("target@example.com", response.Email);
+        Assert.Equal(3600, response.ExpiresIn);
+    }
+
+    [Fact]
+    public async Task ImpersonateUser_WithInvalidUserId_ReturnsNotFound()
+    {
+        // Arrange
+        var impersonateRequest = new ImpersonateRequest
+        {
+            UserId = "invalid-user-id"
+        };
+
+        _mockErrorSimulationService.Setup(x => x.ShouldSimulateErrorAsync(It.IsAny<string>()))
+            .ReturnsAsync(false);
+        _mockAuthService.Setup(x => x.GetUserByIdAsync("invalid-user-id"))
+            .ReturnsAsync((MockUser?)null);
+
+        // Act
+        var result = await _controller.ImpersonateUser(impersonateRequest);
+
+        // Assert
+        var notFoundResult = Assert.IsType<NotFoundObjectResult>(result.Result);
+        var errorResponse = Assert.IsType<ErrorResponse>(notFoundResult.Value);
+        
+        Assert.Equal("USER_NOT_FOUND", errorResponse.Error);
+        Assert.Equal("User not found", errorResponse.Message);
+    }
+
+    [Fact]
+    public async Task ImpersonateUser_WithEmptyUserId_ReturnsBadRequest()
+    {
+        // Arrange
+        var impersonateRequest = new ImpersonateRequest
+        {
+            UserId = ""
+        };
+
+        _mockErrorSimulationService.Setup(x => x.ShouldSimulateErrorAsync(It.IsAny<string>()))
+            .ReturnsAsync(false);
+
+        // Act
+        var result = await _controller.ImpersonateUser(impersonateRequest);
+
+        // Assert
+        var badRequestResult = Assert.IsType<BadRequestObjectResult>(result.Result);
+        var errorResponse = Assert.IsType<ErrorResponse>(badRequestResult.Value);
+        
+        Assert.Equal("INVALID_USER_ID", errorResponse.Error);
+        Assert.Equal("User ID is required for impersonation", errorResponse.Message);
+    }
+
+    [Fact]
+    public async Task ImpersonateUser_InProductionEnvironment_ReturnsNotFound()
+    {
+        // Arrange
+        var impersonateRequest = new ImpersonateRequest
+        {
+            UserId = "target-user-id"
+        };
+
+        // Set up production environment
+        _mockEnvironment.Setup(x => x.EnvironmentName).Returns("Production");
+
+        // Act
+        var result = await _controller.ImpersonateUser(impersonateRequest);
+
+        // Assert
+        var notFoundResult = Assert.IsType<NotFoundObjectResult>(result.Result);
+        var errorResponse = Assert.IsType<ErrorResponse>(notFoundResult.Value);
+        
+        Assert.Equal("ENDPOINT_NOT_FOUND", errorResponse.Error);
+        Assert.Equal("This endpoint is only available in development mode", errorResponse.Message);
     }
 }

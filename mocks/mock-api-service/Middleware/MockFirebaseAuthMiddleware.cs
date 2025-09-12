@@ -8,17 +8,19 @@ public class MockFirebaseAuthMiddleware
 {
     private readonly RequestDelegate _next;
     private readonly ILogger<MockFirebaseAuthMiddleware> _logger;
+    private readonly IWebHostEnvironment _environment;
 
-    public MockFirebaseAuthMiddleware(RequestDelegate next, ILogger<MockFirebaseAuthMiddleware> logger)
+    public MockFirebaseAuthMiddleware(RequestDelegate next, ILogger<MockFirebaseAuthMiddleware> logger, IWebHostEnvironment environment)
     {
         _next = next;
         _logger = logger;
+        _environment = environment;
     }
 
     public async Task InvokeAsync(HttpContext context, ITokenService tokenService)
     {
         // Skip authentication for certain endpoints
-        if (ShouldSkipAuthentication(context.Request.Path))
+        if (ShouldSkipAuthentication(context.Request.Path, _environment))
         {
             await _next(context);
             return;
@@ -103,7 +105,7 @@ public class MockFirebaseAuthMiddleware
         context.Items["UserEmail"] = validationResult.Email;
     }
 
-    private static bool ShouldSkipAuthentication(PathString path)
+    private static bool ShouldSkipAuthentication(PathString path, IWebHostEnvironment environment)
     {
         // Skip authentication for these endpoints
         var skipPaths = new[]
@@ -111,13 +113,64 @@ public class MockFirebaseAuthMiddleware
             "/health",
             "/api/auth/login",
             "/api/auth/register",
+            "/api/auth/refresh",
             "/api/error-simulation",
             "/swagger",
             "/favicon.ico"
         };
 
-        return skipPaths.Any(skipPath => 
-            path.StartsWithSegments(skipPath, StringComparison.OrdinalIgnoreCase));
+        // Only skip impersonate endpoint in development
+        var developmentOnlySkipPaths = new[]
+        {
+            "/api/auth/impersonate"
+        };
+
+        // Check exact matches first
+        if (skipPaths.Any(skipPath => 
+            path.StartsWithSegments(skipPath, StringComparison.OrdinalIgnoreCase)))
+        {
+            return true;
+        }
+
+        // Check development-only skip paths
+        if (string.Equals(environment.EnvironmentName, "Development", StringComparison.OrdinalIgnoreCase) && 
+            developmentOnlySkipPaths.Any(skipPath => 
+                path.StartsWithSegments(skipPath, StringComparison.OrdinalIgnoreCase)))
+        {
+            return true;
+        }
+
+        // Special handling for user management endpoints (but not user options)
+        // Skip authentication for direct user management operations like:
+        // GET /api/users, POST /api/users, GET /api/users/{id}, PUT /api/users/{id}, DELETE /api/users/{id}
+        // But NOT for /api/users/{userId}/options which requires authentication
+        if (path.StartsWithSegments("/api/users", StringComparison.OrdinalIgnoreCase))
+        {
+            var pathValue = path.Value?.ToLowerInvariant();
+            if (pathValue != null)
+            {
+                // If it contains "/options", it's an options endpoint that needs authentication
+                if (pathValue.Contains("/options"))
+                {
+                    return false;
+                }
+                
+                // Check if it's a direct user management endpoint
+                var segments = pathValue.Split('/', StringSplitOptions.RemoveEmptyEntries);
+                if (segments.Length == 2 && segments[0] == "api" && segments[1] == "users")
+                {
+                    // GET /api/users or POST /api/users
+                    return true;
+                }
+                else if (segments.Length == 3 && segments[0] == "api" && segments[1] == "users")
+                {
+                    // GET /api/users/{id}, PUT /api/users/{id}, DELETE /api/users/{id}
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     private static async Task WriteUnauthorizedResponse(HttpContext context, string message)

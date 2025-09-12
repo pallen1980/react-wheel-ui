@@ -64,6 +64,71 @@ public class MockAuthService : IAuthService
         return Task.FromResult<MockUser?>(newUser);
     }
 
+    // User Management Operations
+    public Task<IEnumerable<MockUser>> GetAllUsersAsync()
+    {
+        return Task.FromResult<IEnumerable<MockUser>>(_mockUsers);
+    }
+
+    public Task<MockUser?> GetUserByIdAsync(string userId)
+    {
+        var user = _mockUsers.FirstOrDefault(u => u.Uid == userId);
+        return Task.FromResult(user);
+    }
+
+    public Task<MockUser?> CreateUserAsync(CreateUserRequest request)
+    {
+        if (_mockUsers.Any(u => u.Email == request.Email))
+            return Task.FromResult<MockUser?>(null);
+
+        var newUser = new MockUser
+        {
+            Uid = Guid.NewGuid().ToString(),
+            Email = request.Email,
+            DisplayName = request.DisplayName,
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password),
+            CreatedAt = DateTime.UtcNow,
+            EmailVerified = true,
+            IsTestUser = true
+        };
+
+        _mockUsers.Add(newUser);
+        return Task.FromResult<MockUser?>(newUser);
+    }
+
+    public Task<MockUser?> UpdateUserAsync(string userId, UpdateUserRequest request)
+    {
+        var user = _mockUsers.FirstOrDefault(u => u.Uid == userId);
+        if (user == null)
+            return Task.FromResult<MockUser?>(null);
+
+        // Check if email is being changed and if it already exists
+        if (!string.IsNullOrEmpty(request.Email) && request.Email != user.Email)
+        {
+            if (_mockUsers.Any(u => u.Email == request.Email && u.Uid != userId))
+                return Task.FromResult<MockUser?>(null);
+            user.Email = request.Email;
+        }
+
+        if (!string.IsNullOrEmpty(request.DisplayName))
+            user.DisplayName = request.DisplayName;
+
+        if (!string.IsNullOrEmpty(request.Password))
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(request.Password);
+
+        return Task.FromResult<MockUser?>(user);
+    }
+
+    public Task<bool> DeleteUserAsync(string userId)
+    {
+        var user = _mockUsers.FirstOrDefault(u => u.Uid == userId);
+        if (user == null)
+            return Task.FromResult(false);
+
+        _mockUsers.Remove(user);
+        return Task.FromResult(true);
+    }
+
     private List<MockUser> LoadMockUsers()
     {
         var users = new List<MockUser>();
@@ -80,7 +145,8 @@ public class MockAuthService : IAuthService
                     DisplayName = config.DisplayName,
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword(config.Password),
                     CreatedAt = DateTime.UtcNow,
-                    EmailVerified = true
+                    EmailVerified = true,
+                    IsTestUser = true
                 });
             }
         }

@@ -47,3 +47,34 @@ public class ErrorResponse
     public string Message { get; set; } = string.Empty;
     public object? Details { get; set; }
 }
+
+public class CreateUserRequest
+{
+    [Required]
+    [EmailAddress]
+    public string Email { get; set; } = string.Empty;
+    
+    [Required]
+    [MinLength(6)]
+    public string Password { get; set; } = string.Empty;
+    
+    [Required]
+    public string DisplayName { get; set; } = string.Empty;
+}
+
+public class UpdateUserRequest
+{
+    [EmailAddress]
+    public string? Email { get; set; }
+    
+    [MinLength(6)]
+    public string? Password { get; set; }
+    
+    public string? DisplayName { get; set; }
+}
+
+public class ImpersonateRequest
+{
+    [Required]
+    public string UserId { get; set; } = string.Empty;
+}

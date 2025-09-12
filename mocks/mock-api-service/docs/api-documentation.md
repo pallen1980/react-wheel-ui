@@ -132,6 +132,167 @@ Authorization: Bearer <current_access_token>
 }
 ```
 
+#### POST /api/auth/impersonate
+
+**⚠️ Development Only**: Impersonate any user for testing purposes. This endpoint is only available when the application is running in Development environment.
+
+**Request:**
+```http
+POST /api/auth/impersonate
+Content-Type: application/json
+
+{
+  "userId": "mock-user-1"
+}
+```
+
+**Success Response (200 OK):**
+```json
+{
+  "idToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "refreshToken": "refresh_token_string",
+  "localId": "mock-user-1",
+  "email": "test@example.com",
+  "expiresIn": 3600
+}
+```
+
+**Error Response (404 Not Found - Production Mode):**
+```json
+{
+  "error": "ENDPOINT_NOT_FOUND",
+  "message": "This endpoint is only available in development mode"
+}
+```
+
+**Error Response (404 Not Found - User Not Found):**
+```json
+{
+  "error": "USER_NOT_FOUND",
+  "message": "User not found"
+}
+```
+
+### User Management Endpoints
+
+#### GET /api/users
+
+Retrieve all test users.
+
+**Request:**
+```http
+GET /api/users
+```
+
+**Success Response (200 OK):**
+```json
+[
+  {
+    "uid": "mock-user-1",
+    "email": "test@example.com",
+    "displayName": "Test User",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "emailVerified": true,
+    "isTestUser": true
+  },
+  {
+    "uid": "mock-user-2",
+    "email": "demo@example.com",
+    "displayName": "Demo User",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "emailVerified": true,
+    "isTestUser": true
+  }
+]
+```
+
+#### GET /api/users/{id}
+
+Retrieve a specific user by ID.
+
+**Request:**
+```http
+GET /api/users/mock-user-1
+```
+
+**Success Response (200 OK):**
+```json
+{
+  "uid": "mock-user-1",
+  "email": "test@example.com",
+  "displayName": "Test User",
+  "createdAt": "2024-01-01T00:00:00Z",
+  "emailVerified": true,
+  "isTestUser": true
+}
+```
+
+#### POST /api/users
+
+Create a new test user.
+
+**Request:**
+```http
+POST /api/users
+Content-Type: application/json
+
+{
+  "email": "newuser@example.com",
+  "password": "password123",
+  "displayName": "New User"
+}
+```
+
+**Success Response (201 Created):**
+```json
+{
+  "uid": "generated-user-id",
+  "email": "newuser@example.com",
+  "displayName": "New User",
+  "createdAt": "2024-01-01T00:00:00Z",
+  "emailVerified": true,
+  "isTestUser": true
+}
+```
+
+#### PUT /api/users/{id}
+
+Update an existing user.
+
+**Request:**
+```http
+PUT /api/users/mock-user-1
+Content-Type: application/json
+
+{
+  "displayName": "Updated Name",
+  "email": "updated@example.com"
+}
+```
+
+**Success Response (200 OK):**
+```json
+{
+  "uid": "mock-user-1",
+  "email": "updated@example.com",
+  "displayName": "Updated Name",
+  "createdAt": "2024-01-01T00:00:00Z",
+  "emailVerified": true,
+  "isTestUser": true
+}
+```
+
+#### DELETE /api/users/{id}
+
+Delete a user.
+
+**Request:**
+```http
+DELETE /api/users/mock-user-1
+```
+
+**Success Response (204 No Content)**
+
 ### Options Management Endpoints
 
 #### GET /api/users/{userId}/options
