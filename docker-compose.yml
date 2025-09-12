@@ -50,7 +50,7 @@ services:
       context: ./mocks/mock-user-ui
       dockerfile: Dockerfile
       args:
-        - VITE_API_BASE_URL=http://mock-api:3001
+        - VITE_API_BASE_URL=http://localhost:3001  # Browser access URL
         - VITE_MAIN_APP_URL=http://localhost:5173
         - VITE_APP_TITLE=User Management
     ports:

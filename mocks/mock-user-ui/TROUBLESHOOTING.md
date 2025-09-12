@@ -69,6 +69,9 @@ docker-compose exec mock-user-ui env | grep VITE_API_BASE_URL
 
 # Should show: VITE_API_BASE_URL=http://localhost:3001
 # If incorrect, update docker-compose.yml and restart
+
+# Note: The UI must use localhost:3001 (not internal Docker network URLs)
+# because the React app runs in the browser, not inside the container
 ```
 
 #### Network Connectivity Issues
