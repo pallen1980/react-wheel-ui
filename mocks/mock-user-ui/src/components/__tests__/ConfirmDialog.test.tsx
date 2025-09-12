@@ -129,7 +129,8 @@ describe('ConfirmDialog Component', () => {
       />
     )
 
-    fireEvent.keyDown(document, { key: 'Escape', code: 'Escape' })
+    const overlay = screen.getByTestId('dialog-overlay')
+    fireEvent.keyDown(overlay, { key: 'Escape', code: 'Escape' })
 
     expect(mockOnCancel).toHaveBeenCalledOnce()
   })
@@ -166,19 +167,19 @@ describe('ConfirmDialog Component', () => {
     expect(screen.queryByText('Cancel')).not.toBeInTheDocument()
   })
 
-  it('applies danger variant styling', () => {
+  it('applies destructive styling', () => {
     render(
       <ConfirmDialog
         isOpen={true}
         title="Delete User"
         message="Are you sure you want to delete this user?"
-        variant="danger"
+        isDestructive={true}
         onConfirm={mockOnConfirm}
         onCancel={mockOnCancel}
       />
     )
 
     const confirmButton = screen.getByText('Confirm')
-    expect(confirmButton).toHaveClass('danger')
+    expect(confirmButton).toHaveClass('destructive')
   })
 })

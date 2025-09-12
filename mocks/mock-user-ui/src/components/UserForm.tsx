@@ -27,6 +27,8 @@ export const UserForm: React.FC<UserFormProps> = ({
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [submitError, setSubmitError] = React.useState<string | null>(null);
   const [submitSuccess, setSubmitSuccess] = React.useState<string | null>(null);
+  const formRef = React.useRef<HTMLDivElement>(null);
+  const firstInputRef = React.useRef<HTMLInputElement>(null);
 
   const {
     register,
@@ -61,6 +63,40 @@ export const UserForm: React.FC<UserFormProps> = ({
     setSubmitError(null);
     setSubmitSuccess(null);
   }, [user, reset]);
+
+  // Focus management
+  useEffect(() => {
+    // Focus the first input when the form opens
+    if (firstInputRef.current) {
+      firstInputRef.current.focus();
+    }
+
+    // Trap focus within the modal
+    const handleTabKey = (e: KeyboardEvent) => {
+      if (e.key === 'Tab' && formRef.current) {
+        const focusableElements = formRef.current.querySelectorAll(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        const firstElement = focusableElements[0] as HTMLElement;
+        const lastElement = focusableElements[focusableElements.length - 1] as HTMLElement;
+
+        if (e.shiftKey) {
+          if (document.activeElement === firstElement) {
+            lastElement.focus();
+            e.preventDefault();
+          }
+        } else {
+          if (document.activeElement === lastElement) {
+            firstElement.focus();
+            e.preventDefault();
+          }
+        }
+      }
+    };
+
+    document.addEventListener('keydown', handleTabKey);
+    return () => document.removeEventListener('keydown', handleTabKey);
+  }, []);
 
   const onSubmit = async (data: UserFormData) => {
     try {
@@ -169,12 +205,15 @@ export const UserForm: React.FC<UserFormProps> = ({
       className="user-form-overlay" 
       onClick={handleBackdropClick}
       onKeyDown={handleKeyDown}
-      tabIndex={-1}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="user-form-title"
+      aria-describedby="user-form-description"
     >
-      <div className="user-form">
+      <div className="user-form" ref={formRef}>
       <div className="form-header">
-        <h2>{isEditMode ? 'Edit User' : 'Create New User'}</h2>
-        <p className="form-description">
+        <h2 id="user-form-title">{isEditMode ? 'Edit User' : 'Create New User'}</h2>
+        <p id="user-form-description" className="form-description">
           {isEditMode 
             ? 'Update user information. Leave password empty to keep current password.'
             : 'Fill in the details to create a new test user account.'
@@ -183,13 +222,13 @@ export const UserForm: React.FC<UserFormProps> = ({
       </div>
 
       {submitError && (
-        <div className="alert alert-error">
+        <div className="alert alert-error" role="alert" aria-live="polite">
           <strong>Error:</strong> {submitError}
         </div>
       )}
 
       {submitSuccess && (
-        <div className="alert alert-success">
+        <div className="alert alert-success" role="alert" aria-live="polite">
           <strong>Success:</strong> {submitSuccess}
         </div>
       )}
@@ -210,10 +249,15 @@ export const UserForm: React.FC<UserFormProps> = ({
                 message: 'Please enter a valid email address'
               }
             })}
+            ref={firstInputRef}
             placeholder="user@example.com"
+            aria-invalid={errors.email ? 'true' : 'false'}
+            aria-describedby={errors.email ? 'email-error' : undefined}
           />
           {errors.email && (
-            <span className="error-message">{errors.email.message}</span>
+            <span id="email-error" className="error-message" role="alert">
+              {errors.email.message}
+            </span>
           )}
         </div>
 
@@ -237,9 +281,13 @@ export const UserForm: React.FC<UserFormProps> = ({
               }
             })}
             placeholder="John Doe"
+            aria-invalid={errors.displayName ? 'true' : 'false'}
+            aria-describedby={errors.displayName ? 'displayName-error' : undefined}
           />
           {errors.displayName && (
-            <span className="error-message">{errors.displayName.message}</span>
+            <span id="displayName-error" className="error-message" role="alert">
+              {errors.displayName.message}
+            </span>
           )}
         </div>
 
@@ -259,14 +307,31 @@ export const UserForm: React.FC<UserFormProps> = ({
               }
             })}
             placeholder={isEditMode ? 'Enter new password (optional)' : 'Enter password'}
+            aria-invalid={errors.password ? 'true' : 'false'}
+            aria-describedby={
+              errors.password 
+                ? 'password-error' 
+                : password 
+                  ? 'password-strength' 
+                  : undefined
+            }
           />
           {errors.password && (
-            <span className="error-message">{errors.password.message}</span>
+            <span id="password-error" className="error-message" role="alert">
+              {errors.password.message}
+            </span>
           )}
           
           {password && (
-            <div className="password-strength">
-              <div className="strength-bar">
+            <div id="password-strength" className="password-strength" aria-live="polite">
+              <div 
+                className="strength-bar" 
+                role="progressbar" 
+                aria-valuenow={passwordStrength.strength} 
+                aria-valuemin={0} 
+                aria-valuemax={6}
+                aria-label="Password strength"
+              >
                 <div 
                   className="strength-fill" 
                   style={{ 
@@ -278,6 +343,7 @@ export const UserForm: React.FC<UserFormProps> = ({
               <span 
                 className="strength-label"
                 style={{ color: passwordStrength.color }}
+                aria-label={`Password strength: ${passwordStrength.label}`}
               >
                 {passwordStrength.label}
               </span>

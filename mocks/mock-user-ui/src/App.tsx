@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { UserList, UserForm, ToastContainer } from './components';
 import { User } from './types';
 import { useToast } from './hooks';
@@ -48,7 +48,7 @@ function App() {
 
   return (
     <div className="app">
-      <header className="app-header">
+      <header className="app-header" role="banner">
         <div className="header-content">
           <div className="header-text">
             <h1>User Management</h1>
@@ -57,13 +57,14 @@ function App() {
           <button 
             onClick={handleAddUser}
             className="add-user-button"
+            aria-label="Add new test user"
           >
             Add New User
           </button>
         </div>
       </header>
       
-      <main className="app-main">
+      <main className="app-main" role="main">
         <UserList
           onEditUser={handleEditUser}
           onDeleteUser={handleUserDeleted}

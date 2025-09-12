@@ -16,10 +16,15 @@ export const ErrorMessage: React.FC<ErrorMessageProps> = ({
   retryText = 'Try Again',
   className = ''
 }) => {
+  // Don't render if message is empty or null
+  if (!message) {
+    return null;
+  }
+
   return (
-    <div className={`error-message ${className}`}>
+    <div className={`error-message ${className}`} role="alert" aria-live="polite">
       <div className="error-content">
-        <div className="error-icon">⚠️</div>
+        <div className="error-icon" aria-hidden="true">⚠️</div>
         <div className="error-text">
           <p>{message}</p>
         </div>
@@ -28,15 +33,17 @@ export const ErrorMessage: React.FC<ErrorMessageProps> = ({
             <button
               onClick={onDismiss}
               className="error-button dismiss-button"
+              aria-label="Dismiss error message"
               title="Dismiss error"
             >
-              ✕
+              <span aria-hidden="true">✕</span>
             </button>
           )}
           {onRetry && (
             <button
               onClick={onRetry}
               className="error-button retry-button"
+              aria-label={`Retry the failed operation: ${retryText}`}
             >
               {retryText}
             </button>

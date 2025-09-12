@@ -5,7 +5,7 @@ import { UserList } from '../UserList'
 import { mockUsers, mockUserManagementService } from '../../test/mocks'
 
 // Mock the userService
-vi.mock('../../services/userService', () => ({
+vi.mock('../../services', () => ({
   userService: mockUserManagementService,
 }))
 

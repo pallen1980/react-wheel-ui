@@ -44,15 +44,25 @@
         align-items: center;
         justify-content: center;
 
+        &:focus {
+          outline: 2px solid #721c24;
+          outline-offset: 2px;
+        }
+
         &.dismiss-button {
           background: transparent;
           color: #721c24;
           padding: 0.25rem;
-          width: 24px;
-          height: 24px;
+          width: 28px; // Increased for better touch target
+          height: 28px;
           border-radius: 50%;
+          min-width: 28px; // Minimum touch target size
 
           &:hover {
+            background-color: rgba(114, 28, 36, 0.1);
+          }
+
+          &:focus {
             background-color: rgba(114, 28, 36, 0.1);
           }
         }
@@ -61,9 +71,15 @@
           background-color: #721c24;
           color: white;
           padding: 0.5rem 1rem;
+          min-height: 32px; // Minimum touch target size
 
           &:hover {
             background-color: #5a161f;
+          }
+
+          &:focus {
+            outline-color: #ffffff;
+            box-shadow: 0 0 0 2px rgba(114, 28, 36, 0.25);
           }
         }
       }
@@ -114,7 +130,36 @@
 
       .error-actions {
         align-self: flex-end;
+
+        .error-button {
+          &.retry-button {
+            padding: 0.625rem 1.25rem; // Larger touch target on mobile
+            font-size: 0.9rem;
+          }
+        }
       }
+    }
+  }
+}
+
+// High contrast mode support
+@media (prefers-contrast: high) {
+  .error-message {
+    border: 2px solid;
+
+    .error-button {
+      border: 1px solid;
+    }
+  }
+}
+
+// Reduced motion support
+@media (prefers-reduced-motion: reduce) {
+  .error-message {
+    animation: none;
+
+    .error-button {
+      transition: none;
     }
   }
 }

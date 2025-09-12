@@ -15,6 +15,12 @@ Welcome to The Wheel application documentation. This documentation is organized 
 - [**Services**](./services/) - API communication and business logic
 - [**State Management**](./store/) - Redux store with async thunks
 
+### 🛠️ Development Tools
+- [User Management UI](../mocks/mock-user-ui/README.md) - Test user management interface
+- [Mock API Service](../mocks/mock-api-service/README.md) - Backend simulation for development
+- [Testing Strategy](./testing-strategy.md) - Comprehensive testing approach
+- [Coverage Setup](./coverage-setup.md) - Test coverage configuration
+
 ### 📚 Detailed Documentation
 
 #### Authentication System

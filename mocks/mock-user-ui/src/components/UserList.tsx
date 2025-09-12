@@ -172,7 +172,7 @@ export const UserList: React.FC<UserListProps> = ({
   }
 
   return (
-    <div className="user-list">
+    <div className="user-list" role="main" aria-label="User management interface">
       {error && (
         <ErrorMessage
           message={error}
@@ -184,15 +184,20 @@ export const UserList: React.FC<UserListProps> = ({
       
       <div className="user-list-header">
         <div className="search-container">
+          <label htmlFor="user-search" className="sr-only">
+            Search users by email or name
+          </label>
           <input
+            id="user-search"
             type="text"
             placeholder="Search users by email or name..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             className="search-input"
+            aria-describedby="user-count"
           />
         </div>
-        <div className="user-count">
+        <div id="user-count" className="user-count" aria-live="polite">
           {filteredUsers.length} of {users.length} users
         </div>
       </div>
@@ -207,54 +212,106 @@ export const UserList: React.FC<UserListProps> = ({
         </div>
       ) : (
         <div className="table-container">
-          <table className="users-table">
+          <table className="users-table" role="table" aria-label="Users list">
             <thead>
-              <tr>
+              <tr role="row">
                 <th 
                   onClick={() => handleSort('email')}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleSort('email');
+                    }
+                  }}
                   className="sortable"
+                  tabIndex={0}
+                  role="columnheader"
+                  aria-sort={
+                    sortField === 'email' 
+                      ? sortDirection === 'asc' ? 'ascending' : 'descending'
+                      : 'none'
+                  }
+                  aria-label={`Sort by email ${sortField === 'email' ? (sortDirection === 'asc' ? 'descending' : 'ascending') : 'ascending'}`}
                 >
                   Email {getSortIcon('email')}
                 </th>
                 <th 
                   onClick={() => handleSort('displayName')}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleSort('displayName');
+                    }
+                  }}
                   className="sortable"
+                  tabIndex={0}
+                  role="columnheader"
+                  aria-sort={
+                    sortField === 'displayName' 
+                      ? sortDirection === 'asc' ? 'ascending' : 'descending'
+                      : 'none'
+                  }
+                  aria-label={`Sort by display name ${sortField === 'displayName' ? (sortDirection === 'asc' ? 'descending' : 'ascending') : 'ascending'}`}
                 >
                   Display Name {getSortIcon('displayName')}
                 </th>
                 <th 
                   onClick={() => handleSort('createdAt')}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      e.preventDefault();
+                      handleSort('createdAt');
+                    }
+                  }}
                   className="sortable"
+                  tabIndex={0}
+                  role="columnheader"
+                  aria-sort={
+                    sortField === 'createdAt' 
+                      ? sortDirection === 'asc' ? 'ascending' : 'descending'
+                      : 'none'
+                  }
+                  aria-label={`Sort by creation date ${sortField === 'createdAt' ? (sortDirection === 'asc' ? 'descending' : 'ascending') : 'ascending'}`}
                 >
                   Created {getSortIcon('createdAt')}
                 </th>
-                <th>Status</th>
-                <th>Actions</th>
+                <th role="columnheader">Status</th>
+                <th role="columnheader">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredUsers.map((user) => (
-                <tr key={user.uid}>
-                  <td className="email-cell">{user.email}</td>
-                  <td className="name-cell">{user.displayName}</td>
-                  <td className="date-cell">{formatDate(user.createdAt)}</td>
-                  <td className="status-cell">
-                    <span className={`status-badge ${user.emailVerified ? 'verified' : 'unverified'}`}>
+                <tr key={user.uid} role="row">
+                  <td className="email-cell" role="gridcell">
+                    <span aria-label={`Email: ${user.email}`}>{user.email}</span>
+                  </td>
+                  <td className="name-cell" role="gridcell">
+                    <span aria-label={`Display name: ${user.displayName}`}>{user.displayName}</span>
+                  </td>
+                  <td className="date-cell" role="gridcell">
+                    <span aria-label={`Created: ${formatDate(user.createdAt)}`}>{formatDate(user.createdAt)}</span>
+                  </td>
+                  <td className="status-cell" role="gridcell">
+                    <span 
+                      className={`status-badge ${user.emailVerified ? 'verified' : 'unverified'}`}
+                      aria-label={`Email verification status: ${user.emailVerified ? 'Verified' : 'Unverified'}`}
+                    >
                       {user.emailVerified ? 'Verified' : 'Unverified'}
                     </span>
                   </td>
-                  <td className="actions-cell">
-                    <div className="action-buttons">
+                  <td className="actions-cell" role="gridcell">
+                    <div className="action-buttons" role="group" aria-label={`Actions for ${user.email}`}>
                       <button
                         onClick={() => handleLoginAsUser(user)}
                         className={`action-button login-button ${impersonatingUserId === user.uid ? 'loading' : ''}`}
                         disabled={impersonatingUserId === user.uid}
-                        title={impersonatingUserId === user.uid ? 'Logging in...' : 'Login as this user'}
+                        aria-label={impersonatingUserId === user.uid ? `Logging in as ${user.email}...` : `Login as ${user.email}`}
+                        aria-describedby={impersonatingUserId === user.uid ? `login-status-${user.uid}` : undefined}
                       >
                         {impersonatingUserId === user.uid ? (
                           <>
-                            <span className="loading-spinner-small"></span>
-                            Logging in...
+                            <span className="loading-spinner-small" aria-hidden="true"></span>
+                            <span id={`login-status-${user.uid}`}>Logging in...</span>
                           </>
                         ) : (
                           'Login as User'
@@ -264,7 +321,7 @@ export const UserList: React.FC<UserListProps> = ({
                         <button
                           onClick={() => onEditUser(user)}
                           className="action-button edit-button"
-                          title="Edit user"
+                          aria-label={`Edit user ${user.email}`}
                         >
                           Edit
                         </button>
@@ -272,7 +329,7 @@ export const UserList: React.FC<UserListProps> = ({
                       <button
                         onClick={() => handleDeleteUser(user)}
                         className="action-button delete-button"
-                        title="Delete user"
+                        aria-label={`Delete user ${user.email}`}
                       >
                         Delete
                       </button>

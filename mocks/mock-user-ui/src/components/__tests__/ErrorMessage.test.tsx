@@ -35,7 +35,7 @@ describe('ErrorMessage Component', () => {
       />
     )
 
-    expect(screen.getByText('Retry')).toBeInTheDocument()
+    expect(screen.getByText('Try Again')).toBeInTheDocument()
   })
 
   it('calls onRetry when retry button is clicked', async () => {
@@ -49,7 +49,7 @@ describe('ErrorMessage Component', () => {
       />
     )
 
-    const retryButton = screen.getByText('Retry')
+    const retryButton = screen.getByText('Try Again')
     await user.click(retryButton)
 
     expect(mockOnRetry).toHaveBeenCalledOnce()
@@ -88,16 +88,16 @@ describe('ErrorMessage Component', () => {
     expect(screen.getByText(longMessage)).toBeInTheDocument()
   })
 
-  it('renders with different severity levels', () => {
+  it('renders with custom className', () => {
     render(
       <ErrorMessage
         message="Warning message"
-        severity="warning"
+        className="custom-error"
       />
     )
 
     const errorElement = screen.getByRole('alert')
-    expect(errorElement).toHaveClass('warning')
+    expect(errorElement).toHaveClass('custom-error')
   })
 
   it('renders dismissible error message', async () => {
@@ -111,7 +111,7 @@ describe('ErrorMessage Component', () => {
       />
     )
 
-    const dismissButton = screen.getByText('×')
+    const dismissButton = screen.getByLabelText('Dismiss error message')
     await user.click(dismissButton)
 
     expect(mockOnDismiss).toHaveBeenCalledOnce()

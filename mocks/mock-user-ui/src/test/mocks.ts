@@ -1,14 +1,4 @@
 import { vi } from 'vitest'
-import { vi } from 'vitest'
-import { vi } from 'vitest'
-import { vi } from 'vitest'
-import { vi } from 'vitest'
-import { vi } from 'vitest'
-import { vi } from 'vitest'
-import { vi } from 'vitest'
-import { vi } from 'vitest'
-import { vi } from 'vitest'
-import { vi } from 'vitest'
 import { User, CreateUserRequest, UpdateUserRequest, LoginResponse } from '../types'
 
 export const mockUser: User = {
@@ -62,12 +52,12 @@ export const mockApiError = {
 }
 
 // Mock axios
-export const mockAxios = {
+export const mockAxios: any = {
   get: vi.fn(),
   post: vi.fn(),
   put: vi.fn(),
   delete: vi.fn(),
-  create: vi.fn(() => mockAxios),
+  create: vi.fn((): any => mockAxios),
 }
 
 // Mock UserManagementService
