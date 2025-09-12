@@ -108,7 +108,31 @@ environment:
   - CORS_ORIGINS=http://localhost:5173,http://localhost:3000,http://localhost:3002
 ```
 
-### 4. User Impersonation Fails
+### 4. Authentication Issues (401 Unauthorized)
+
+**Symptoms:**
+- "Failed to load users" with 401 Unauthorized errors
+- API requests return authentication errors
+- Console shows "No Bearer token found" messages
+
+**Cause & Solution:**
+The Mock API Service requires authentication for user management endpoints. This has been resolved by implementing automatic authentication in the User Management UI.
+
+**How it works:**
+- The UI automatically authenticates using a mock user account (`test@example.com`)
+- Authentication tokens are automatically included in API requests
+- If a token expires, the UI automatically re-authenticates
+
+**If issues persist:**
+```bash
+# Check if authentication is working in API logs
+docker-compose logs mock-api | grep "Successfully authenticated"
+
+# Verify mock users are configured
+docker-compose exec mock-api cat appsettings.json | grep -A 10 "MockUsers"
+```
+
+### 5. User Impersonation Fails
 
 **Symptoms:**
 - "Login as User" button doesn't redirect

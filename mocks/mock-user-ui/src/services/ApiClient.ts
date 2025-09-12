@@ -9,6 +9,8 @@ interface RetryConfig {
 
 export class ApiClient {
   private client: AxiosInstance;
+  private authToken: string | null = null;
+  private authPromise: Promise<void> | null = null;
   private defaultRetryConfig: RetryConfig = {
     maxRetries: 3,
     retryDelay: 1000,
@@ -27,14 +29,79 @@ export class ApiClient {
       },
     });
 
+    // Request interceptor to add authentication
+    this.client.interceptors.request.use(
+      async (config) => {
+        // Ensure we have a valid token before making requests
+        await this.ensureAuthenticated();
+        
+        if (this.authToken) {
+          config.headers.Authorization = `Bearer ${this.authToken}`;
+        }
+        
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
+
     // Response interceptor for error handling
     this.client.interceptors.response.use(
       (response: AxiosResponse) => response,
-      (error: AxiosError) => {
+      async (error: AxiosError) => {
+        // If we get a 401, try to re-authenticate once
+        if (error.response?.status === 401 && this.authToken) {
+          this.authToken = null;
+          this.authPromise = null;
+          
+          try {
+            await this.ensureAuthenticated();
+            // Retry the original request with new token
+            if (error.config && this.authToken) {
+              error.config.headers.Authorization = `Bearer ${this.authToken}`;
+              return this.client.request(error.config);
+            }
+          } catch (authError) {
+            // If re-authentication fails, return the original error
+          }
+        }
+        
         const apiError = this.handleError(error);
         return Promise.reject(apiError);
       }
     );
+  }
+
+  private async ensureAuthenticated(): Promise<void> {
+    if (this.authToken) {
+      return; // Already authenticated
+    }
+
+    if (this.authPromise) {
+      return this.authPromise; // Authentication in progress
+    }
+
+    this.authPromise = this.authenticate();
+    return this.authPromise;
+  }
+
+  private async authenticate(): Promise<void> {
+    try {
+      // Use a mock user for authentication in development
+      const loginData = {
+        email: 'test@example.com',
+        password: 'password123'
+      };
+
+      const response = await axios.post(`${this.client.defaults.baseURL}/api/auth/login`, loginData, {
+        headers: { 'Content-Type': 'application/json' },
+        timeout: 10000
+      });
+
+      this.authToken = response.data.idToken;
+    } catch (error) {
+      console.error('Authentication failed:', error);
+      throw new Error('Failed to authenticate with the API service');
+    }
   }
 
   private async sleep(ms: number): Promise<void> {
