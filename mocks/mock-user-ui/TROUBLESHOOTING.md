@@ -105,7 +105,7 @@ docker-compose logs mock-api | grep CORS
 ```yaml
 # In docker-compose.yml, mock-api service should have:
 environment:
-  - CORS_ORIGINS=http://localhost:5173,http://localhost:3000,http://localhost:3002
+  - CORS_ORIGINS=http://localhost:51235,http://localhost:3000,http://localhost:3002
 ```
 
 ### 4. Authentication Issues (401 Unauthorized)
@@ -144,7 +144,7 @@ docker-compose exec mock-api cat appsettings.json | grep -A 10 "MockUsers"
 #### Main Application Not Running
 ```bash
 # Check if main app is accessible
-curl http://localhost:5173
+curl http://localhost:51235
 
 # Start main application if needed
 npm run dev  # or docker-compose up -d
@@ -155,7 +155,7 @@ npm run dev  # or docker-compose up -d
 # Check environment variable
 docker-compose exec mock-user-ui env | grep VITE_MAIN_APP_URL
 
-# Should show: VITE_MAIN_APP_URL=http://localhost:5173
+# Should show: VITE_MAIN_APP_URL=http://localhost:51235
 # Update if incorrect
 ```
 

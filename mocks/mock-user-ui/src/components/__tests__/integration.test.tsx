@@ -215,7 +215,7 @@ describe('Component Integration Tests', () => {
       await waitFor(() => {
         expect(mockUserManagementService.loginAsUser).toHaveBeenCalledWith(
           mockUsers[0].uid,
-          'http://localhost:5173'
+          'http://localhost:51235'
         )
       })
     })

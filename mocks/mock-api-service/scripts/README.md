@@ -171,7 +171,7 @@ The scripts automatically configure the Mock API Service with appropriate enviro
 **Development Mode:**
 - `ASPNETCORE_ENVIRONMENT=Development`
 - `ASPNETCORE_URLS=http://+:3001`
-- `CORS_ORIGINS=http://localhost:5173,http://localhost:3000`
+- `CORS_ORIGINS=http://localhost:51235,http://localhost:3000`
 
 **Production Mode:**
 - `ASPNETCORE_ENVIRONMENT=Production`
@@ -242,7 +242,7 @@ scripts\test-api.bat --verbose
 ### Manual Testing
 After running integration tests, you can manually test:
 
-1. **Frontend URL:** http://localhost:5173
+1. **Frontend URL:** http://localhost:51235
 2. **API Health:** http://localhost:3001/health
 3. **Test Credentials:**
    - Email: test@example.com

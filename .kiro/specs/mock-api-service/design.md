@@ -339,7 +339,7 @@ public class TokenValidationResult
     "ProjectId": "myauth-1569840907611"
   },
   "Cors": {
-    "AllowedOrigins": ["http://localhost:5173", "http://localhost:3000"]
+    "AllowedOrigins": ["http://localhost:51235", "http://localhost:3000"]
   },
   "AllowedHosts": "*"
 }
@@ -350,7 +350,7 @@ public class TokenValidationResult
 ASPNETCORE_ENVIRONMENT=Development     # Environment mode
 ASPNETCORE_URLS=http://+:3001         # Server URLs and port
 FIREBASE_PROJECT_ID=myauth-1569840907611  # Firebase project ID
-CORS_ORIGINS=http://localhost:5173    # Allowed CORS origins
+CORS_ORIGINS=http://localhost:51235    # Allowed CORS origins
 ```
 
 ### Docker Configuration

@@ -112,7 +112,7 @@ docker-compose logs mock-api
 ### CORS issues?
 Add your frontend URL to the `CORS_ORIGINS` environment variable:
 ```bash
-CORS_ORIGINS=http://localhost:5173,http://localhost:3000,your-frontend-url
+CORS_ORIGINS=http://localhost:51235,http://localhost:3000,your-frontend-url
 ```
 
 ### Need help?

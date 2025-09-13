@@ -98,7 +98,7 @@ The following environment variables can be configured:
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `FIREBASE_PROJECT_ID` | `myauth-1569840907611` | Firebase project ID for authentication |
-| `CORS_ORIGINS` | `http://localhost:5173,http://localhost:3000,http://localhost:51235` | Comma-separated list of allowed CORS origins |
+| `CORS_ORIGINS` | `http://localhost:51235,http://localhost:3000,http://localhost:51235` | Comma-separated list of allowed CORS origins |
 | `ASPNETCORE_ENVIRONMENT` | `Development` | ASP.NET Core environment (Development/Production) |
 
 ### Setting Environment Variables
@@ -108,7 +108,7 @@ Create a `.env` file in this directory:
 ```bash
 # .env file
 FIREBASE_PROJECT_ID=your-firebase-project-id
-CORS_ORIGINS=http://localhost:5173,https://your-frontend-domain.com
+CORS_ORIGINS=http://localhost:51235,https://your-frontend-domain.com
 ```
 
 ## Service Endpoints

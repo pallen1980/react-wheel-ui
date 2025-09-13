@@ -212,7 +212,7 @@ describe('User Management Integration Tests', () => {
       expect(mockLocalStorage.setItem).toHaveBeenCalledWith('authToken', 'mock-jwt-token')
 
       // Verify redirect occurred
-      expect(window.location.href).toBe('http://localhost:5173')
+      expect(window.location.href).toBe('http://localhost:51235')
     })
 
     it('should handle search and filtering workflow', async () => {

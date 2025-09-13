@@ -179,7 +179,7 @@ exit /b 0
 
 :run_integration_tests
 echo [INTEGRATION] Testing CORS headers...
-curl -s -H "Origin: http://localhost:5173" -H "Access-Control-Request-Method: POST" -H "Access-Control-Request-Headers: Content-Type,Authorization" -X OPTIONS -o temp_response.json -w "%%{http_code}" "%API_BASE_URL%/api/auth/login" > temp_status.txt
+curl -s -H "Origin: http://localhost:51235" -H "Access-Control-Request-Method: POST" -H "Access-Control-Request-Headers: Content-Type,Authorization" -X OPTIONS -o temp_response.json -w "%%{http_code}" "%API_BASE_URL%/api/auth/login" > temp_status.txt
 set /p STATUS=<temp_status.txt
 if "%STATUS%"=="200" (
     echo ✓ CORS preflight successful
@@ -188,7 +188,7 @@ if "%STATUS%"=="200" (
 )
 
 echo [INTEGRATION] Testing with frontend origin...
-curl -s -H "Origin: http://localhost:5173" -H "Content-Type: application/json" -d "{\"email\":\"%TEST_EMAIL%\",\"password\":\"%TEST_PASSWORD%\"}" -o temp_response.json -w "%%{http_code}" "%API_BASE_URL%/api/auth/login" > temp_status.txt
+curl -s -H "Origin: http://localhost:51235" -H "Content-Type: application/json" -d "{\"email\":\"%TEST_EMAIL%\",\"password\":\"%TEST_PASSWORD%\"}" -o temp_response.json -w "%%{http_code}" "%API_BASE_URL%/api/auth/login" > temp_status.txt
 set /p STATUS=<temp_status.txt
 if "%STATUS%"=="200" (
     echo ✓ Frontend origin request successful

@@ -74,14 +74,14 @@ describe('Basic Integration Tests', () => {
       mockAxios.post.mockResolvedValueOnce({ data: mockLoginResponse })
 
       // Perform impersonation
-      await userService.loginAsUser(mockUser.uid, 'http://localhost:5173')
+      await userService.loginAsUser(mockUser.uid, 'http://localhost:51235')
 
       // Verify API call
       expect(mockAxios.post).toHaveBeenCalledWith('/api/auth/impersonate', { userId: mockUser.uid })
       
       // Verify token storage and redirect
       expect(mockLocalStorage.setItem).toHaveBeenCalledWith('authToken', mockLoginResponse.token)
-      expect(window.location.href).toBe('http://localhost:5173')
+      expect(window.location.href).toBe('http://localhost:51235')
     })
   })
 

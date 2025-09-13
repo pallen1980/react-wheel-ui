@@ -193,7 +193,7 @@ if ($Integration) {
     
     # Test CORS headers
     $result = Invoke-ApiTest -TestName "CORS preflight" -Method "OPTIONS" -Endpoint "/api/auth/login" -Headers @{
-        "Origin" = "http://localhost:5173"
+        "Origin" = "http://localhost:51235"
         "Access-Control-Request-Method" = "POST"
         "Access-Control-Request-Headers" = "Content-Type,Authorization"
     }
@@ -201,7 +201,7 @@ if ($Integration) {
     
     # Test with frontend origin
     $result = Invoke-ApiTest -TestName "Frontend origin request" -Method "POST" -Endpoint "/api/auth/login" -Headers @{
-        "Origin" = "http://localhost:5173"
+        "Origin" = "http://localhost:51235"
         "Content-Type" = "application/json"
     } -Body $loginBody
     Write-Host ""

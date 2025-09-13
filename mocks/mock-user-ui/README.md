@@ -52,7 +52,7 @@ Create a `.env` file or set these environment variables:
 VITE_API_BASE_URL=http://localhost:3001
 
 # Main Application URL for redirects
-VITE_MAIN_APP_URL=http://localhost:5173
+VITE_MAIN_APP_URL=http://localhost:51235
 
 # Application Title
 VITE_APP_TITLE=User Management
@@ -65,7 +65,7 @@ For containerized deployment, these are automatically configured:
 ```bash
 # Internal service communication
 VITE_API_BASE_URL=http://localhost:3001  # External browser access
-VITE_MAIN_APP_URL=http://localhost:5173
+VITE_MAIN_APP_URL=http://localhost:51235
 VITE_APP_TITLE=User Management
 ```
 

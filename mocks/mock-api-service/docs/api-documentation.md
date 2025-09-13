@@ -635,7 +635,7 @@ Edit the `.env` file with your configuration:
 
 ```bash
 FIREBASE_PROJECT_ID=your-firebase-project-id
-CORS_ORIGINS=http://localhost:5173,http://localhost:3000
+CORS_ORIGINS=http://localhost:51235,http://localhost:3000
 ASPNETCORE_ENVIRONMENT=Development
 ```
 
@@ -678,7 +678,7 @@ docker run -d -p 3001:3001 --name mock-api-service mock-api-service
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `FIREBASE_PROJECT_ID` | `myauth-1569840907611` | Firebase project ID |
-| `CORS_ORIGINS` | `http://localhost:5173,http://localhost:3000` | Allowed CORS origins |
+| `CORS_ORIGINS` | `http://localhost:51235,http://localhost:3000` | Allowed CORS origins |
 | `ASPNETCORE_ENVIRONMENT` | `Development` | Environment mode |
 | `ASPNETCORE_HTTP_PORTS` | `3001` | HTTP port |
 | `ERROR_SIMULATION_ENABLED` | `false` | Enable error simulation |

@@ -2,7 +2,7 @@
 
 param(
     [string]$ApiBaseUrl = "http://localhost:3001",
-    [string]$FrontendUrl = "http://localhost:5173", 
+    [string]$FrontendUrl = "http://localhost:51235", 
     [string]$FrontendDir = "../..",
     [int]$Timeout = 30,
     [switch]$NoCleanup,
@@ -14,7 +14,7 @@ function Show-Help {
     Write-Host ""
     Write-Host "Options:" -ForegroundColor Green
     Write-Host "  -ApiBaseUrl URL      Set API base URL [default: http://localhost:3001]" -ForegroundColor White
-    Write-Host "  -FrontendUrl URL     Set frontend URL [default: http://localhost:5173]" -ForegroundColor White
+    Write-Host "  -FrontendUrl URL     Set frontend URL [default: http://localhost:51235]" -ForegroundColor White
     Write-Host "  -FrontendDir DIR     Set frontend directory [default: ../..] " -ForegroundColor White
     Write-Host "  -Timeout SECONDS     Set startup timeout [default: 30]" -ForegroundColor White
     Write-Host "  -NoCleanup          Don't cleanup services after testing" -ForegroundColor White

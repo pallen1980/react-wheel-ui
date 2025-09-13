@@ -29,6 +29,7 @@ export interface ErrorContext {
   friendlyMessage?: string;
   isRetryable?: boolean;
   isOfflineMode?: boolean;
+  [key: string]: unknown;
 }
 
 class ErrorLogger {
@@ -190,7 +191,7 @@ class ErrorLogger {
    */
   private addLogEntry(entry: ErrorLogEntry): void {
     this.logs.push(entry);
-    
+
     // Maintain max log limit
     if (this.logs.length > this.maxLogs) {
       this.logs = this.logs.slice(-this.maxLogs);

@@ -41,7 +41,7 @@ public class IntegrationTests : IDisposable
                 ["JwtSettings:Audience"] = "the-wheel-app",
                 ["JwtSettings:ExpirationMinutes"] = "60",
                 ["Firebase:ProjectId"] = "myauth-1569840907611",
-                ["Cors:AllowedOrigins:0"] = "http://localhost:5173",
+                ["Cors:AllowedOrigins:0"] = "http://localhost:51235",
                 ["Cors:AllowedOrigins:1"] = "http://localhost:3000"
             })
             .Build();
@@ -584,7 +584,7 @@ public class IntegrationTests : IDisposable
     {
         // Arrange
         var request = new HttpRequestMessage(HttpMethod.Options, "/api/auth/login");
-        request.Headers.Add("Origin", "http://localhost:5173");
+        request.Headers.Add("Origin", "http://localhost:51235");
         request.Headers.Add("Access-Control-Request-Method", "POST");
         request.Headers.Add("Access-Control-Request-Headers", "Content-Type,Authorization");
 
@@ -617,7 +617,7 @@ public class IntegrationTests : IDisposable
         {
             Content = content
         };
-        request.Headers.Add("Origin", "http://localhost:5173");
+        request.Headers.Add("Origin", "http://localhost:51235");
 
         // Act
         var response = await _client.SendAsync(request);

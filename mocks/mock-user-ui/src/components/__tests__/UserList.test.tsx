@@ -125,7 +125,7 @@ describe('UserList Component', () => {
     const impersonateButtons = screen.getAllByText('Login as User')
     fireEvent.click(impersonateButtons[0])
 
-    expect(mockUserManagementService.loginAsUser).toHaveBeenCalledWith(mockUsers[0].uid, 'http://localhost:5173')
+    expect(mockUserManagementService.loginAsUser).toHaveBeenCalledWith(mockUsers[0].uid, 'http://localhost:51235')
   })
 
   it('filters users based on search input', async () => {

@@ -65,9 +65,9 @@ export class UserManagementService {
   /**
    * Redirect to main application with authentication token
    * @param token Authentication token
-   * @param mainAppUrl Main application URL (default: http://localhost:5173)
+   * @param mainAppUrl Main application URL (default: http://localhost:51235)
    */
-  redirectToMainApp(token: string, mainAppUrl: string = 'http://localhost:5173'): void {
+  redirectToMainApp(token: string, mainAppUrl: string = 'http://localhost:51235'): void {
     // Store token in localStorage for the main app to pick up
     localStorage.setItem('authToken', token);
     

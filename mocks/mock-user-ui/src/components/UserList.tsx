@@ -76,7 +76,7 @@ export const UserList: React.FC<UserListProps> = ({
       setError(null);
       
       // Get main app URL from environment or use default
-      const mainAppUrl = import.meta.env.VITE_MAIN_APP_URL || 'http://localhost:5173';
+      const mainAppUrl = import.meta.env.VITE_MAIN_APP_URL || 'http://localhost:51235';
       
       await userService.loginAsUser(user.uid, mainAppUrl);
       

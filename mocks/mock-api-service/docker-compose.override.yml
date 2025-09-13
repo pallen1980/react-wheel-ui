@@ -12,7 +12,7 @@ services:
       - ASPNETCORE_DETAILEDERRORS=true
       
       # Development CORS - more permissive
-      - CORS_ORIGINS=http://localhost:5173,http://localhost:3000,http://localhost:51235,http://localhost:8080
+      - CORS_ORIGINS=http://localhost:51235,http://localhost:3000,http://localhost:51235,http://localhost:8080
       
     volumes:
       # Mount source code for hot reload during development (if using dotnet watch)

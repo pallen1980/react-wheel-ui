@@ -25,7 +25,7 @@ public static class ServiceCollectionExtensions
             options.AddDefaultPolicy(builder =>
             {
                 var allowedOrigins = configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() 
-                    ?? new[] { "http://localhost:5173" };
+                    ?? new[] { "http://localhost:51235" };
                 
                 builder
                     .WithOrigins(allowedOrigins)

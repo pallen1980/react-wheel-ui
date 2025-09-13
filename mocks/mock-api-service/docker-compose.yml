@@ -18,7 +18,7 @@ services:
       - FIREBASE_PROJECT_ID=${FIREBASE_PROJECT_ID:-myauth-1569840907611}
       
       # CORS Configuration - Allow frontend origins
-      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:5173,http://localhost:3000,http://localhost:51235}
+      - CORS_ORIGINS=${CORS_ORIGINS:-http://localhost:51235,http://localhost:3000,http://localhost:51235}
       
       # Logging Configuration
       - Logging__LogLevel__Default=Information

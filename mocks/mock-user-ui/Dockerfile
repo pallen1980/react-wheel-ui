@@ -1,5 +1,5 @@
 # Build stage
-FROM node:18-alpine as build
+FROM node:18-alpine AS build
 
 WORKDIR /app
 
@@ -14,7 +14,7 @@ COPY . .
 
 # Set default build-time environment variables
 ARG VITE_API_BASE_URL=http://localhost:3001
-ARG VITE_MAIN_APP_URL=http://localhost:5173
+ARG VITE_MAIN_APP_URL=http://localhost:51235
 ARG VITE_APP_TITLE="User Management"
 
 # Set environment variables for build
@@ -43,7 +43,7 @@ RUN chmod +x /docker-entrypoint.sh
 
 # Set default runtime environment variables
 ENV VITE_API_BASE_URL=http://localhost:3001
-ENV VITE_MAIN_APP_URL=http://localhost:5173
+ENV VITE_MAIN_APP_URL=http://localhost:51235
 ENV VITE_APP_TITLE="User Management"
 
 # Expose port

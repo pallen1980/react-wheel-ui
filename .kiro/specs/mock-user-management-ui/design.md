@@ -343,7 +343,7 @@ services:
       - "3002:3002"
     environment:
       - VITE_API_BASE_URL=http://mock-api:3001
-      - VITE_MAIN_APP_URL=http://localhost:5173
+      - VITE_MAIN_APP_URL=http://localhost:51235
     depends_on:
       - mock-api
     networks:
@@ -359,7 +359,7 @@ services:
     # Existing configuration
     environment:
       # Existing variables
-      - CORS_ORIGINS=http://localhost:5173,http://localhost:3000,http://localhost:3002
+      - CORS_ORIGINS=http://localhost:51235,http://localhost:3000,http://localhost:3002
       # New user management configuration
       - USER_MANAGEMENT_ENABLED=true
       - TEST_USER_PREFIX=test_

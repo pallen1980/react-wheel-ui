@@ -9,7 +9,7 @@ echo ========================================
 
 REM Configuration
 set "API_BASE_URL=http://localhost:3001"
-set "FRONTEND_URL=http://localhost:5173"
+set "FRONTEND_URL=http://localhost:51235"
 set "FRONTEND_DIR=..\.."
 set "TIMEOUT=30"
 set "CLEANUP=true"
@@ -259,7 +259,7 @@ echo Usage: integration-test.bat [OPTIONS]
 echo.
 echo Options:
 echo   --api-url URL         Set API base URL [default: http://localhost:3001]
-echo   --frontend-url URL    Set frontend URL [default: http://localhost:5173]
+echo   --frontend-url URL    Set frontend URL [default: http://localhost:51235]
 echo   --frontend-dir DIR    Set frontend directory [default: ..\..] 
 echo   --timeout SECONDS     Set startup timeout [default: 30]
 echo   --no-cleanup         Don't cleanup services after testing

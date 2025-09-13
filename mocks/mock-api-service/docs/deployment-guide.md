@@ -61,7 +61,7 @@ Create `appsettings.Development.json` for local overrides:
   },
   "Cors": {
     "AllowedOrigins": [
-      "http://localhost:5173",
+      "http://localhost:51235",
       "http://localhost:3000",
       "http://localhost:4173"
     ]
@@ -340,7 +340,7 @@ spec:
 | `ASPNETCORE_ENVIRONMENT` | No | `Development` | Runtime environment |
 | `ASPNETCORE_HTTP_PORTS` | No | `3001` | HTTP port |
 | `FIREBASE_PROJECT_ID` | Yes | `myauth-1569840907611` | Firebase project ID |
-| `CORS_ORIGINS` | No | `http://localhost:5173,http://localhost:3000` | Allowed CORS origins |
+| `CORS_ORIGINS` | No | `http://localhost:51235,http://localhost:3000` | Allowed CORS origins |
 | `JWT_SECRET_KEY` | No | Auto-generated | JWT signing key |
 | `ERROR_SIMULATION_ENABLED` | No | `false` | Enable error simulation |
 
@@ -359,7 +359,7 @@ spec:
     "ProjectId": "myauth-1569840907611"
   },
   "Cors": {
-    "AllowedOrigins": ["http://localhost:5173", "http://localhost:3000"]
+    "AllowedOrigins": ["http://localhost:51235", "http://localhost:3000"]
   },
   "JwtSettings": {
     "SecretKey": "mock-secret-key-for-development-only",
@@ -398,7 +398,7 @@ spec:
 #### .env (Development)
 ```bash
 FIREBASE_PROJECT_ID=myauth-1569840907611
-CORS_ORIGINS=http://localhost:5173,http://localhost:3000
+CORS_ORIGINS=http://localhost:51235,http://localhost:3000
 ASPNETCORE_ENVIRONMENT=Development
 ```
 
@@ -521,11 +521,11 @@ docker-compose up -d --build
 ```bash
 # Check current CORS configuration
 curl -I -X OPTIONS http://localhost:3001/api/auth/login \
-  -H "Origin: http://localhost:5173" \
+  -H "Origin: http://localhost:51235" \
   -H "Access-Control-Request-Method: POST"
 
 # Expected response should include:
-# Access-Control-Allow-Origin: http://localhost:5173
+# Access-Control-Allow-Origin: http://localhost:51235
 # Access-Control-Allow-Methods: POST, GET, OPTIONS
 ```
 
