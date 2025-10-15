@@ -13,20 +13,15 @@ interface AuthProps {
 }
 
 const Auth = (props: AuthProps) => {
-    const [user, setUser] = useState<Identity | null>(null);
     const [isLoading, setIsLoading] = useState(false);
-    const { onLogin, onLogout } = useAuth();
+    const { user, isAuthenticated } = useAuth();
     
     const handleSigningIn = () => {
         setIsLoading(true);
     }
 
-    const handleSuccessfulSignIn = (user?: Identity) => {
-        if (user) {
-            setUser(user);
-            onLogin(user);   
-            setIsLoading(false);
-        }
+    const handleSuccessfulSignIn = () => {
+        setIsLoading(false);
     }
 
     const handleSignInError = (error: Error) => {
@@ -39,11 +34,7 @@ const Auth = (props: AuthProps) => {
     }
 
     const handleSuccessfulSignOut = () => {
-        onLogout();
-        setUser(null);
-
         setIsLoading(false);
-        setUser(null);
     }
 
     const handleSignOutError = (error: Error) => {
@@ -68,7 +59,7 @@ const Auth = (props: AuthProps) => {
             }
             {
                 isLoading ? <p>Loading...</p> :
-                    user ? 
+                    isAuthenticated && user ? 
                         <div>
                             <p>Logged in as: {user.name || user.email}</p>
                             <SignOut 

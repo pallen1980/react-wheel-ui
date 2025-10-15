@@ -1,43 +1,27 @@
-# Docker Compose Production Configuration
-# Use this file for production deployments
-# Run with: docker-compose -f docker-compose.yml -f docker-compose.prod.yml up
-
 services:
   web:
     environment:
       - NODE_ENV=production
     restart: unless-stopped
-    # Remove development ports and use production settings
     logging:
       driver: "json-file"
       options:
         max-size: "10m"
         max-file: "3"
-
-  mock-api:
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_LOGGING__LOGLEVEL__DEFAULT=Warning
-      - ASPNETCORE_LOGGING__LOGLEVEL__MICROSOFT=Error
-      - USER_MANAGEMENT_ENABLED=true
-      - TEST_USER_PREFIX=prod_test_
-      - MAX_TEST_USERS=50
-    restart: unless-stopped
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  mock-user-ui:
-    environment:
-      - NODE_ENV=production
-      - VITE_API_BASE_URL=http://localhost:3001
-      - VITE_MAIN_APP_URL=http://localhost:51235
-      - VITE_APP_TITLE=User Management
-    restart: unless-stopped
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
+    build: 
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - FIREBASE_API_KEY=${VITE_FIREBASE_API_KEY}
+        - FIREBASE_AUTH_DOMAIN=${VITE_FIREBASE_AUTH_DOMAIN}
+        - FIREBASE_DATABASE_URL=${VITE_FIREBASE_DATABASE_URL}
+        - FIREBASE_PROJECT_ID=${VITE_FIREBASE_PROJECT_ID}
+        - FIREBASE_STORAGE_BUCKET=${VITE_FIREBASE_STORAGE_BUCKET}
+        - FIREBASE_MESSAGING_SENDER_ID=${VITE_FIREBASE_MESSAGING_SENDER_ID}
+        - FIREBASE_APP_ID=${VITE_FIREBASE_APP_ID}
+        - FIREBASE_MEASUREMENT_ID=${VITE_FIREBASE_MEASUREMENT_ID} # Optional
+        - VITE_API_BASE_URL=${VITE_API_BASE_URL}
+    ports:
+      - "51235:80" # Map host port 51235 to container port 80
+    container_name: the-wheel-ui
+    

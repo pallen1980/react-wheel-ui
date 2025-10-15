@@ -1,5 +1,4 @@
-import { useEffect } from "react";
-import { GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "firebase/auth";
+import { GoogleAuthProvider, signInWithPopup } from "firebase/auth";
 import { auth } from "../Config/Firebase";
 import { Identity } from "../../Models";
 
@@ -10,30 +9,7 @@ interface GoogleAuthByPopupCallbackProps {
 }
 
 const GoogleAuthByPopupCallback = (props: GoogleAuthByPopupCallbackProps) => {
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
-            if (authUser) {
-                const accessToken = await authUser.getIdToken(true);
-
-                const user: Identity = {
-                    id: authUser.uid,
-                    name: authUser.displayName ?? "",
-                    email: authUser.email ?? ""
-                };
-
-                props.onSuccessfulSignIn(user, accessToken);
-            } else {
-                // User is signed out
-                props.onSuccessfulSignOut();
-            }
-        }, (error) => {
-            props.onFailedSignIn(error);
-        });
-
-        // Clean up the listener when the component unmounts
-        return () => unsubscribe();
-    }, [props]);
-
+    // No need for onAuthStateChanged here - AuthProvider handles it
     return null;
 }
 

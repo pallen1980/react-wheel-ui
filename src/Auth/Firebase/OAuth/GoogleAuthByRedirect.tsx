@@ -1,5 +1,5 @@
 import { useEffect, useCallback } from "react";
-import { GoogleAuthProvider, signInWithRedirect, getRedirectResult, onAuthStateChanged } from "firebase/auth";
+import { GoogleAuthProvider, signInWithRedirect, getRedirectResult } from "firebase/auth";
 import { auth } from "../Config/Firebase";
 import { Identity } from "../../Models";
 
@@ -10,43 +10,13 @@ interface GoogleAuthByRedirectCallbackProps {
 }
 
 const GoogleAuthByRedirectCallback = (props: GoogleAuthByRedirectCallbackProps) => {
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (authUser) => {
-            if (authUser) {
-                const accessToken = await authUser.getIdToken(true);
-
-                const user: Identity = {
-                    id: authUser.uid,
-                    name: authUser.displayName ?? "",
-                    email: authUser.email ?? ""
-                };
-
-                props.onSuccessfulSignIn(user, accessToken);
-            } else {
-                // User is signed out
-                props.onSuccessfulSignOut();
-            }
-        }, (error) => {
-            props.onFailedSignIn(error);
-        });
-
-        // Clean up the listener when the component unmounts
-        return () => unsubscribe();
-    }, [props]);
-
     const processRedirectResult = useCallback(async () => {
         try {
             const result = await getRedirectResult(auth);
 
             if (result) {
-                // User signed in successfully
-                const user: Identity = {
-                    id: result.user?.uid,
-                    name: result.user.displayName ?? "",
-                    email: result.user.email ?? ""
-                };
-                const credential = GoogleAuthProvider.credentialFromResult(result);
-                props.onSuccessfulSignIn(user, credential?.accessToken);
+                // User signed in successfully - AuthProvider will handle the auth state change
+                // No need to call onSuccessfulSignIn here
             }
         } catch (error) {
             props.onFailedSignIn(error as Error);
@@ -56,7 +26,6 @@ const GoogleAuthByRedirectCallback = (props: GoogleAuthByRedirectCallbackProps) 
     useEffect(() => {
         processRedirectResult();
     }, [processRedirectResult]);
-
 
     return null;
 }
