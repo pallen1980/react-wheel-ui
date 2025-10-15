@@ -173,10 +173,10 @@ try {
     # Test API endpoints
     $headers = @{ "Content-Type" = "application/json" }
     
-    $testResults.UserManagementAPI = Test-APIEndpoint "User Management API" "http://localhost:3001/api/users" -Headers $headers
+    $testResults.UserManagementAPI = Test-APIEndpoint "User Management API" "http://localhost:3001/v1/users" -Headers $headers
     
     # Test auth endpoint (expect 400 for empty request)
-    $testResults.AuthenticationAPI = Test-APIEndpoint "Authentication API" "http://localhost:3001/api/auth/login" -Method "POST" -Headers $headers -ExpectedStatusCode 400
+    $testResults.AuthenticationAPI = Test-APIEndpoint "Authentication API" "http://localhost:3001/v1/auth/login" -Method "POST" -Headers $headers -ExpectedStatusCode 400
     
     # Additional API tests
     Write-Host "`n🔍 Running additional API validation tests..." -ForegroundColor Cyan
@@ -184,7 +184,7 @@ try {
     
     # Test CORS headers
     try {
-        $corsTest = Invoke-WebRequest -Uri "http://localhost:3001/api/users" -Method "OPTIONS" -UseBasicParsing
+        $corsTest = Invoke-WebRequest -Uri "http://localhost:3001/v1/users" -Method "OPTIONS" -UseBasicParsing
         if ($corsTest.Headers["Access-Control-Allow-Origin"]) {
             Write-Host "✅ CORS headers are configured correctly" -ForegroundColor Green
         } else {

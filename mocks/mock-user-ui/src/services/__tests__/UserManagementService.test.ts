@@ -35,7 +35,7 @@ describe('UserManagementService', () => {
 
       const result = await service.getUsers()
 
-      expect(mockAxios.get).toHaveBeenCalledWith('/api/users')
+      expect(mockAxios.get).toHaveBeenCalledWith('/v1/users')
       expect(result).toEqual(mockUsers)
     })
 
@@ -64,7 +64,7 @@ describe('UserManagementService', () => {
 
       const result = await service.createUser(mockCreateUserRequest)
 
-      expect(mockAxios.post).toHaveBeenCalledWith('/api/users', mockCreateUserRequest)
+      expect(mockAxios.post).toHaveBeenCalledWith('/v1/users', mockCreateUserRequest)
       expect(result).toEqual(mockUser)
     })
 
@@ -103,7 +103,7 @@ describe('UserManagementService', () => {
 
       const result = await service.updateUser(mockUser.uid, mockUpdateUserRequest)
 
-      expect(mockAxios.put).toHaveBeenCalledWith(`/api/users/${mockUser.uid}`, mockUpdateUserRequest)
+      expect(mockAxios.put).toHaveBeenCalledWith(`/v1/users/${mockUser.uid}`, mockUpdateUserRequest)
       expect(result).toEqual(updatedUser)
     })
 
@@ -129,7 +129,7 @@ describe('UserManagementService', () => {
 
       await service.deleteUser(mockUser.uid)
 
-      expect(mockAxios.delete).toHaveBeenCalledWith(`/api/users/${mockUser.uid}`)
+      expect(mockAxios.delete).toHaveBeenCalledWith(`/v1/users/${mockUser.uid}`)
     })
 
     it('handles delete user not found error', async () => {
@@ -154,7 +154,7 @@ describe('UserManagementService', () => {
 
       const result = await service.impersonateUser(mockUser.uid)
 
-      expect(mockAxios.post).toHaveBeenCalledWith('/api/auth/impersonate', { userId: mockUser.uid })
+      expect(mockAxios.post).toHaveBeenCalledWith('/v1/auth/impersonate', { userId: mockUser.uid })
       expect(result).toEqual(mockLoginResponse)
     })
 

@@ -112,7 +112,7 @@ const autoSaveMiddleware: Middleware = (store) => (next) => (action) => {
 
 ### Backend API Data Structure
 ```typescript
-// API Endpoint: GET/POST /api/users/{userId}/options
+// API Endpoint: GET/POST /v1/users/{userId}/options
 interface UserOptionsResponse {
   userId: string;
   options: Option[];
@@ -223,8 +223,8 @@ const mockUser = {
 ```typescript
 // API endpoints
 const API_ENDPOINTS = {
-  LOAD_OPTIONS: '/api/users/{userId}/options',
-  SAVE_OPTIONS: '/api/users/{userId}/options'
+  LOAD_OPTIONS: '/v1/users/{userId}/options',
+  SAVE_OPTIONS: '/v1/users/{userId}/options'
 } as const;
 
 // HTTP client configuration

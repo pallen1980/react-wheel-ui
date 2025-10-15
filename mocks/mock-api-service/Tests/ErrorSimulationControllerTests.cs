@@ -93,7 +93,7 @@ public class ErrorSimulationControllerTests
         // Arrange
         var request = new ConfigureErrorRequest
         {
-            Endpoint = "/api/test",
+            Endpoint = "/v1/test",
             ErrorType = "TIMEOUT",
             DelayMs = 1000
         };
@@ -106,7 +106,7 @@ public class ErrorSimulationControllerTests
         var response = okResult.Value;
         Assert.NotNull(response);
         
-        _mockErrorSimulationService.Verify(x => x.ConfigureError("/api/test", "TIMEOUT", 1000), Times.Once);
+        _mockErrorSimulationService.Verify(x => x.ConfigureError("/v1/test", "TIMEOUT", 1000), Times.Once);
     }
 
     [Fact]
@@ -115,7 +115,7 @@ public class ErrorSimulationControllerTests
         // Arrange
         var request = new ConfigureErrorRequest
         {
-            Endpoint = "/api/test",
+            Endpoint = "/v1/test",
             ErrorType = "TIMEOUT"
         };
         

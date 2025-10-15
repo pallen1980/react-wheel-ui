@@ -120,8 +120,8 @@ function Show-HealthStatus {
     Write-Host "`n🔌 API Endpoints:" -ForegroundColor Yellow
     
     $apiEndpoints = @(
-        @{ Name = "Users API"; Url = "http://localhost:3001/api/users" }
-        @{ Name = "Auth API"; Url = "http://localhost:3001/api/auth/login"; Method = "POST"; ExpectedStatus = 400 }
+        @{ Name = "Users API"; Url = "http://localhost:3001/v1/users" }
+        @{ Name = "Auth API"; Url = "http://localhost:3001/v1/auth/login"; Method = "POST"; ExpectedStatus = 400 }
     )
     
     foreach ($endpoint in $apiEndpoints) {

@@ -25,7 +25,7 @@ public class UserManagementController : ControllerBase
         try
         {
             // Check for error simulation
-            var endpoint = "/api/users";
+            var endpoint = "/v1/users";
             if (await _errorSimulationService.ShouldSimulateErrorAsync(endpoint))
             {
                 var (errorType, delayMs) = await _errorSimulationService.GetConfiguredErrorAsync(endpoint);
@@ -60,7 +60,7 @@ public class UserManagementController : ControllerBase
         try
         {
             // Check for error simulation
-            var endpoint = "/api/users/{id}";
+            var endpoint = "/v1/users/{id}";
             if (await _errorSimulationService.ShouldSimulateErrorAsync(endpoint))
             {
                 var (errorType, delayMs) = await _errorSimulationService.GetConfiguredErrorAsync(endpoint);
@@ -114,7 +114,7 @@ public class UserManagementController : ControllerBase
         try
         {
             // Check for error simulation
-            var endpoint = "/api/users";
+            var endpoint = "/v1/users";
             if (await _errorSimulationService.ShouldSimulateErrorAsync(endpoint))
             {
                 var (errorType, delayMs) = await _errorSimulationService.GetConfiguredErrorAsync(endpoint);
@@ -169,7 +169,7 @@ public class UserManagementController : ControllerBase
         try
         {
             // Check for error simulation
-            var endpoint = "/api/users/{id}";
+            var endpoint = "/v1/users/{id}";
             if (await _errorSimulationService.ShouldSimulateErrorAsync(endpoint))
             {
                 var (errorType, delayMs) = await _errorSimulationService.GetConfiguredErrorAsync(endpoint);
@@ -259,7 +259,7 @@ public class UserManagementController : ControllerBase
         try
         {
             // Check for error simulation
-            var endpoint = "/api/users/{id}";
+            var endpoint = "/v1/users/{id}";
             if (await _errorSimulationService.ShouldSimulateErrorAsync(endpoint))
             {
                 var (errorType, delayMs) = await _errorSimulationService.GetConfiguredErrorAsync(endpoint);

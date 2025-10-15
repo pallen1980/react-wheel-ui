@@ -62,7 +62,7 @@ echo.
 
 REM Test user management endpoints
 echo Testing user management endpoints...
-curl -f -s -H "Content-Type: application/json" http://localhost:3001/api/users >nul
+curl -f -s -H "Content-Type: application/json" http://localhost:3001/v1/users >nul
 if errorlevel 1 (
     echo ❌ User management API endpoint failed
     set "user_api_status=FAILED"
@@ -73,11 +73,11 @@ if errorlevel 1 (
 
 REM Test authentication endpoints
 echo Testing authentication endpoints...
-curl -f -s -H "Content-Type: application/json" http://localhost:3001/api/auth/login >nul 2>&1
+curl -f -s -H "Content-Type: application/json" http://localhost:3001/v1/auth/login >nul 2>&1
 REM Note: This will return 400 (bad request) but that means the endpoint is accessible
 if errorlevel 1 (
     REM Check if it's a 400 error (expected) vs connection error
-    curl -s -w "%%{http_code}" http://localhost:3001/api/auth/login | findstr "400" >nul
+    curl -s -w "%%{http_code}" http://localhost:3001/v1/auth/login | findstr "400" >nul
     if errorlevel 1 (
         echo ❌ Authentication API endpoint failed
         set "auth_api_status=FAILED"

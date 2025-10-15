@@ -29,7 +29,7 @@ public class AuthController : ControllerBase
         try
         {
             // Check for error simulation
-            var endpoint = "/api/auth/login";
+            var endpoint = "/v1/auth/login";
             if (await _errorSimulationService.ShouldSimulateErrorAsync(endpoint))
             {
                 var (errorType, delayMs) = await _errorSimulationService.GetConfiguredErrorAsync(endpoint);
@@ -94,7 +94,7 @@ public class AuthController : ControllerBase
         try
         {
             // Check for error simulation
-            var endpoint = "/api/auth/register";
+            var endpoint = "/v1/auth/register";
             if (await _errorSimulationService.ShouldSimulateErrorAsync(endpoint))
             {
                 var (errorType, delayMs) = await _errorSimulationService.GetConfiguredErrorAsync(endpoint);
@@ -159,7 +159,7 @@ public class AuthController : ControllerBase
         try
         {
             // Check for error simulation
-            var endpoint = "/api/auth/refresh";
+            var endpoint = "/v1/auth/refresh";
             if (await _errorSimulationService.ShouldSimulateErrorAsync(endpoint))
             {
                 var (errorType, delayMs) = await _errorSimulationService.GetConfiguredErrorAsync(endpoint);
@@ -289,7 +289,7 @@ public class AuthController : ControllerBase
         try
         {
             // Check for error simulation
-            var endpoint = "/api/auth/impersonate";
+            var endpoint = "/v1/auth/impersonate";
             if (await _errorSimulationService.ShouldSimulateErrorAsync(endpoint))
             {
                 var (errorType, delayMs) = await _errorSimulationService.GetConfiguredErrorAsync(endpoint);

@@ -96,11 +96,11 @@ The "Login as User" feature:
 
 The UI communicates with the Mock API Service endpoints:
 
-- `GET /api/users` - Retrieve all test users
-- `POST /api/users` - Create new user
-- `PUT /api/users/{id}` - Update existing user
-- `DELETE /api/users/{id}` - Delete user
-- `POST /api/auth/impersonate` - Generate auth token for user
+- `GET /v1/users` - Retrieve all test users
+- `POST /v1/users` - Create new user
+- `PUT /v1/users/{id}` - Update existing user
+- `DELETE /v1/users/{id}` - Delete user
+- `POST /v1/auth/impersonate` - Generate auth token for user
 
 ## Development
 
@@ -202,7 +202,7 @@ docker-compose logs -f mock-user-ui
 curl http://localhost:3002/health
 
 # Test API connectivity
-curl http://localhost:3001/api/users
+curl http://localhost:3001/v1/users
 
 # Check container status
 docker-compose ps

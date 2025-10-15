@@ -77,21 +77,21 @@ All errors return a consistent JSON format:
 
 ### Enable Error Simulation
 ```http
-POST /api/error-simulation/enable
+POST /v1/error-simulation/enable
 ```
 
 ### Disable Error Simulation  
 ```http
-POST /api/error-simulation/disable
+POST /v1/error-simulation/disable
 ```
 
 ### Configure Error for Endpoint
 ```http
-POST /api/error-simulation/configure
+POST /v1/error-simulation/configure
 Content-Type: application/json
 
 {
-  "endpoint": "/api/users/123/options",
+  "endpoint": "/v1/users/123/options",
   "errorType": "TIMEOUT",
   "delayMs": 5000
 }
@@ -99,12 +99,12 @@ Content-Type: application/json
 
 ### Clear All Error Configurations
 ```http
-DELETE /api/error-simulation/clear
+DELETE /v1/error-simulation/clear
 ```
 
 ### Manually Trigger Error
 ```http
-POST /api/error-simulation/trigger/{errorType}
+POST /v1/error-simulation/trigger/{errorType}
 ```
 
 **Supported Error Types**:
@@ -124,7 +124,7 @@ Controllers can use the error simulation service to test error scenarios:
 
 ```csharp
 // Check for error simulation
-var endpoint = "/api/users/{userId}/options";
+var endpoint = "/v1/users/{userId}/options";
 if (await _errorSimulationService.ShouldSimulateErrorAsync(endpoint))
 {
     var (errorType, delayMs) = await _errorSimulationService.GetConfiguredErrorAsync(endpoint);

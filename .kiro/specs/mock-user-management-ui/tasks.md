@@ -9,16 +9,16 @@
 
 - [x] 2. Enhance mock API service with user management endpoints
 - [x] 2.1 Create UserManagementController with CRUD operations
-  - Implement GET /api/users endpoint to retrieve all test users
-  - Implement GET /api/users/{id} endpoint for single user retrieval
-  - Implement POST /api/users endpoint for user creation
-  - Implement PUT /api/users/{id} endpoint for user updates
-  - Implement DELETE /api/users/{id} endpoint for user deletion
+  - Implement GET /v1/users endpoint to retrieve all test users
+  - Implement GET /v1/users/{id} endpoint for single user retrieval
+  - Implement POST /v1/users endpoint for user creation
+  - Implement PUT /v1/users/{id} endpoint for user updates
+  - Implement DELETE /v1/users/{id} endpoint for user deletion
   - Add proper validation and error handling for all endpoints
   - _Requirements: 1.1, 1.2, 5.1, 5.2, 5.3, 5.4, 5.5_
 
 - [x] 2.2 Add user impersonation functionality to AuthController
-  - Implement POST /api/auth/impersonate endpoint
+  - Implement POST /v1/auth/impersonate endpoint
   - Create authentication token generation for specified user
   - Add validation to ensure user exists before impersonation
   - _Requirements: 2.1, 2.2, 2.3, 2.4_

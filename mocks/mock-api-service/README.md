@@ -117,8 +117,8 @@ Once running, the service will be available at:
 
 - **Base URL**: `http://localhost:3001`
 - **Health Check**: `http://localhost:3001/health`
-- **Authentication**: `http://localhost:3001/api/auth/login`
-- **Options API**: `http://localhost:3001/api/users/{userId}/options`
+- **Authentication**: `http://localhost:3001/v1/auth/login`
+- **Options API**: `http://localhost:3001/v1/users/{userId}/options`
 
 ## Integration with Frontend
 

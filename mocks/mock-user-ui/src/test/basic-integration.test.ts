@@ -35,13 +35,13 @@ describe('Basic Integration Tests', () => {
       mockAxios.post.mockResolvedValueOnce({ data: mockUser })
       const createdUser = await userService.createUser(mockCreateUserRequest)
       expect(createdUser).toEqual(mockUser)
-      expect(mockAxios.post).toHaveBeenCalledWith('/api/users', mockCreateUserRequest)
+      expect(mockAxios.post).toHaveBeenCalledWith('/v1/users', mockCreateUserRequest)
 
       // Read users
       mockAxios.get.mockResolvedValueOnce({ data: [mockUser] })
       const users = await userService.getUsers()
       expect(users).toEqual([mockUser])
-      expect(mockAxios.get).toHaveBeenCalledWith('/api/users')
+      expect(mockAxios.get).toHaveBeenCalledWith('/v1/users')
 
       // Update user
       const updateData = { displayName: 'Updated Name' }
@@ -49,12 +49,12 @@ describe('Basic Integration Tests', () => {
       mockAxios.put.mockResolvedValueOnce({ data: updatedUser })
       const result = await userService.updateUser(mockUser.uid, updateData)
       expect(result).toEqual(updatedUser)
-      expect(mockAxios.put).toHaveBeenCalledWith(`/api/users/${mockUser.uid}`, updateData)
+      expect(mockAxios.put).toHaveBeenCalledWith(`/v1/users/${mockUser.uid}`, updateData)
 
       // Delete user
       mockAxios.delete.mockResolvedValueOnce({ status: 204 })
       await userService.deleteUser(mockUser.uid)
-      expect(mockAxios.delete).toHaveBeenCalledWith(`/api/users/${mockUser.uid}`)
+      expect(mockAxios.delete).toHaveBeenCalledWith(`/v1/users/${mockUser.uid}`)
     })
 
     it('should handle user impersonation', async () => {
@@ -77,7 +77,7 @@ describe('Basic Integration Tests', () => {
       await userService.loginAsUser(mockUser.uid, 'http://localhost:51235')
 
       // Verify API call
-      expect(mockAxios.post).toHaveBeenCalledWith('/api/auth/impersonate', { userId: mockUser.uid })
+      expect(mockAxios.post).toHaveBeenCalledWith('/v1/auth/impersonate', { userId: mockUser.uid })
       
       // Verify token storage and redirect
       expect(mockLocalStorage.setItem).toHaveBeenCalledWith('authToken', mockLoginResponse.token)
@@ -124,23 +124,23 @@ describe('Basic Integration Tests', () => {
       // Test GET request
       mockAxios.get.mockResolvedValueOnce({ data: mockUsers })
       await userService.getUsers()
-      expect(mockAxios.get).toHaveBeenCalledWith('/api/users')
+      expect(mockAxios.get).toHaveBeenCalledWith('/v1/users')
 
       // Test POST request
       mockAxios.post.mockResolvedValueOnce({ data: mockUser })
       await userService.createUser(mockCreateUserRequest)
-      expect(mockAxios.post).toHaveBeenCalledWith('/api/users', mockCreateUserRequest)
+      expect(mockAxios.post).toHaveBeenCalledWith('/v1/users', mockCreateUserRequest)
 
       // Test PUT request
       const updateData = { displayName: 'Updated' }
       mockAxios.put.mockResolvedValueOnce({ data: mockUser })
       await userService.updateUser(mockUser.uid, updateData)
-      expect(mockAxios.put).toHaveBeenCalledWith(`/api/users/${mockUser.uid}`, updateData)
+      expect(mockAxios.put).toHaveBeenCalledWith(`/v1/users/${mockUser.uid}`, updateData)
 
       // Test DELETE request
       mockAxios.delete.mockResolvedValueOnce({ status: 204 })
       await userService.deleteUser(mockUser.uid)
-      expect(mockAxios.delete).toHaveBeenCalledWith(`/api/users/${mockUser.uid}`)
+      expect(mockAxios.delete).toHaveBeenCalledWith(`/v1/users/${mockUser.uid}`)
     })
 
     it('should handle different response formats', async () => {

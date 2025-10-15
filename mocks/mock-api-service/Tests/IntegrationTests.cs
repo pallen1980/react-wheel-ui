@@ -106,7 +106,7 @@ public class IntegrationTests : IDisposable
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         // Act
-        var response = await _client.PostAsync("/api/auth/login", content);
+        var response = await _client.PostAsync("/v1/auth/login", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -136,7 +136,7 @@ public class IntegrationTests : IDisposable
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         // Act
-        var response = await _client.PostAsync("/api/auth/login", content);
+        var response = await _client.PostAsync("/v1/auth/login", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -163,7 +163,7 @@ public class IntegrationTests : IDisposable
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         // Act
-        var response = await _client.PostAsync("/api/auth/login", content);
+        var response = await _client.PostAsync("/v1/auth/login", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -183,7 +183,7 @@ public class IntegrationTests : IDisposable
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         // Act
-        var response = await _client.PostAsync("/api/auth/login", content);
+        var response = await _client.PostAsync("/v1/auth/login", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -204,7 +204,7 @@ public class IntegrationTests : IDisposable
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         // Act
-        var response = await _client.PostAsync("/api/auth/register", content);
+        var response = await _client.PostAsync("/v1/auth/register", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -237,7 +237,7 @@ public class IntegrationTests : IDisposable
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         // Act - Try to register with existing email
-        var response = await _client.PostAsync("/api/auth/register", content);
+        var response = await _client.PostAsync("/v1/auth/register", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.Conflict, response.StatusCode);
@@ -262,7 +262,7 @@ public class IntegrationTests : IDisposable
 
         var loginJson = JsonSerializer.Serialize(loginRequest, _jsonOptions);
         var loginContent = new StringContent(loginJson, Encoding.UTF8, "application/json");
-        var loginResponse = await _client.PostAsync("/api/auth/login", loginContent);
+        var loginResponse = await _client.PostAsync("/v1/auth/login", loginContent);
         var loginResponseContent = await loginResponse.Content.ReadAsStringAsync();
         var loginResult = JsonSerializer.Deserialize<LoginResponse>(loginResponseContent, _jsonOptions);
 
@@ -278,7 +278,7 @@ public class IntegrationTests : IDisposable
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", loginResult.IdToken);
 
         // Act
-        var response = await _client.PostAsync("/api/auth/refresh", refreshContent);
+        var response = await _client.PostAsync("/v1/auth/refresh", refreshContent);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -310,7 +310,7 @@ public class IntegrationTests : IDisposable
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         // Act
-        var response = await _client.GetAsync($"/api/users/{userId}/options");
+        var response = await _client.GetAsync($"/v1/users/{userId}/options");
 
         // Assert
         Assert.True(response.StatusCode == HttpStatusCode.OK || response.StatusCode == HttpStatusCode.NotFound);
@@ -336,7 +336,7 @@ public class IntegrationTests : IDisposable
         var userId = "test-user-id";
 
         // Act
-        var response = await _client.GetAsync($"/api/users/{userId}/options");
+        var response = await _client.GetAsync($"/v1/users/{userId}/options");
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -350,7 +350,7 @@ public class IntegrationTests : IDisposable
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "invalid-token");
 
         // Act
-        var response = await _client.GetAsync($"/api/users/{userId}/options");
+        var response = await _client.GetAsync($"/v1/users/{userId}/options");
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -375,7 +375,7 @@ public class IntegrationTests : IDisposable
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         // Act
-        var response = await _client.GetAsync($"/api/users/{differentUserId}/options");
+        var response = await _client.GetAsync($"/v1/users/{differentUserId}/options");
 
         // Assert - Should return Forbidden when trying to access another user's data
         // Note: Due to middleware architecture, this might return InternalServerError instead of Forbidden
@@ -409,7 +409,7 @@ public class IntegrationTests : IDisposable
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         // Act
-        var response = await _client.PostAsync($"/api/users/{userId}/options", content);
+        var response = await _client.PostAsync($"/v1/users/{userId}/options", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -435,7 +435,7 @@ public class IntegrationTests : IDisposable
         var content = new StringContent(json, Encoding.UTF8, "application/json");
 
         // Act
-        var response = await _client.PostAsync($"/api/users/{userId}/options", content);
+        var response = await _client.PostAsync($"/v1/users/{userId}/options", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -463,7 +463,7 @@ public class IntegrationTests : IDisposable
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         // Act
-        var response = await _client.PostAsync($"/api/users/{userId}/options", content);
+        var response = await _client.PostAsync($"/v1/users/{userId}/options", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -513,7 +513,7 @@ public class IntegrationTests : IDisposable
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         // Act
-        var response = await _client.PostAsync($"/api/users/{userId}/options", content);
+        var response = await _client.PostAsync($"/v1/users/{userId}/options", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -552,11 +552,11 @@ public class IntegrationTests : IDisposable
         _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
         // Act - Save options
-        var saveResponse = await _client.PostAsync($"/api/users/{userId}/options", content);
+        var saveResponse = await _client.PostAsync($"/v1/users/{userId}/options", content);
         Assert.Equal(HttpStatusCode.OK, saveResponse.StatusCode);
 
         // Act - Load options
-        var loadResponse = await _client.GetAsync($"/api/users/{userId}/options");
+        var loadResponse = await _client.GetAsync($"/v1/users/{userId}/options");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, loadResponse.StatusCode);
@@ -583,7 +583,7 @@ public class IntegrationTests : IDisposable
     public async Task OptionsRequest_ForCors_ReturnsCorrectHeaders()
     {
         // Arrange
-        var request = new HttpRequestMessage(HttpMethod.Options, "/api/auth/login");
+        var request = new HttpRequestMessage(HttpMethod.Options, "/v1/auth/login");
         request.Headers.Add("Origin", "http://localhost:51235");
         request.Headers.Add("Access-Control-Request-Method", "POST");
         request.Headers.Add("Access-Control-Request-Headers", "Content-Type,Authorization");
@@ -613,7 +613,7 @@ public class IntegrationTests : IDisposable
         var json = JsonSerializer.Serialize(loginRequest, _jsonOptions);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
         
-        var request = new HttpRequestMessage(HttpMethod.Post, "/api/auth/login")
+        var request = new HttpRequestMessage(HttpMethod.Post, "/v1/auth/login")
         {
             Content = content
         };
@@ -642,7 +642,7 @@ public class IntegrationTests : IDisposable
         var json = JsonSerializer.Serialize(loginRequest, _jsonOptions);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
         
-        var request = new HttpRequestMessage(HttpMethod.Post, "/api/auth/login")
+        var request = new HttpRequestMessage(HttpMethod.Post, "/v1/auth/login")
         {
             Content = content
         };
@@ -666,7 +666,7 @@ public class IntegrationTests : IDisposable
     public async Task InvalidEndpoint_ReturnsUnauthorized()
     {
         // Act - Invalid endpoint without authentication will return 401 because middleware runs first
-        var response = await _client.GetAsync("/api/nonexistent");
+        var response = await _client.GetAsync("/v1/nonexistent");
 
         // Assert
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -680,7 +680,7 @@ public class IntegrationTests : IDisposable
         var content = new StringContent(malformedJson, Encoding.UTF8, "application/json");
 
         // Act
-        var response = await _client.PostAsync("/api/auth/login", content);
+        var response = await _client.PostAsync("/v1/auth/login", content);
 
         // Assert
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -715,7 +715,7 @@ public class IntegrationTests : IDisposable
         var json = JsonSerializer.Serialize(loginRequest, _jsonOptions);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
         
-        var response = await _client.PostAsync("/api/auth/login", content);
+        var response = await _client.PostAsync("/v1/auth/login", content);
         var responseContent = await response.Content.ReadAsStringAsync();
         var loginResponse = JsonSerializer.Deserialize<LoginResponse>(responseContent, _jsonOptions);
         
@@ -735,7 +735,7 @@ public class IntegrationTests : IDisposable
         var json = JsonSerializer.Serialize(loginRequest, _jsonOptions);
         var content = new StringContent(json, Encoding.UTF8, "application/json");
         
-        var response = await _client.PostAsync("/api/auth/login", content);
+        var response = await _client.PostAsync("/v1/auth/login", content);
         var responseContent = await response.Content.ReadAsStringAsync();
         var loginResponse = JsonSerializer.Deserialize<LoginResponse>(responseContent, _jsonOptions);
         

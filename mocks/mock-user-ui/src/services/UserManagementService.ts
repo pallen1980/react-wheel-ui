@@ -13,7 +13,7 @@ export class UserManagementService {
    * @returns Promise<User[]> List of all users
    */
   async getUsers(): Promise<User[]> {
-    return this.apiClient.get<User[]>('/api/users');
+    return this.apiClient.get<User[]>('/v1/users');
   }
 
   /**
@@ -22,7 +22,7 @@ export class UserManagementService {
    * @returns Promise<User> User details
    */
   async getUserById(id: string): Promise<User> {
-    return this.apiClient.get<User>(`/api/users/${id}`);
+    return this.apiClient.get<User>(`/v1/users/${id}`);
   }
 
   /**
@@ -31,7 +31,7 @@ export class UserManagementService {
    * @returns Promise<User> Created user
    */
   async createUser(userData: CreateUserRequest): Promise<User> {
-    return this.apiClient.post<User>('/api/users', userData);
+    return this.apiClient.post<User>('/v1/users', userData);
   }
 
   /**
@@ -41,7 +41,7 @@ export class UserManagementService {
    * @returns Promise<User> Updated user
    */
   async updateUser(id: string, userData: UpdateUserRequest): Promise<User> {
-    return this.apiClient.put<User>(`/api/users/${id}`, userData);
+    return this.apiClient.put<User>(`/v1/users/${id}`, userData);
   }
 
   /**
@@ -50,7 +50,7 @@ export class UserManagementService {
    * @returns Promise<void>
    */
   async deleteUser(id: string): Promise<void> {
-    return this.apiClient.delete<void>(`/api/users/${id}`);
+    return this.apiClient.delete<void>(`/v1/users/${id}`);
   }
 
   /**
@@ -59,7 +59,7 @@ export class UserManagementService {
    * @returns Promise<LoginResponse> Authentication response with token
    */
   async impersonateUser(userId: string): Promise<LoginResponse> {
-    return this.apiClient.post<LoginResponse>('/api/auth/impersonate', { userId });
+    return this.apiClient.post<LoginResponse>('/v1/auth/impersonate', { userId });
   }
 
   /**

@@ -214,7 +214,7 @@ Write-Host ""
 # Test CORS configuration
 Write-Host "Testing CORS configuration..." -ForegroundColor Yellow
 try {
-    $corsResponse = curl -s -H "Origin: $FrontendUrl" -H "Access-Control-Request-Method: POST" -H "Access-Control-Request-Headers: Content-Type,Authorization" -X OPTIONS "$ApiBaseUrl/api/auth/login" -w "%{http_code}"
+    $corsResponse = curl -s -H "Origin: $FrontendUrl" -H "Access-Control-Request-Method: POST" -H "Access-Control-Request-Headers: Content-Type,Authorization" -X OPTIONS "$ApiBaseUrl/v1/auth/login" -w "%{http_code}"
     $corsStatus = $corsResponse[-3..-1] -join ""
     
     if ($corsStatus -eq "200") {
@@ -238,7 +238,7 @@ try {
     $tempFile = [System.IO.Path]::GetTempFileName()
     $loginBody | Out-File -FilePath $tempFile -Encoding UTF8 -NoNewline
     
-    $authResponse = curl -s -H "Origin: $FrontendUrl" -H "Content-Type: application/json" -d "@$tempFile" "$ApiBaseUrl/api/auth/login" -w "%{http_code}"
+    $authResponse = curl -s -H "Origin: $FrontendUrl" -H "Content-Type: application/json" -d "@$tempFile" "$ApiBaseUrl/v1/auth/login" -w "%{http_code}"
     $authStatus = $authResponse[-3..-1] -join ""
     
     Remove-Item $tempFile -Force
@@ -274,8 +274,8 @@ Write-Host "5. Test logout and login again" -ForegroundColor White
 Write-Host ""
 Write-Host "API Test Endpoints:" -ForegroundColor Green
 Write-Host "- Health: $ApiBaseUrl/health" -ForegroundColor White
-Write-Host "- Login: $ApiBaseUrl/api/auth/login" -ForegroundColor White
-Write-Host "- Options: $ApiBaseUrl/api/users/{userId}/options" -ForegroundColor White
+Write-Host "- Login: $ApiBaseUrl/v1/auth/login" -ForegroundColor White
+Write-Host "- Options: $ApiBaseUrl/v1/users/{userId}/options" -ForegroundColor White
 Write-Host ""
 Write-Host "Press any key to stop services and cleanup..." -ForegroundColor Yellow
 $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")

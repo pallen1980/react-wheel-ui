@@ -32,7 +32,7 @@ dotnet run
 ### 1. Login with Test User
 
 ```bash
-curl -X POST http://localhost:3001/api/auth/login \
+curl -X POST http://localhost:3001/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"password123"}'
 ```
@@ -53,7 +53,7 @@ curl -X POST http://localhost:3001/api/auth/login \
 ```bash
 TOKEN="your_token_here"
 
-curl -X POST http://localhost:3001/api/users/mock-user-1/options \
+curl -X POST http://localhost:3001/v1/users/mock-user-1/options \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -67,7 +67,7 @@ curl -X POST http://localhost:3001/api/users/mock-user-1/options \
 ### 3. Retrieve Options
 
 ```bash
-curl -X GET http://localhost:3001/api/users/mock-user-1/options \
+curl -X GET http://localhost:3001/v1/users/mock-user-1/options \
   -H "Authorization: Bearer $TOKEN"
 ```
 
@@ -89,9 +89,9 @@ VITE_API_BASE_URL=http://localhost:3001
 
 ## 🛠️ Available Endpoints
 
-- **Authentication**: `/api/auth/login`, `/api/auth/register`, `/api/auth/refresh`
-- **Options**: `/api/users/{userId}/options` (GET/POST)
-- **Error Simulation**: `/api/error-simulation/*`
+- **Authentication**: `/v1/auth/login`, `/v1/auth/register`, `/v1/auth/refresh`
+- **Options**: `/v1/users/{userId}/options` (GET/POST)
+- **Error Simulation**: `/v1/error-simulation/*`
 - **Health Check**: `/health`
 
 ## 📖 Full Documentation

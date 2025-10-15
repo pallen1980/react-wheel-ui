@@ -133,7 +133,7 @@ $loginBody = @{
     password = $TestPassword
 } | ConvertTo-Json
 
-$result = Invoke-ApiTest -TestName "Login with test user" -Method "POST" -Endpoint "/api/auth/login" -Headers @{"Content-Type" = "application/json"} -Body $loginBody
+$result = Invoke-ApiTest -TestName "Login with test user" -Method "POST" -Endpoint "/v1/auth/login" -Headers @{"Content-Type" = "application/json"} -Body $loginBody
 
 if ($result.Success) {
     try {
@@ -154,12 +154,12 @@ $registerBody = @{
     displayName = "Test User"
 } | ConvertTo-Json
 
-$result = Invoke-ApiTest -TestName "Register new user" -Method "POST" -Endpoint "/api/auth/register" -Headers @{"Content-Type" = "application/json"} -Body $registerBody
+$result = Invoke-ApiTest -TestName "Register new user" -Method "POST" -Endpoint "/v1/auth/register" -Headers @{"Content-Type" = "application/json"} -Body $registerBody
 Write-Host ""
 
 # Test 4: Get user options (should return 404 for new user)
 if ($AccessToken -and $UserId) {
-    $result = Invoke-ApiTest -TestName "Get user options (expecting 404)" -Endpoint "/api/users/$UserId/options" -Headers @{"Authorization" = "Bearer $AccessToken"} -ExpectedStatus @(404)
+    $result = Invoke-ApiTest -TestName "Get user options (expecting 404)" -Endpoint "/v1/users/$UserId/options" -Headers @{"Authorization" = "Bearer $AccessToken"} -ExpectedStatus @(404)
     Write-Host ""
     
     # Test 5: Save user options
@@ -170,11 +170,11 @@ if ($AccessToken -and $UserId) {
         )
     } | ConvertTo-Json -Depth 3
     
-    $result = Invoke-ApiTest -TestName "Save user options" -Method "POST" -Endpoint "/api/users/$UserId/options" -Headers @{"Content-Type" = "application/json"; "Authorization" = "Bearer $AccessToken"} -Body $optionsBody
+    $result = Invoke-ApiTest -TestName "Save user options" -Method "POST" -Endpoint "/v1/users/$UserId/options" -Headers @{"Content-Type" = "application/json"; "Authorization" = "Bearer $AccessToken"} -Body $optionsBody
     Write-Host ""
     
     # Test 6: Get user options (should return saved options)
-    $result = Invoke-ApiTest -TestName "Get user options (expecting saved data)" -Endpoint "/api/users/$UserId/options" -Headers @{"Authorization" = "Bearer $AccessToken"}
+    $result = Invoke-ApiTest -TestName "Get user options (expecting saved data)" -Endpoint "/v1/users/$UserId/options" -Headers @{"Authorization" = "Bearer $AccessToken"}
     Write-Host ""
 } else {
     Write-Host "[SKIP] Skipping authenticated tests - login failed" -ForegroundColor Yellow
@@ -182,7 +182,7 @@ if ($AccessToken -and $UserId) {
 }
 
 # Test 7: Unauthorized access
-$result = Invoke-ApiTest -TestName "Test unauthorized access" -Endpoint "/api/users/test-user/options" -ExpectedStatus @(401)
+$result = Invoke-ApiTest -TestName "Test unauthorized access" -Endpoint "/v1/users/test-user/options" -ExpectedStatus @(401)
 Write-Host ""
 
 # Integration tests with frontend
@@ -192,7 +192,7 @@ if ($Integration) {
     Write-Host "========================================" -ForegroundColor Cyan
     
     # Test CORS headers
-    $result = Invoke-ApiTest -TestName "CORS preflight" -Method "OPTIONS" -Endpoint "/api/auth/login" -Headers @{
+    $result = Invoke-ApiTest -TestName "CORS preflight" -Method "OPTIONS" -Endpoint "/v1/auth/login" -Headers @{
         "Origin" = "http://localhost:51235"
         "Access-Control-Request-Method" = "POST"
         "Access-Control-Request-Headers" = "Content-Type,Authorization"
@@ -200,7 +200,7 @@ if ($Integration) {
     Write-Host ""
     
     # Test with frontend origin
-    $result = Invoke-ApiTest -TestName "Frontend origin request" -Method "POST" -Endpoint "/api/auth/login" -Headers @{
+    $result = Invoke-ApiTest -TestName "Frontend origin request" -Method "POST" -Endpoint "/v1/auth/login" -Headers @{
         "Origin" = "http://localhost:51235"
         "Content-Type" = "application/json"
     } -Body $loginBody

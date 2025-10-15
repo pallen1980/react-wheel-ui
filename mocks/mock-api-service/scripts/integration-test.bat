@@ -181,7 +181,7 @@ echo.
 
 REM Test CORS configuration
 echo Testing CORS configuration...
-curl -s -H "Origin: %FRONTEND_URL%" -H "Access-Control-Request-Method: POST" -H "Access-Control-Request-Headers: Content-Type,Authorization" -X OPTIONS "%API_BASE_URL%/api/auth/login" -w "%%{http_code}" > temp_cors.txt
+curl -s -H "Origin: %FRONTEND_URL%" -H "Access-Control-Request-Method: POST" -H "Access-Control-Request-Headers: Content-Type,Authorization" -X OPTIONS "%API_BASE_URL%/v1/auth/login" -w "%%{http_code}" > temp_cors.txt
 set /p CORS_STATUS=<temp_cors.txt
 if "%CORS_STATUS%"=="200" (
     echo ✓ CORS configuration working
@@ -194,7 +194,7 @@ echo.
 REM Test authentication flow
 echo Testing authentication flow...
 echo {"email":"test@example.com","password":"password123"} > temp_login.json
-curl -s -H "Origin: %FRONTEND_URL%" -H "Content-Type: application/json" -d @temp_login.json "%API_BASE_URL%/api/auth/login" -w "%%{http_code}" > temp_auth.txt
+curl -s -H "Origin: %FRONTEND_URL%" -H "Content-Type: application/json" -d @temp_login.json "%API_BASE_URL%/v1/auth/login" -w "%%{http_code}" > temp_auth.txt
 set /p AUTH_STATUS=<temp_auth.txt
 if "%AUTH_STATUS%"=="200" (
     echo ✓ Authentication flow working
@@ -225,8 +225,8 @@ echo 5. Test logout and login again
 echo.
 echo API Test Endpoints:
 echo - Health: %API_BASE_URL%/health
-echo - Login: %API_BASE_URL%/api/auth/login
-echo - Options: %API_BASE_URL%/api/users/{userId}/options
+echo - Login: %API_BASE_URL%/v1/auth/login
+echo - Options: %API_BASE_URL%/v1/users/{userId}/options
 echo.
 echo Press any key to stop services and cleanup...
 pause >nul

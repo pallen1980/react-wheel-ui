@@ -41,12 +41,12 @@ describe('Service Integration Tests', () => {
       // 1. Get initial empty user list
       const initialUsers = await userService.getUsers()
       expect(initialUsers).toEqual([])
-      expect(mockAxios.get).toHaveBeenCalledWith('/api/users')
+      expect(mockAxios.get).toHaveBeenCalledWith('/v1/users')
 
       // 2. Create a new user
       const createdUser = await userService.createUser(mockCreateUserRequest)
       expect(createdUser).toEqual(mockUser)
-      expect(mockAxios.post).toHaveBeenCalledWith('/api/users', mockCreateUserRequest)
+      expect(mockAxios.post).toHaveBeenCalledWith('/v1/users', mockCreateUserRequest)
 
       // 3. Get updated user list
       const usersAfterCreate = await userService.getUsers()
@@ -56,11 +56,11 @@ describe('Service Integration Tests', () => {
       const updateRequest = { displayName: 'Updated' }
       const updatedUser = await userService.updateUser(mockUser.uid, updateRequest)
       expect(updatedUser.displayName).toBe('Updated')
-      expect(mockAxios.put).toHaveBeenCalledWith(`/api/users/${mockUser.uid}`, updateRequest)
+      expect(mockAxios.put).toHaveBeenCalledWith(`/v1/users/${mockUser.uid}`, updateRequest)
 
       // 5. Delete the user
       await userService.deleteUser(mockUser.uid)
-      expect(mockAxios.delete).toHaveBeenCalledWith(`/api/users/${mockUser.uid}`)
+      expect(mockAxios.delete).toHaveBeenCalledWith(`/v1/users/${mockUser.uid}`)
     })
 
     it('should handle user impersonation workflow', async () => {
@@ -86,7 +86,7 @@ describe('Service Integration Tests', () => {
       await userService.loginAsUser(mockUser.uid, 'http://localhost:51235')
 
       // Verify impersonation API call
-      expect(mockAxios.post).toHaveBeenCalledWith('/api/auth/impersonate', { userId: mockUser.uid })
+      expect(mockAxios.post).toHaveBeenCalledWith('/v1/auth/impersonate', { userId: mockUser.uid })
 
       // Verify token storage and redirect
       expect(mockLocalStorage.setItem).toHaveBeenCalledWith('authToken', mockLoginResponse.token)
@@ -145,9 +145,9 @@ describe('Service Integration Tests', () => {
       expect(results[2]).toBeUndefined() // deleteUser result
 
       // Verify all API calls were made
-      expect(mockAxios.get).toHaveBeenCalledWith('/api/users')
-      expect(mockAxios.post).toHaveBeenCalledWith('/api/users', mockCreateUserRequest)
-      expect(mockAxios.delete).toHaveBeenCalledWith('/api/users/user-to-delete')
+      expect(mockAxios.get).toHaveBeenCalledWith('/v1/users')
+      expect(mockAxios.post).toHaveBeenCalledWith('/v1/users', mockCreateUserRequest)
+      expect(mockAxios.delete).toHaveBeenCalledWith('/v1/users/user-to-delete')
     })
 
     it('should handle different response formats', async () => {
@@ -179,7 +179,7 @@ describe('Service Integration Tests', () => {
         displayName: 'Test User',
       })
 
-      expect(mockAxios.post).toHaveBeenCalledWith('/api/users', {
+      expect(mockAxios.post).toHaveBeenCalledWith('/v1/users', {
         email: 'test@example.com',
         password: 'password123',
         displayName: 'Test User',
@@ -190,13 +190,13 @@ describe('Service Integration Tests', () => {
         displayName: 'Updated Name',
       })
 
-      expect(mockAxios.put).toHaveBeenCalledWith('/api/users/user-id', {
+      expect(mockAxios.put).toHaveBeenCalledWith('/v1/users/user-id', {
         displayName: 'Updated Name',
       })
 
       // Test delete user with ID
       await userService.deleteUser('user-id')
-      expect(mockAxios.delete).toHaveBeenCalledWith('/api/users/user-id')
+      expect(mockAxios.delete).toHaveBeenCalledWith('/v1/users/user-id')
     })
   })
 
@@ -241,7 +241,7 @@ describe('Service Integration Tests', () => {
       await userService.loginAsUser(mockUser.uid)
 
       // Verify impersonation flow
-      expect(mockAxios.post).toHaveBeenCalledWith('/api/auth/impersonate', { userId: mockUser.uid })
+      expect(mockAxios.post).toHaveBeenCalledWith('/v1/auth/impersonate', { userId: mockUser.uid })
       expect(mockLocalStorage.setItem).toHaveBeenCalledWith('authToken', mockLoginResponse.token)
       expect(window.location.href).toBe('http://localhost:51235')
     })

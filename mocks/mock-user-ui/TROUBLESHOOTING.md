@@ -80,7 +80,7 @@ docker-compose exec mock-user-ui env | grep VITE_API_BASE_URL
 docker-compose exec mock-user-ui curl http://mock-api:3001/health
 
 # Test from host machine
-curl http://localhost:3001/api/users
+curl http://localhost:3001/v1/users
 ```
 
 ### 3. CORS Errors
@@ -165,7 +165,7 @@ docker-compose exec mock-user-ui env | grep VITE_MAIN_APP_URL
 docker-compose logs mock-api | grep impersonate
 
 # Verify user exists in API
-curl http://localhost:3001/api/users
+curl http://localhost:3001/v1/users
 ```
 
 ### 5. Form Validation Issues
@@ -238,7 +238,7 @@ docker-compose logs mock-user-ui
 docker-compose logs mock-api
 
 # 4. Test API endpoints directly
-curl http://localhost:3001/api/users
+curl http://localhost:3001/v1/users
 ```
 
 ### 2. Network Debugging
@@ -309,7 +309,7 @@ ping localhost
 
 ```bash
 # Check if users are persisted
-curl http://localhost:3001/api/users
+curl http://localhost:3001/v1/users
 
 # Reset user data (if needed)
 docker-compose restart mock-api

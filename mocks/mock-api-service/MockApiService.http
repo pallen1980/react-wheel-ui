@@ -7,7 +7,7 @@ Accept: application/json
 ###
 
 # Login with test user
-POST {{MockApiService_HostAddress}}/api/auth/login
+POST {{MockApiService_HostAddress}}/v1/auth/login
 Content-Type: application/json
 
 {
@@ -18,7 +18,7 @@ Content-Type: application/json
 ###
 
 # Register new user
-POST {{MockApiService_HostAddress}}/api/auth/register
+POST {{MockApiService_HostAddress}}/v1/auth/register
 Content-Type: application/json
 
 {
@@ -30,7 +30,7 @@ Content-Type: application/json
 ###
 
 # Refresh token (requires Authorization header with current access token)
-POST {{MockApiService_HostAddress}}/api/auth/refresh
+POST {{MockApiService_HostAddress}}/v1/auth/refresh
 Content-Type: application/json
 Authorization: Bearer YOUR_ACCESS_TOKEN_HERE
 

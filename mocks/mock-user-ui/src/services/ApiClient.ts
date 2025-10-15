@@ -92,7 +92,7 @@ export class ApiClient {
         password: 'password123'
       };
 
-      const response = await axios.post(`${this.client.defaults.baseURL}/api/auth/login`, loginData, {
+      const response = await axios.post(`${this.client.defaults.baseURL}/v1/auth/login`, loginData, {
         headers: { 'Content-Type': 'application/json' },
         timeout: 10000
       });

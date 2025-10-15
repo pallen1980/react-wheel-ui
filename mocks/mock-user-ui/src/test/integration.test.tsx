@@ -129,7 +129,7 @@ describe('User Management Integration Tests', () => {
       
       // Check create user call
       expect(mockFetch).toHaveBeenNthCalledWith(2, 
-        'http://localhost:3001/api/users',
+        'http://localhost:3001/v1/users',
         expect.objectContaining({
           method: 'POST',
           headers: expect.objectContaining({
@@ -141,7 +141,7 @@ describe('User Management Integration Tests', () => {
 
       // Check update user call
       expect(mockFetch).toHaveBeenNthCalledWith(4,
-        `http://localhost:3001/api/users/${mockUser.uid}`,
+        `http://localhost:3001/v1/users/${mockUser.uid}`,
         expect.objectContaining({
           method: 'PUT',
           headers: expect.objectContaining({
@@ -156,7 +156,7 @@ describe('User Management Integration Tests', () => {
 
       // Check delete user call
       expect(mockFetch).toHaveBeenNthCalledWith(5,
-        `http://localhost:3001/api/users/${mockUser.uid}`,
+        `http://localhost:3001/v1/users/${mockUser.uid}`,
         expect.objectContaining({
           method: 'DELETE',
         })
@@ -197,7 +197,7 @@ describe('User Management Integration Tests', () => {
       // Verify impersonation API call
       await waitFor(() => {
         expect(mockFetch).toHaveBeenNthCalledWith(2,
-          'http://localhost:3001/api/auth/impersonate',
+          'http://localhost:3001/v1/auth/impersonate',
           expect.objectContaining({
             method: 'POST',
             headers: expect.objectContaining({
@@ -415,7 +415,7 @@ describe('User Management Integration Tests', () => {
       // Verify API call was made with correct parameters
       await waitFor(() => {
         expect(mockFetch).toHaveBeenCalledWith(
-          'http://localhost:3001/api/users',
+          'http://localhost:3001/v1/users',
           expect.objectContaining({
             method: 'GET',
             headers: expect.objectContaining({

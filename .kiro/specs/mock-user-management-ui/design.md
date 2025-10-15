@@ -99,29 +99,29 @@ The solution will extend the existing docker-compose setup with a new service:
 // User Management API Interface
 interface UserManagementAPI {
   // Get all users
-  GET /api/users
+  GET /v1/users
   Response: MockUser[]
 
   // Get user by ID
-  GET /api/users/{id}
+  GET /v1/users/{id}
   Response: MockUser
 
   // Create new user
-  POST /api/users
+  POST /v1/users
   Body: CreateUserRequest
   Response: MockUser
 
   // Update existing user
-  PUT /api/users/{id}
+  PUT /v1/users/{id}
   Body: UpdateUserRequest
   Response: MockUser
 
   // Delete user
-  DELETE /api/users/{id}
+  DELETE /v1/users/{id}
   Response: 204 No Content
 
   // Impersonate user (generate auth token)
-  POST /api/users/{id}/impersonate
+  POST /v1/users/{id}/impersonate
   Response: LoginResponse
 }
 ```
@@ -132,12 +132,12 @@ interface UserManagementAPI {
 // Enhanced Auth API
 interface AuthAPI {
   // Existing endpoints remain unchanged
-  POST /api/auth/login
-  POST /api/auth/register
-  POST /api/auth/refresh
+  POST /v1/auth/login
+  POST /v1/auth/register
+  POST /v1/auth/refresh
 
   // New impersonation endpoint
-  POST /api/auth/impersonate
+  POST /v1/auth/impersonate
   Body: { userId: string }
   Response: LoginResponse
 }

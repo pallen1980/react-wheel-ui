@@ -33,7 +33,7 @@ describe('HttpOptionsService', () => {
   beforeEach(() => {
     mockGetAuthToken = vi.fn().mockResolvedValue(mockAuthToken);
     // Use default configuration to match test expectations
-    service = new HttpOptionsService(mockGetAuthToken, '/api');
+    service = new HttpOptionsService(mockGetAuthToken, '/v1');
     vi.clearAllMocks();
   });
 
@@ -74,7 +74,7 @@ describe('HttpOptionsService', () => {
 
       expect(result).toEqual(mockOptions);
       expect(mockFetch).toHaveBeenCalledWith(
-        '/api/users/test-user-123/options',
+        '/v1/users/test-user-123/options',
         expect.objectContaining({
           method: 'GET',
           headers: expect.objectContaining({
@@ -210,7 +210,7 @@ describe('HttpOptionsService', () => {
         .resolves.toBeUndefined();
 
       expect(mockFetch).toHaveBeenCalledWith(
-        '/api/users/test-user-123/options',
+        '/v1/users/test-user-123/options',
         expect.objectContaining({
           method: 'POST',
           headers: expect.objectContaining({
@@ -294,7 +294,7 @@ describe('HttpOptionsService', () => {
   describe('timeout handling', () => {
     it('should handle timeout during load operation', async () => {
       // Create a service with short timeout for testing
-      const shortTimeoutService = new HttpOptionsService(mockGetAuthToken, '/api', 100);
+      const shortTimeoutService = new HttpOptionsService(mockGetAuthToken, '/v1', 100);
 
       // Mock a slow response
       mockFetch.mockImplementationOnce(() =>
@@ -307,7 +307,7 @@ describe('HttpOptionsService', () => {
 
     it('should handle timeout during save operation', async () => {
       // Create a service with short timeout for testing
-      const shortTimeoutService = new HttpOptionsService(mockGetAuthToken, '/api', 100);
+      const shortTimeoutService = new HttpOptionsService(mockGetAuthToken, '/v1', 100);
 
       // Mock a slow response
       mockFetch.mockImplementationOnce(() =>

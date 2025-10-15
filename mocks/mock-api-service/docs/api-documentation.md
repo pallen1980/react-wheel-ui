@@ -37,13 +37,13 @@ The service comes with pre-configured test users for immediate testing:
 
 ### Authentication Endpoints
 
-#### POST /api/auth/login
+#### POST /v1/auth/login
 
 Authenticate a user with email and password.
 
 **Request:**
 ```http
-POST /api/auth/login
+POST /v1/auth/login
 Content-Type: application/json
 
 {
@@ -71,13 +71,13 @@ Content-Type: application/json
 }
 ```
 
-#### POST /api/auth/register
+#### POST /v1/auth/register
 
 Register a new user account.
 
 **Request:**
 ```http
-POST /api/auth/register
+POST /v1/auth/register
 Content-Type: application/json
 
 {
@@ -106,13 +106,13 @@ Content-Type: application/json
 }
 ```
 
-#### POST /api/auth/refresh
+#### POST /v1/auth/refresh
 
 Refresh an expired access token using a refresh token.
 
 **Request:**
 ```http
-POST /api/auth/refresh
+POST /v1/auth/refresh
 Content-Type: application/json
 Authorization: Bearer <current_access_token>
 
@@ -132,13 +132,13 @@ Authorization: Bearer <current_access_token>
 }
 ```
 
-#### POST /api/auth/impersonate
+#### POST /v1/auth/impersonate
 
 **⚠️ Development Only**: Impersonate any user for testing purposes. This endpoint is only available when the application is running in Development environment.
 
 **Request:**
 ```http
-POST /api/auth/impersonate
+POST /v1/auth/impersonate
 Content-Type: application/json
 
 {
@@ -175,13 +175,13 @@ Content-Type: application/json
 
 ### User Management Endpoints
 
-#### GET /api/users
+#### GET /v1/users
 
 Retrieve all test users.
 
 **Request:**
 ```http
-GET /api/users
+GET /v1/users
 ```
 
 **Success Response (200 OK):**
@@ -206,13 +206,13 @@ GET /api/users
 ]
 ```
 
-#### GET /api/users/{id}
+#### GET /v1/users/{id}
 
 Retrieve a specific user by ID.
 
 **Request:**
 ```http
-GET /api/users/mock-user-1
+GET /v1/users/mock-user-1
 ```
 
 **Success Response (200 OK):**
@@ -227,13 +227,13 @@ GET /api/users/mock-user-1
 }
 ```
 
-#### POST /api/users
+#### POST /v1/users
 
 Create a new test user.
 
 **Request:**
 ```http
-POST /api/users
+POST /v1/users
 Content-Type: application/json
 
 {
@@ -255,13 +255,13 @@ Content-Type: application/json
 }
 ```
 
-#### PUT /api/users/{id}
+#### PUT /v1/users/{id}
 
 Update an existing user.
 
 **Request:**
 ```http
-PUT /api/users/mock-user-1
+PUT /v1/users/mock-user-1
 Content-Type: application/json
 
 {
@@ -282,26 +282,26 @@ Content-Type: application/json
 }
 ```
 
-#### DELETE /api/users/{id}
+#### DELETE /v1/users/{id}
 
 Delete a user.
 
 **Request:**
 ```http
-DELETE /api/users/mock-user-1
+DELETE /v1/users/mock-user-1
 ```
 
 **Success Response (204 No Content)**
 
 ### Options Management Endpoints
 
-#### GET /api/users/{userId}/options
+#### GET /v1/users/{userId}/options
 
 Retrieve saved options for a specific user.
 
 **Request:**
 ```http
-GET /api/users/mock-user-1/options
+GET /v1/users/mock-user-1/options
 Authorization: Bearer <access_token>
 ```
 
@@ -340,13 +340,13 @@ Authorization: Bearer <access_token>
 }
 ```
 
-#### POST /api/users/{userId}/options
+#### POST /v1/users/{userId}/options
 
 Save options for a specific user.
 
 **Request:**
 ```http
-POST /api/users/mock-user-1/options
+POST /v1/users/mock-user-1/options
 Content-Type: application/json
 Authorization: Bearer <access_token>
 
@@ -388,13 +388,13 @@ HTTP/1.1 200 OK
 
 These endpoints allow testing various error scenarios.
 
-#### POST /api/error-simulation/enable
+#### POST /v1/error-simulation/enable
 
 Enable error simulation mode.
 
 **Request:**
 ```http
-POST /api/error-simulation/enable
+POST /v1/error-simulation/enable
 ```
 
 **Response (200 OK):**
@@ -404,13 +404,13 @@ POST /api/error-simulation/enable
 }
 ```
 
-#### POST /api/error-simulation/disable
+#### POST /v1/error-simulation/disable
 
 Disable error simulation mode.
 
 **Request:**
 ```http
-POST /api/error-simulation/disable
+POST /v1/error-simulation/disable
 ```
 
 **Response (200 OK):**
@@ -420,17 +420,17 @@ POST /api/error-simulation/disable
 }
 ```
 
-#### POST /api/error-simulation/configure
+#### POST /v1/error-simulation/configure
 
 Configure specific errors for endpoints.
 
 **Request:**
 ```http
-POST /api/error-simulation/configure
+POST /v1/error-simulation/configure
 Content-Type: application/json
 
 {
-  "endpoint": "/api/users/mock-user-1/options",
+  "endpoint": "/v1/users/mock-user-1/options",
   "errorType": "TIMEOUT",
   "delayMs": 5000
 }
@@ -447,22 +447,22 @@ Content-Type: application/json
 - `SERVICE_UNAVAILABLE`
 - `INTERNAL_SERVER_ERROR`
 
-#### DELETE /api/error-simulation/clear
+#### DELETE /v1/error-simulation/clear
 
 Clear all error configurations.
 
 **Request:**
 ```http
-DELETE /api/error-simulation/clear
+DELETE /v1/error-simulation/clear
 ```
 
-#### POST /api/error-simulation/trigger/{errorType}
+#### POST /v1/error-simulation/trigger/{errorType}
 
 Manually trigger a specific error type.
 
 **Request:**
 ```http
-POST /api/error-simulation/trigger/TIMEOUT
+POST /v1/error-simulation/trigger/TIMEOUT
 ```
 
 ## Data Models
@@ -573,13 +573,13 @@ Configure specific errors for endpoints:
 
 ```bash
 # Enable error simulation
-curl -X POST http://localhost:3001/api/error-simulation/enable
+curl -X POST http://localhost:3001/v1/error-simulation/enable
 
 # Configure timeout for options endpoint
-curl -X POST http://localhost:3001/api/error-simulation/configure \
+curl -X POST http://localhost:3001/v1/error-simulation/configure \
   -H "Content-Type: application/json" \
   -d '{
-    "endpoint": "/api/users/mock-user-1/options",
+    "endpoint": "/v1/users/mock-user-1/options",
     "errorType": "TIMEOUT", 
     "delayMs": 5000
   }'
@@ -589,13 +589,13 @@ curl -X POST http://localhost:3001/api/error-simulation/configure \
 
 ```bash
 # Test authentication error
-curl -X POST http://localhost:3001/api/error-simulation/trigger/AUTHENTICATION_ERROR
+curl -X POST http://localhost:3001/v1/error-simulation/trigger/AUTHENTICATION_ERROR
 
 # Test validation error  
-curl -X POST http://localhost:3001/api/error-simulation/trigger/VALIDATION_ERROR
+curl -X POST http://localhost:3001/v1/error-simulation/trigger/VALIDATION_ERROR
 
 # Test server error
-curl -X POST http://localhost:3001/api/error-simulation/trigger/INTERNAL_SERVER_ERROR
+curl -X POST http://localhost:3001/v1/error-simulation/trigger/INTERNAL_SERVER_ERROR
 ```
 
 ## Setup and Deployment
@@ -732,7 +732,7 @@ Example health check response:
 #### Authentication Flow
 ```bash
 # Login
-curl -X POST http://localhost:3001/api/auth/login \
+curl -X POST http://localhost:3001/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"password123"}'
 
@@ -740,11 +740,11 @@ curl -X POST http://localhost:3001/api/auth/login \
 TOKEN="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
 
 # Get options (should return 404 initially)
-curl -X GET http://localhost:3001/api/users/mock-user-1/options \
+curl -X GET http://localhost:3001/v1/users/mock-user-1/options \
   -H "Authorization: Bearer $TOKEN"
 
 # Save options
-curl -X POST http://localhost:3001/api/users/mock-user-1/options \
+curl -X POST http://localhost:3001/v1/users/mock-user-1/options \
   -H "Authorization: Bearer $TOKEN" \
   -H "Content-Type: application/json" \
   -d '{
@@ -755,22 +755,22 @@ curl -X POST http://localhost:3001/api/users/mock-user-1/options \
   }'
 
 # Get options again (should return saved options)
-curl -X GET http://localhost:3001/api/users/mock-user-1/options \
+curl -X GET http://localhost:3001/v1/users/mock-user-1/options \
   -H "Authorization: Bearer $TOKEN"
 ```
 
 #### Error Testing
 ```bash
 # Test invalid credentials
-curl -X POST http://localhost:3001/api/auth/login \
+curl -X POST http://localhost:3001/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"invalid@example.com","password":"wrong"}'
 
 # Test unauthorized access
-curl -X GET http://localhost:3001/api/users/mock-user-1/options
+curl -X GET http://localhost:3001/v1/users/mock-user-1/options
 
 # Test user mismatch
-curl -X GET http://localhost:3001/api/users/different-user/options \
+curl -X GET http://localhost:3001/v1/users/different-user/options \
   -H "Authorization: Bearer $TOKEN"
 ```
 
@@ -780,7 +780,7 @@ The service includes `MockApiService.http` file for testing with REST clients:
 
 ```http
 ### Login
-POST http://localhost:3001/api/auth/login
+POST http://localhost:3001/v1/auth/login
 Content-Type: application/json
 
 {
@@ -789,11 +789,11 @@ Content-Type: application/json
 }
 
 ### Get Options
-GET http://localhost:3001/api/users/mock-user-1/options
+GET http://localhost:3001/v1/users/mock-user-1/options
 Authorization: Bearer {{token}}
 
 ### Save Options
-POST http://localhost:3001/api/users/mock-user-1/options
+POST http://localhost:3001/v1/users/mock-user-1/options
 Content-Type: application/json
 Authorization: Bearer {{token}}
 

@@ -72,7 +72,7 @@ echo.
 REM Test 2: Login with test user
 echo [TEST 2] Login with test user...
 echo {"email":"%TEST_EMAIL%","password":"%TEST_PASSWORD%"} > temp_login.json
-curl -s -X POST -H "Content-Type: application/json" -d @temp_login.json -o temp_response.json -w "%%{http_code}" "%API_BASE_URL%/api/auth/login" > temp_status.txt
+curl -s -X POST -H "Content-Type: application/json" -d @temp_login.json -o temp_response.json -w "%%{http_code}" "%API_BASE_URL%/v1/auth/login" > temp_status.txt
 set /p STATUS=<temp_status.txt
 if "%STATUS%"=="200" (
     echo ✓ Login successful
@@ -96,7 +96,7 @@ echo.
 REM Test 3: Register new user
 echo [TEST 3] Register new user...
 echo {"email":"%NEW_USER_EMAIL%","password":"%TEST_PASSWORD%","displayName":"Test User"} > temp_register.json
-curl -s -X POST -H "Content-Type: application/json" -d @temp_register.json -o temp_response.json -w "%%{http_code}" "%API_BASE_URL%/api/auth/register" > temp_status.txt
+curl -s -X POST -H "Content-Type: application/json" -d @temp_register.json -o temp_response.json -w "%%{http_code}" "%API_BASE_URL%/v1/auth/register" > temp_status.txt
 set /p STATUS=<temp_status.txt
 if "%STATUS%"=="200" (
     echo ✓ Registration successful
@@ -109,7 +109,7 @@ echo.
 REM Test 4: Get user options (should return 404 for new user)
 if not "%ACCESS_TOKEN%"=="" if not "%USER_ID%"=="" (
     echo [TEST 4] Get user options (expecting 404)...
-    curl -s -H "Authorization: Bearer %ACCESS_TOKEN%" -o temp_response.json -w "%%{http_code}" "%API_BASE_URL%/api/users/%USER_ID%/options" > temp_status.txt
+    curl -s -H "Authorization: Bearer %ACCESS_TOKEN%" -o temp_response.json -w "%%{http_code}" "%API_BASE_URL%/v1/users/%USER_ID%/options" > temp_status.txt
     set /p STATUS=<temp_status.txt
     if "%STATUS%"=="404" (
         echo ✓ Get options returned 404 as expected (no saved options)
@@ -122,7 +122,7 @@ if not "%ACCESS_TOKEN%"=="" if not "%USER_ID%"=="" (
     REM Test 5: Save user options
     echo [TEST 5] Save user options...
     echo {"options":[{"key":"option1","value":"Option 1","sequence":1},{"key":"option2","value":"Option 2","sequence":2}]} > temp_options.json
-    curl -s -X POST -H "Content-Type: application/json" -H "Authorization: Bearer %ACCESS_TOKEN%" -d @temp_options.json -o temp_response.json -w "%%{http_code}" "%API_BASE_URL%/api/users/%USER_ID%/options" > temp_status.txt
+    curl -s -X POST -H "Content-Type: application/json" -H "Authorization: Bearer %ACCESS_TOKEN%" -d @temp_options.json -o temp_response.json -w "%%{http_code}" "%API_BASE_URL%/v1/users/%USER_ID%/options" > temp_status.txt
     set /p STATUS=<temp_status.txt
     if "%STATUS%"=="200" (
         echo ✓ Save options successful
@@ -134,7 +134,7 @@ if not "%ACCESS_TOKEN%"=="" if not "%USER_ID%"=="" (
     
     REM Test 6: Get user options (should return saved options)
     echo [TEST 6] Get user options (expecting saved data)...
-    curl -s -H "Authorization: Bearer %ACCESS_TOKEN%" -o temp_response.json -w "%%{http_code}" "%API_BASE_URL%/api/users/%USER_ID%/options" > temp_status.txt
+    curl -s -H "Authorization: Bearer %ACCESS_TOKEN%" -o temp_response.json -w "%%{http_code}" "%API_BASE_URL%/v1/users/%USER_ID%/options" > temp_status.txt
     set /p STATUS=<temp_status.txt
     if "%STATUS%"=="200" (
         echo ✓ Get options returned saved data
@@ -150,7 +150,7 @@ if not "%ACCESS_TOKEN%"=="" if not "%USER_ID%"=="" (
 
 REM Test 7: Unauthorized access
 echo [TEST 7] Test unauthorized access...
-curl -s -o temp_response.json -w "%%{http_code}" "%API_BASE_URL%/api/users/test-user/options" > temp_status.txt
+curl -s -o temp_response.json -w "%%{http_code}" "%API_BASE_URL%/v1/users/test-user/options" > temp_status.txt
 set /p STATUS=<temp_status.txt
 if "%STATUS%"=="401" (
     echo ✓ Unauthorized access properly rejected
@@ -179,7 +179,7 @@ exit /b 0
 
 :run_integration_tests
 echo [INTEGRATION] Testing CORS headers...
-curl -s -H "Origin: http://localhost:51235" -H "Access-Control-Request-Method: POST" -H "Access-Control-Request-Headers: Content-Type,Authorization" -X OPTIONS -o temp_response.json -w "%%{http_code}" "%API_BASE_URL%/api/auth/login" > temp_status.txt
+curl -s -H "Origin: http://localhost:51235" -H "Access-Control-Request-Method: POST" -H "Access-Control-Request-Headers: Content-Type,Authorization" -X OPTIONS -o temp_response.json -w "%%{http_code}" "%API_BASE_URL%/v1/auth/login" > temp_status.txt
 set /p STATUS=<temp_status.txt
 if "%STATUS%"=="200" (
     echo ✓ CORS preflight successful
@@ -188,7 +188,7 @@ if "%STATUS%"=="200" (
 )
 
 echo [INTEGRATION] Testing with frontend origin...
-curl -s -H "Origin: http://localhost:51235" -H "Content-Type: application/json" -d "{\"email\":\"%TEST_EMAIL%\",\"password\":\"%TEST_PASSWORD%\"}" -o temp_response.json -w "%%{http_code}" "%API_BASE_URL%/api/auth/login" > temp_status.txt
+curl -s -H "Origin: http://localhost:51235" -H "Content-Type: application/json" -d "{\"email\":\"%TEST_EMAIL%\",\"password\":\"%TEST_PASSWORD%\"}" -o temp_response.json -w "%%{http_code}" "%API_BASE_URL%/v1/auth/login" > temp_status.txt
 set /p STATUS=<temp_status.txt
 if "%STATUS%"=="200" (
     echo ✓ Frontend origin request successful

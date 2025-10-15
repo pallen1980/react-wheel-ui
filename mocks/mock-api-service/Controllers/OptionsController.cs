@@ -28,7 +28,7 @@ public class OptionsController : ControllerBase
         try
         {
             // Check for error simulation
-            var endpoint = $"/api/users/{userId}/options";
+            var endpoint = $"/v1/users/{userId}/options";
             if (await _errorSimulationService.ShouldSimulateErrorAsync(endpoint))
             {
                 var (errorType, delayMs) = await _errorSimulationService.GetConfiguredErrorAsync(endpoint);
@@ -101,7 +101,7 @@ public class OptionsController : ControllerBase
         try
         {
             // Check for error simulation
-            var endpoint = $"/api/users/{userId}/options";
+            var endpoint = $"/v1/users/{userId}/options";
             if (await _errorSimulationService.ShouldSimulateErrorAsync(endpoint))
             {
                 var (errorType, delayMs) = await _errorSimulationService.GetConfiguredErrorAsync(endpoint);

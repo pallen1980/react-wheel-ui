@@ -111,10 +111,10 @@ public class MockFirebaseAuthMiddleware
         var skipPaths = new[]
         {
             "/health",
-            "/api/auth/login",
-            "/api/auth/register",
-            "/api/auth/refresh",
-            "/api/error-simulation",
+            "/v1/auth/login",
+            "/v1/auth/register",
+            "/v1/auth/refresh",
+            "/v1/error-simulation",
             "/swagger",
             "/favicon.ico"
         };
@@ -122,7 +122,7 @@ public class MockFirebaseAuthMiddleware
         // Only skip impersonate endpoint in development
         var developmentOnlySkipPaths = new[]
         {
-            "/api/auth/impersonate"
+            "/v1/auth/impersonate"
         };
 
         // Check exact matches first
@@ -142,9 +142,9 @@ public class MockFirebaseAuthMiddleware
 
         // Special handling for user management endpoints (but not user options)
         // Skip authentication for direct user management operations like:
-        // GET /api/users, POST /api/users, GET /api/users/{id}, PUT /api/users/{id}, DELETE /api/users/{id}
-        // But NOT for /api/users/{userId}/options which requires authentication
-        if (path.StartsWithSegments("/api/users", StringComparison.OrdinalIgnoreCase))
+        // GET /v1/users, POST /v1/users, GET /v1/users/{id}, PUT /v1/users/{id}, DELETE /v1/users/{id}
+        // But NOT for /v1/users/{userId}/options which requires authentication
+        if (path.StartsWithSegments("/v1/users", StringComparison.OrdinalIgnoreCase))
         {
             var pathValue = path.Value?.ToLowerInvariant();
             if (pathValue != null)
@@ -159,12 +159,12 @@ public class MockFirebaseAuthMiddleware
                 var segments = pathValue.Split('/', StringSplitOptions.RemoveEmptyEntries);
                 if (segments.Length == 2 && segments[0] == "api" && segments[1] == "users")
                 {
-                    // GET /api/users or POST /api/users
+                    // GET /v1/users or POST /v1/users
                     return true;
                 }
                 else if (segments.Length == 3 && segments[0] == "api" && segments[1] == "users")
                 {
-                    // GET /api/users/{id}, PUT /api/users/{id}, DELETE /api/users/{id}
+                    // GET /v1/users/{id}, PUT /v1/users/{id}, DELETE /v1/users/{id}
                     return true;
                 }
             }

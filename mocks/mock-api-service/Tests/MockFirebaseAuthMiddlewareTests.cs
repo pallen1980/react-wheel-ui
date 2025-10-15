@@ -35,7 +35,7 @@ public class MockFirebaseAuthMiddlewareTests
     {
         // Arrange
         var context = new DefaultHttpContext();
-        context.Request.Path = "/api/users/test-user/options";
+        context.Request.Path = "/v1/users/test-user/options";
         context.Request.Headers.Authorization = "Bearer valid-token";
 
         var validationResult = new TokenValidationResult
@@ -64,7 +64,7 @@ public class MockFirebaseAuthMiddlewareTests
     {
         // Arrange
         var context = new DefaultHttpContext();
-        context.Request.Path = "/api/users/test-user/options";
+        context.Request.Path = "/v1/users/test-user/options";
         context.Request.Headers.Authorization = "Bearer invalid-token";
         context.Response.Body = new MemoryStream();
 
@@ -91,7 +91,7 @@ public class MockFirebaseAuthMiddlewareTests
     {
         // Arrange
         var context = new DefaultHttpContext();
-        context.Request.Path = "/api/users/test-user/options";
+        context.Request.Path = "/v1/users/test-user/options";
         context.Response.Body = new MemoryStream();
 
         // Act
@@ -120,9 +120,9 @@ public class MockFirebaseAuthMiddlewareTests
 
     [Theory]
     [InlineData("/health")]
-    [InlineData("/api/auth/login")]
-    [InlineData("/api/auth/register")]
-    [InlineData("/api/auth/refresh")]
+    [InlineData("/v1/auth/login")]
+    [InlineData("/v1/auth/register")]
+    [InlineData("/v1/auth/refresh")]
     [InlineData("/swagger")]
     [InlineData("/favicon.ico")]
     public async Task InvokeAsync_WithSkippedPaths_CallsNextWithoutAuthentication(string path)
@@ -144,7 +144,7 @@ public class MockFirebaseAuthMiddlewareTests
     {
         // Arrange
         var context = new DefaultHttpContext();
-        context.Request.Path = "/api/users/test-user/options";
+        context.Request.Path = "/v1/users/test-user/options";
         context.Request.Headers.Authorization = "Basic invalid-header";
         context.Response.Body = new MemoryStream();
 
@@ -162,7 +162,7 @@ public class MockFirebaseAuthMiddlewareTests
     {
         // Arrange
         var context = new DefaultHttpContext();
-        context.Request.Path = "/api/auth/impersonate";
+        context.Request.Path = "/v1/auth/impersonate";
         
         // Ensure we're in development mode
         _mockEnvironment.Setup(x => x.EnvironmentName).Returns("Development");
@@ -180,7 +180,7 @@ public class MockFirebaseAuthMiddlewareTests
     {
         // Arrange
         var context = new DefaultHttpContext();
-        context.Request.Path = "/api/auth/impersonate";
+        context.Request.Path = "/v1/auth/impersonate";
         context.Response.Body = new MemoryStream();
         
         // Set to production mode

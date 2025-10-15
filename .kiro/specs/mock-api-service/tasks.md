@@ -48,9 +48,9 @@
     - _Requirements: 2.3, 2.4, 2.5, 2.6_
 
   - [x] 4.2 Create AuthController for authentication endpoints
-    - Implement POST /api/auth/login endpoint
-    - Add POST /api/auth/register endpoint
-    - Create POST /api/auth/refresh endpoint for token refresh
+    - Implement POST /v1/auth/login endpoint
+    - Add POST /v1/auth/register endpoint
+    - Create POST /v1/auth/refresh endpoint for token refresh
     - Handle authentication errors and validation
     - _Requirements: 2.1, 2.2, 8.1, 8.2, 8.3, 8.4_
 
@@ -62,8 +62,8 @@
     - _Requirements: 3.1, 3.2, 3.3, 3.4_
 
   - [x] 5.2 Implement OptionsController
-    - Create GET /api/users/{userId}/options endpoint
-    - Add POST /api/users/{userId}/options endpoint
+    - Create GET /v1/users/{userId}/options endpoint
+    - Add POST /v1/users/{userId}/options endpoint
     - Validate user ID matches authenticated user
     - Handle 404 responses for users with no saved options
     - _Requirements: 1.1, 1.2, 1.3, 2.5, 2.6_

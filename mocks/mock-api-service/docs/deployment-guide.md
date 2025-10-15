@@ -484,7 +484,7 @@ check_service() {
 
 echo "$(date): Checking Mock API Service..."
 check_service "http://localhost:3001/health" 200
-check_service "http://localhost:3001/api/auth/login" 400  # Expected without body
+check_service "http://localhost:3001/v1/auth/login" 400  # Expected without body
 ```
 
 ## Troubleshooting
@@ -520,7 +520,7 @@ docker-compose up -d --build
 #### CORS Problems
 ```bash
 # Check current CORS configuration
-curl -I -X OPTIONS http://localhost:3001/api/auth/login \
+curl -I -X OPTIONS http://localhost:3001/v1/auth/login \
   -H "Origin: http://localhost:51235" \
   -H "Access-Control-Request-Method: POST"
 
@@ -532,7 +532,7 @@ curl -I -X OPTIONS http://localhost:3001/api/auth/login \
 #### Authentication Issues
 ```bash
 # Test login endpoint
-curl -X POST http://localhost:3001/api/auth/login \
+curl -X POST http://localhost:3001/v1/auth/login \
   -H "Content-Type: application/json" \
   -d '{"email":"test@example.com","password":"password123"}' \
   -v

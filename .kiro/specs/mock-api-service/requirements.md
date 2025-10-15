@@ -12,9 +12,9 @@ This document outlines the requirements for creating a mock API service that pro
 
 #### Acceptance Criteria
 
-1. WHEN a GET request is made to `/api/users/{userId}/options` with valid authentication THEN the system SHALL return a JSON response with user options in the format `{ options: Option[], lastModified: string }`
-2. WHEN a GET request is made to `/api/users/{userId}/options` for a user with no saved options THEN the system SHALL return HTTP 404 status
-3. WHEN a POST request is made to `/api/users/{userId}/options` with valid authentication and option data THEN the system SHALL save the options and return HTTP 200 status
+1. WHEN a GET request is made to `/v1/users/{userId}/options` with valid authentication THEN the system SHALL return a JSON response with user options in the format `{ options: Option[], lastModified: string }`
+2. WHEN a GET request is made to `/v1/users/{userId}/options` for a user with no saved options THEN the system SHALL return HTTP 404 status
+3. WHEN a POST request is made to `/v1/users/{userId}/options` with valid authentication and option data THEN the system SHALL save the options and return HTTP 200 status
 4. WHEN any request is made without valid Bearer token authentication THEN the system SHALL return HTTP 401 status with appropriate error message
 
 ### Requirement 2
@@ -23,8 +23,8 @@ This document outlines the requirements for creating a mock API service that pro
 
 #### Acceptance Criteria
 
-1. WHEN a POST request is made to `/api/auth/login` with valid email/password THEN the system SHALL return a Firebase-compatible JWT token
-2. WHEN a POST request is made to `/api/auth/login` with invalid credentials THEN the system SHALL return HTTP 401 status
+1. WHEN a POST request is made to `/v1/auth/login` with valid email/password THEN the system SHALL return a Firebase-compatible JWT token
+2. WHEN a POST request is made to `/v1/auth/login` with invalid credentials THEN the system SHALL return HTTP 401 status
 3. WHEN a request includes a Bearer token in the Authorization header THEN the system SHALL validate the token format and signature
 4. WHEN a request includes an invalid or expired token THEN the system SHALL return HTTP 401 status
 5. WHEN a request includes a valid token but for a different user than the URL parameter THEN the system SHALL return HTTP 403 status
@@ -91,7 +91,7 @@ This document outlines the requirements for creating a mock API service that pro
 
 #### Acceptance Criteria
 
-1. WHEN a POST request is made to `/api/auth/register` with email/password/displayName THEN the system SHALL create a new mock user account
+1. WHEN a POST request is made to `/v1/auth/register` with email/password/displayName THEN the system SHALL create a new mock user account
 2. WHEN a registration request uses an existing email THEN the system SHALL return HTTP 409 status with appropriate error message
 3. WHEN a registration request has invalid data THEN the system SHALL return HTTP 400 status with validation errors
 4. WHEN registration is successful THEN the system SHALL return a Firebase-compatible JWT token for the new user
