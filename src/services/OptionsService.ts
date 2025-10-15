@@ -72,6 +72,6 @@ export const API_CONFIG = {
  * API endpoints
  */
 export const API_ENDPOINTS = {
-  LOAD_OPTIONS: '/users/{userId}/options',
-  SAVE_OPTIONS: '/users/{userId}/options'
+  LOAD_OPTIONS: '/v1/users/{userId}/options',
+  SAVE_OPTIONS: '/v1/users/{userId}/options'
 } as const;
